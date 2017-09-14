@@ -1,0 +1,13 @@
+INTEGER: enteros para indices...
+BOOLEAN: TRUE o FALSE
+ENUMERADOS: TYPE tipo IS (enum1, enum2, enum3);
+STD_LOGIC: (estados de una señal)
+	U no inicializado, UNDEFINED
+	X desconocido fuerte (corto)
+	0
+	1
+	Z alta impedancia (desconexión eléctrica)
+	W desconocido débil
+	L 0 débil, resistencia pull-down
+	H 1 débil, resistencia pull-up
+	- comodín para síntesis

@@ -1,0 +1,80 @@
+ESTRUCTURACIÓN DEL LENGUAJE:
+
+ARCHITECUTRE:
+
+	ARCHITECTURE uam OF ejemplo IS
+		--parte declarativa
+	BEGIN
+		-- construcciones
+		-- procesos
+		-- asignaciones
+		-- se ejecuta concurrentemente, así que el orden no importa
+	END uam;
+
+PROCESOS: /*El código de los procesos se ejecuta secuencialmente, pero todos los procesos del programa se ejecutan concurrentemente*/
+	PROCESS(lista de señales)
+		...
+		parte declarativa (variables, procedimientos, tipos...)
+		...
+	BEGIN
+		...
+		instrucciones de comportamiento
+		...
+	END PROCESS;
+
+EJEMPLO DE PROCESO DE PUERTA AND
+	PROCESS(A,B)
+	BEGIN
+		if A='1' and B='1' then
+			S <= 1;
+		else
+			S <= '0';
+		end if;
+	END PROCESS;
+
+SEÑALES: (declaradas entre ARCHITECTURE y el BEGIN del comportamiento)
+
+	ARCHITECTURE uam OF prueba IS
+		SIGNAL s1 : STD_LOGIC;
+		SIGNAL s2 : INTEGER;
+	BEGIN
+
+/*Se rellenan con <=*/
+
+CONSTANTES: (entre ARCHITECTURE y BEGIN)
+	CONSTANT c1 : STD_LOGIC := '0';
+
+VARIABLE: (se pueden declarar dentro de un proceso, y solo existe dentro del proceso)
+	PROCESS
+		VARIABLE r: STD_LOGIC;
+	BEGIN
+		...
+	END PROCESS
+
+/*Se rellenan con := */
+
+ARRAYS:
+	SIGNAL a: STD_LOGIC_VECTOR(O TO 3);
+	SIGNAL b: STD_LOGIC_VECTOR(3 DOWNTO 0);
+		a <= "0101"; ----> a = '0', '1', '0', '1'
+		b <= "0101"; ----> b = '1', '0', '1', '0'
+	OTHERS:
+		a <= (0 => '0', 1 => c and d, others => 'z');
+
+
+ASIGNACION DE SEÑALES EN BUSES
+	tmp <= "10001001"; /*Asignación en strings*/
+	tmp <= x"A3"; /*Hexadecimal, múltiplos de 4*/
+	tmp(7) <= '1'; /*Bits por separado*/
+	tmp(7 downto 4) <= "1001"; /*Parte de la señal*/
+
+ASIGNACIÓN POR TIPOS
+	TYPE estados IS (inactivo, operando, finalizado);
+	SIGNAL maquina : estados; /*La señal máquina solo puede tomar los tipos de estados*/
+
+TIPO BIDIMENSIONAL
+	TYPE estados IS ARRAY (1023 downto 0) OF
+		std_logic_vector(7 downto0);
+	SIGNAL memoria : estados
+
+

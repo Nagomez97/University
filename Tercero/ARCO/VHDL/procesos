@@ -1,0 +1,8 @@
+PROCESOS:
+
+	SECUENCIAS IF, ELSIF, ELSE, THEN
+	BUCLES FOR:
+		[etiqueta] FOR identificador IN rango LOOP
+			...
+		END LOOP [etiqueta]
+	CASE - WHEN
