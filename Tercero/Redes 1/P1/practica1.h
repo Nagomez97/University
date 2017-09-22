@@ -15,6 +15,9 @@
 #define PCAP_TIMEOUT = 0
 #define PCAP_FILE_END = -2
 
+/*Tamaño del nombre del fichero pcap*/
+#define NAME_SIZE = 50
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
