@@ -1,13 +1,10 @@
-<<<<<<< HEAD
+
 /**
 * file practica1.c
 * author Jose Ignacio Gomez, Óscar Gómez
 * date 22/09/17
 */
-#include <practica1.h>
-=======
 #include "practica1.h"
->>>>>>> 1a558543f5f2c7595045a85160c5d37e42352aa9
 
 /***************************************************************
 Nombre:
@@ -32,7 +29,7 @@ int main(int argc, char** argv){
 	if(num < 1) return show_help(); /*Comprobamos que sea positivo y no 0*/
 
 	/*Un argumento*/
-	/*if(argc == 2) return live_capture(num);
+	if(argc == 2) return live_capture(num);
 
 	/*Comprobamos que el fichero sea un archivo pcap, por lo tanto tiene que acabar con ".pcap"*/
 	aux = strrchr(argv[2], '.');
