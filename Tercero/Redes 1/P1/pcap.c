@@ -153,7 +153,7 @@ int live_capture(int num){
 		}
 		else{
 			cabeceras->ts.tv_sec += 172800;
-			pcap_dump((uint8_t *)pdumper, cabeceras, data);
+			pcap_dump((uint8_t *)pdumper, cabeceras, (const u_char *)data);
 			contador = contador + 1;
 			if(print_N_bytes(num, data) == EXIT_ERROR){
 				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
