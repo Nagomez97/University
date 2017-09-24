@@ -13,7 +13,8 @@
 
 /*************************************/
 /*VARIABLES GLOBALES*/
-pcap_t *desc = NULL, *dead_desc = NULL;
+pcap_t *desc = NULL, *descr2
+ = NULL;
 pcap_dumper_t *pdumper=NULL;
 int contador = 0;
 char file_name[NAME_SIZE];
@@ -78,10 +79,8 @@ Salida:
 ************************************************************/
 void handle(int nsignal){
 	printf("Control C pulsado\n");
-	if(descr)
-		pcap_close(descr);
-	if(descr2)
-		pcap_close(descr2)
+	if(desc)
+		pcap_close(desc);
 	if(pdumper)
 		pcap_dump_close(pdumper);
 	fprintf(stdout, "Se han capturado %d paquetes en el archivo %s", contador, file_name);
@@ -116,13 +115,6 @@ int live_capture(int num){
 	if ((desc = pcap_open_live("eth0", ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
 		fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
 		return EXIT_ERROR;
-	}
-
-	descr2=pcap_open_dead(DLT_EN10MB,ETH_FRAME_MAX);
-	if (!descr2){
-		printf("Error al abrir el dump.\n");
-		pcap_close(desc);
-		exit(ERROR);
 	}
 
 	pdumper=pcap_dump_open(descr2,file_name);
