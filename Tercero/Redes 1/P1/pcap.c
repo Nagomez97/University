@@ -104,7 +104,7 @@ int live_capture(int num){
 	int pcap_err = PCAP_OK;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	struct pcap_pkthdr *cabeceras = NULL;
-	uint8_t *data = NULL;
+	char *data = NULL;
 
 	if(signal(SIGINT,handle) == SIG_ERR){
 		fprintf(stdout, "Error: Fallo al capturar la senal SIGINT.\n");
