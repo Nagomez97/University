@@ -13,7 +13,8 @@
 
 /*************************************/
 /*VARIABLES GLOBALES*/
-pcap_t *desc = NULL, *descr2 = NULL;
+pcap_t *desc = NULL, *descr2
+ = NULL;
 pcap_dumper_t *pdumper=NULL;
 int contador = 0;
 char file_name[NAME_SIZE];
