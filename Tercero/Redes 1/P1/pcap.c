@@ -56,6 +56,7 @@ int pcap_analyze(int num, const char* trace){
 		ret = pcap_next_ex(desc, &cabeceras, (const u_char **)&data);
 		print = print_N_bytes(num, data);
 		if(print != EXIT_OK) ret = PCAP_ERROR;
+		contador++;
 	}
 
 	if(ret == PCAP_ERROR){
@@ -69,6 +70,7 @@ int pcap_analyze(int num, const char* trace){
 		pcap_close(desc);
 		return EXIT_ERROR;
 	}
+
 
 	return EXIT_OK;
 
