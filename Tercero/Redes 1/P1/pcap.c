@@ -80,6 +80,8 @@ void handle(int nsignal){
 	printf("Control C pulsado\n");
 	if(descr)
 		pcap_close(descr);
+	if(descr2)
+		pcap_close(descr2)
 	if(pdumper)
 		pcap_dump_close(pdumper);
 	fprintf(stdout, "Se han capturado %d paquetes en el archivo %s", contador, file_name);
@@ -116,10 +118,18 @@ int live_capture(int num){
 		return EXIT_ERROR;
 	}
 
+	descr2=pcap_open_dead(DLT_EN10MB,ETH_FRAME_MAX);
+	if (!descr2){
+		printf("Error al abrir el dump.\n");
+		pcap_close(desc);
+		exit(ERROR);
+	}
+
 	pdumper=pcap_dump_open(descr2,file_name);
 	if(!pdumper){
 		fprintf(stdout, "Error: No se ha podido abrir el dumper.\n");
 		pcap_close(desc);
+		pcap_close(descr2)
 		return EXIT_ERROR;
 	}
 
@@ -128,6 +138,7 @@ int live_capture(int num){
 		if(pcap_err == PCAP_ERROR){
 			fprintf(stdout, "Error: PCAP_ERROR durante la lectura de paquetes.\n");
 			pcap_close(desc);
+			pcap_close(descr2)
 			pcap_dump_close(pdumper);
 			return EXIT_ERROR;
 		}
@@ -143,6 +154,7 @@ int live_capture(int num){
 			if(print_N_bytes(num, data) == EXIT_ERROR){
 				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
 				pcap_close(desc);
+				pcap_close(descr2)
 				pcap_dump_close(pdumper);
 				return EXIT_ERROR;
 			}
