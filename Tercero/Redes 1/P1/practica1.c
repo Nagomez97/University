@@ -34,7 +34,7 @@ int main(int argc, char** argv){
 	/*Comprobamos que el fichero sea un archivo pcap, por lo tanto tiene que acabar con ".pcap"*/
 	aux = strrchr(argv[2], '.');
 	if(aux == NULL) return show_help();
-	if(strcmp(".pcap", aux) != 0) show_help();
+	if(strcmp(".pcap", aux) != 0) return show_help();
 
 	/*Dos argumentos*/
 	if(argc == 3) return pcap_analyze(num, argv[2]);
