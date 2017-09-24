@@ -11,12 +11,44 @@
 #include <signal.h>
 #include <time.h>
 
-/*--------------------------------*/
+/*************************************/
 /*VARIABLES GLOBALES*/
 pcap_t *desc = NULL, *dead_desc = NULL;
 pcap_dumper_t *pdumper=NULL;
 int contador = 0;
 char file_name[NAME_SIZE];
+/**************************************/
+
+
+/*************************************/
+/*FUNCIONES INTERNAS*/
+
+/***************************************************************
+Nombre:
+    print_N_bytes
+Descripcion:
+    función para imprimir los N primeros bytes de un paquete
+Entrada:
+    int num: número de bytes a mostrar por paquete, tiene que ser positivo.
+    char* data: datos del paquete
+Salida:
+    int, EXIT_ERROR en caso de error
+************************************************************/
+int print_N_bytes(int num, char* data){
+	char print[num];
+	int i;
+
+	if(!data) return EXIT_ERROR;
+
+	for(i=0; i<num; i++){
+		print[i] = data[i];
+	}
+
+	fprintf(stdout, "Nuevo paquete: \n\t%s\n", print);
+
+	return EXIT_OK;
+
+}
 
 /***************************************************************
 Nombre:
@@ -32,6 +64,7 @@ int show_help() {
 	fprintf(stdout, "MENSAJE DE AYUDA: \n\tpractica1 [N: numero de bytes a mostrar por paquete]\n\tpractica1 [N] [Traza a analizar]\n");
 	return EXIT_OK;
 }
+
 
 /***************************************************************
 Nombre:
@@ -63,6 +96,7 @@ Entrada:
 Salida:
     int, será el código de error que devolverá el programa completo
 ************************************************************/
+
 int live_capture(int num){
 	int pcap_err = PCAP_OK;
 	char errbuf[PCAP_ERRBUF_SIZE];
@@ -132,7 +166,7 @@ Salida:
 int pcap_analyze(int num, const char* trace){
 	pcap_t *desc = NULL;
 	char* errbuf = NULL;
-	pcap_pkthdr *cabeceras = NULL;
+	struct pcap_pkthdr *cabeceras = NULL;
 	char *data = NULL;
 	int ret = PCAP_OK;
 	int print;
@@ -147,36 +181,18 @@ int pcap_analyze(int num, const char* trace){
 	}
 
 	if(ret == PCAP_ERROR){
-		fprintf(stdout, "Se ha producido un error en la lectura.\n");
+		fprintf(stdout, "Error al leer un paquete: %s, %s %d.\n",pcap_geterr(desc),__FILE__,__LINE__);
+		pcap_close(desc);
 		return EXIT_ERROR;
 	}
 
 	else if(ret == PCAP_TIMEOUT){
 		fprintf(stdout, "Timeout en la lectura.\n");
+		pcap_close(desc);
 		return EXIT_ERROR;
 	}
 
-
-
-
-}
-
-/***************************************************************
-Nombre:
-    print_N_bytes
-Descripcion:
-    función para imprimir los N primeros bytes de un paquete
-Entrada:
-    int num: número de bytes a mostrar por paquete, tiene que ser positivo.
-    char* data: datos del paquete
-Salida:
-    int, EXIT_ERROR en caso de error
-************************************************************/
-int print_N_bytes(int num, char* data){
-	char* print = NULL;
-
-	if(!data) return EXIT_ERROR;
-
-	print = strcat()
+	return EXIT_OK;
 
 }
+

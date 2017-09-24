@@ -6,17 +6,22 @@
 
 
 /*Codigos de salida del programa*/
-#define EXIT_OK = 0
-#define EXIT_ERROR = -1
+#define EXIT_OK 0
+#define EXIT_ERROR -1
 
 /*Codigos de salida de la funcion de lectura de paquetes pcap*/
-#define PCAP_OK = 1
-#define PCAP_ERROR = -1
-#define PCAP_TIMEOUT = 0
-#define PCAP_FILE_END = -2
+#define PCAP_OK 1
+#define PCAP_ERROR -1
+#define PCAP_TIMEOUT 0
+#define PCAP_FILE_END -2
 
+<<<<<<< HEAD
 /*Tamanio del nombre del fichero pcap*/
 #define NAME_SIZE = 50
+=======
+/*Tamaño del nombre del fichero pcap*/
+#define NAME_SIZE 50
+>>>>>>> 1a558543f5f2c7595045a85160c5d37e42352aa9
 
 /*Tamanio maximo trama ethernet*/
 #define ETH_FRAME_MAX 1520
@@ -70,6 +75,6 @@ Entrada:
 Salida:
     int, será el código de error que devolverá el programa completo
 ************************************************************/
-int pcap_analyze(int, char* trace);
+int pcap_analyze(int num, const char* trace);
 
 #endif
