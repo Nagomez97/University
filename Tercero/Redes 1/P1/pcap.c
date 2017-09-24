@@ -1,25 +1,120 @@
+/**
+* file pcap.c
+* author Jose Ignacio Gomez, Óscar Gómez
+* date 22/09/17
+*/
 #include <pcap.h>
 #include "practica1.h"
+#include <netinet/in.h>
+#include <linux/udp.h>
+#include <linux/tcp.h>
+#include <signal.h>
+#include <time.h>
 
 /*--------------------------------*/
 /*VARIABLES GLOBALES*/
 pcap_t *desc = NULL, *dead_desc = NULL;
 pcap_dumper_t *pdumper=NULL;
+int contador = 0;
+char file_name[NAME_SIZE];
 
+/***************************************************************
+Nombre:
+    show_help
+Descripcion:
+    Muestra la ayuda en pantalla
+Entrada:
+    none
+Salida:
+    int, será el código de error que devolverá el programa completo
+************************************************************/
 int show_help() {
 	fprintf(stdout, "MENSAJE DE AYUDA: \n\tpractica1 [N: numero de bytes a mostrar por paquete]\n\tpractica1 [N] [Traza a analizar]\n");
 	return EXIT_OK;
 }
 
+
+void handle(int nsignal){
+	printf("Control C pulsado\n");
+	if(descr)
+		pcap_close(descr);
+	if(pdumper)
+		pcap_dump_close(pdumper);
+	fprintf(stdout, "Se han capturado %d paquetes en el archivo %s", contador, file_name);
+	exit(EXIT_OK);
+ }
+
+/***************************************************************
+Nombre:
+    live_capture
+Descripcion:
+    Captura en vivo los paquetes de la interfaz eth0
+Entrada:
+    int num: número de bytes a mostrar por paquete, tiene que ser positivo.
+Salida:
+    int, será el código de error que devolverá el programa completo
+************************************************************/
 int live_capture(int num){
-	char file_name[NAME_SIZE];
+	int pcap_err = PCAP_OK;
+	char errbuf[PCAP_ERRBUF_SIZE];
+	struct pcap_pkthdr *cabeceras = NULL;
+	char *data = NULL;
+
+	if(signal(SIGINT,handle) == SIG_ERR){
+		fprintf(stdout, "Error: Fallo al capturar la senal SIGINT.\n");
+		return EXIT_ERROR;
+	}	
 
 	sprintf(file_name, "eth0.%lu.pcap", (unsigned long)time(NULL));
 
+	if ((desc = pcap_open_live("eth0", ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
+		fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
+		return EXIT_ERROR;
+	}
 
+	pdumper=pcap_dump_open(descr2,file_name);
+	if(!pdumper){
+		fprintf(stdout, "Error: No se ha podido abrir el dumper.\n");
+		pcap_close(desc);
+		return EXIT_ERROR;
+	}
 
+	while(1){
+		pcap_err = pcap_next_ex(desc, &cabeceras, (const u_char **)&data);
+		if(pcap_err == PCAP_ERROR){
+			fprintf(stdout, "Error: PCAP_ERROR durante la lectura de paquetes.\n");
+			pcap_close(desc);
+			pcap_dump_close(pdumper);
+			return EXIT_ERROR;
+		}
+
+		else if(pcap_err == PCAP_TIMEOUT){
+			fprintf(stdout, "Error: Se ha agotado el tiempo para captura, reintentando.\n");
+			continue;
+		}
+		else{
+			pcap_dump((uint8_t *)pdumper,cabecera,paquete);
+			contador = contador + 1;
+			if(print_N_bytes(num, data) == EXIT_ERROR){
+				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
+			}
+		}
+	}
+
+	return EXIT_OK;
 }
 
+/***************************************************************
+Nombre:
+    pcap_analyze
+Descripcion:
+    Analiza la traza de un archivo .pcap
+Entrada:
+    int num: número de bytes a mostrar por paquete, tiene que ser positivo.
+    char* trace: traza pcap a analizar, tiene que ser un archivo .pcap.
+Salida:
+    int, será el código de error que devolverá el programa completo
+************************************************************/
 int pcap_analyze(int num, const char* trace){
 	pcap_t *desc = NULL;
 	char* errbuf = NULL;
