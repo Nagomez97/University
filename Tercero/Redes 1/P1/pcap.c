@@ -81,6 +81,8 @@ void handle(int nsignal){
 	printf("Control C pulsado\n");
 	if(desc)
 		pcap_close(desc);
+	if(descr2)
+		pcap_close(descr2);
 	if(pdumper)
 		pcap_dump_close(pdumper);
 	fprintf(stdout, "Se han capturado %d paquetes en el archivo %s", contador, file_name);
