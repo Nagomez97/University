@@ -13,7 +13,7 @@
 
 /*************************************/
 /*VARIABLES GLOBALES*/
-pcap_t *desc = NULL, *dead_desc = NULL;
+pcap_t *desc = NULL, *descr2 = NULL;
 pcap_dumper_t *pdumper=NULL;
 int contador = 0;
 char file_name[NAME_SIZE];
@@ -78,8 +78,8 @@ Salida:
 ************************************************************/
 void handle(int nsignal){
 	printf("Control C pulsado\n");
-	if(descr)
-		pcap_close(descr);
+	if(desc)
+		pcap_close(desc);
 	if(pdumper)
 		pcap_dump_close(pdumper);
 	fprintf(stdout, "Se han capturado %d paquetes en el archivo %s", contador, file_name);
