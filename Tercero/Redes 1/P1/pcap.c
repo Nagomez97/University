@@ -129,7 +129,7 @@ int live_capture(int num){
 	if(!pdumper){
 		fprintf(stdout, "Error: No se ha podido abrir el dumper.\n");
 		pcap_close(desc);
-		pcap_close(descr2)
+		pcap_close(descr2);
 		return EXIT_ERROR;
 	}
 
@@ -138,7 +138,7 @@ int live_capture(int num){
 		if(pcap_err == PCAP_ERROR){
 			fprintf(stdout, "Error: PCAP_ERROR durante la lectura de paquetes.\n");
 			pcap_close(desc);
-			pcap_close(descr2)
+			pcap_close(descr2);
 			pcap_dump_close(pdumper);
 			return EXIT_ERROR;
 		}
@@ -154,7 +154,7 @@ int live_capture(int num){
 			if(print_N_bytes(num, data) == EXIT_ERROR){
 				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
 				pcap_close(desc);
-				pcap_close(descr2)
+				pcap_close(descr2);
 				pcap_dump_close(pdumper);
 				return EXIT_ERROR;
 			}
