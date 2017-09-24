@@ -53,3 +53,6 @@ dkms.conf
 
 # Executables
 practica1
+
+# Trazas
+*.pcap
