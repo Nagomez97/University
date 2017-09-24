@@ -8,7 +8,6 @@ int show_help() {
 
 int live_capture(int num){
 	char file_name[NAME_SIZE];
-	pcap_t;
 
 	sprintf(file_name, "eth0.%lu.pcap", (unsigned long)time(NULL));
 
