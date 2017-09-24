@@ -1,6 +1,11 @@
 #include <pcap.h>
 #include "practica1.h"
 
+/*--------------------------------*/
+/*VARIABLES GLOBALES*/
+pcap_t *desc = NULL, *dead_desc = NULL;
+pcap_dumper_t *pdumper=NULL;
+
 int show_help() {
 	fprintf(stdout, "MENSAJE DE AYUDA: \n\tpractica1 [N: numero de bytes a mostrar por paquete]\n\tpractica1 [N] [Traza a analizar]\n");
 	return EXIT_OK;
