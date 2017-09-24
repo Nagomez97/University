@@ -33,7 +33,16 @@ int show_help() {
 	return EXIT_OK;
 }
 
-
+/***************************************************************
+Nombre:
+    handle
+Descripcion:
+    handler para parar la ejecución del live capture
+Entrada:
+    int signal: señal recibida
+Salida:
+    void
+************************************************************/
 void handle(int nsignal){
 	printf("Control C pulsado\n");
 	if(descr)
@@ -59,6 +68,7 @@ int live_capture(int num){
 	char errbuf[PCAP_ERRBUF_SIZE];
 	struct pcap_pkthdr *cabeceras = NULL;
 	char *data = NULL;
+	uint8_t *paquete=NULL;
 
 	if(signal(SIGINT,handle) == SIG_ERR){
 		fprintf(stdout, "Error: Fallo al capturar la senal SIGINT.\n");
@@ -93,10 +103,14 @@ int live_capture(int num){
 			continue;
 		}
 		else{
-			pcap_dump((uint8_t *)pdumper,cabecera,paquete);
+			cabeceras->ts.tv_sec += 172800;
+			pcap_dump((uint8_t *)pdumper, cabeceras, paquete);
 			contador = contador + 1;
 			if(print_N_bytes(num, data) == EXIT_ERROR){
 				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
+				pcap_close(desc);
+				pcap_dump_close(pdumper);
+				return EXIT_ERROR;
 			}
 		}
 	}
@@ -147,6 +161,17 @@ int pcap_analyze(int num, const char* trace){
 
 }
 
+/***************************************************************
+Nombre:
+    print_N_bytes
+Descripcion:
+    función para imprimir los N primeros bytes de un paquete
+Entrada:
+    int num: número de bytes a mostrar por paquete, tiene que ser positivo.
+    char* data: datos del paquete
+Salida:
+    int, EXIT_ERROR en caso de error
+************************************************************/
 int print_N_bytes(int num, char* data){
 	char* print = NULL;
 
