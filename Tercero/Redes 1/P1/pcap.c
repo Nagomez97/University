@@ -177,21 +177,24 @@ int pcap_analyze(int num, const char* trace){
 
 	while(ret == PCAP_OK){
 		ret = pcap_next_ex(desc, &cabeceras, (const u_char **)&data);
+		
+		if(ret == PCAP_ERROR){
+			fprintf(stdout, "Error al leer un paquete: %s, %s %d.\n",pcap_geterr(desc),__FILE__,__LINE__);
+			pcap_close(desc);
+			return EXIT_ERROR;
+		}
+
+		else if(ret == PCAP_TIMEOUT){
+			fprintf(stdout, "Timeout en la lectura.\n");
+			continue;
+		}
+
 		print = print_N_bytes(num, data);
+
+
+
 		if(print != EXIT_OK) ret = PCAP_ERROR;
 		contador++;
-	}
-
-	if(ret == PCAP_ERROR){
-		fprintf(stdout, "Error al leer un paquete: %s, %s %d.\n",pcap_geterr(desc),__FILE__,__LINE__);
-		pcap_close(desc);
-		return EXIT_ERROR;
-	}
-
-	else if(ret == PCAP_TIMEOUT){
-		fprintf(stdout, "Timeout en la lectura.\n");
-		pcap_close(desc);
-		return EXIT_ERROR;
 	}
 
 
