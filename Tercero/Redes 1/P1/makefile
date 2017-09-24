@@ -27,7 +27,7 @@ DEPS = $(shell echo $(SOURCES) | sed -e 's:\.c[p]*:\.d:g')
 
 all:	practica1
 
-practica1:	practica1.o
+practica1:	practica1.o	pcap.o
 
 # receta para hacer un .d (dependencias automaticas de tipo .h para tus .o)
 %.d : %.c
