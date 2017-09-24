@@ -15,8 +15,18 @@
 #define PCAP_TIMEOUT 0
 #define PCAP_FILE_END -2
 
-/*Tamaño del nombre del fichero pcap*/
+/*Tamanio del nombre del fichero pcap*/
 #define NAME_SIZE 50
+
+/*Tamanio maximo trama ethernet*/
+#define ETH_FRAME_MAX 1520
+
+/*Promiscuidad de la itnerfaz*/
+#define PROMISCUO 1
+#define NOPROMISCUO 0
+
+/*Timeout*/
+#define TIMEOUT 5000
 
 #include <stdlib.h>
 #include <stdio.h>
