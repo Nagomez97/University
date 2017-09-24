@@ -119,6 +119,13 @@ int live_capture(int num){
 		return EXIT_ERROR;
 	}
 
+	descr2=pcap_open_dead(DLT_EN10MB,ETH_FRAME_MAX);
+	if (!descr2){
+		printf("Error al abrir el pcap dead.\n");
+		pcap_close(desc);
+		exit(ERROR);
+	}
+
 	pdumper=pcap_dump_open(descr2,file_name);
 	if(!pdumper){
 		fprintf(stdout, "Error: No se ha podido abrir el dumper.\n");
