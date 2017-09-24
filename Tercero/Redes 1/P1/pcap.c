@@ -37,9 +37,13 @@ Salida:
 ************************************************************/
 int print_N_bytes(int num, char* data){
 	char print[num];
-	int i;
+	int i, size;
 
 	if(!data) return EXIT_ERROR;
+
+	size = strlen(data);
+
+	if(num > size) num=size;
 
 	for(i=0; i<num; i++){
 		print[i] = data[i];
@@ -111,9 +115,9 @@ int live_capture(int num){
 		return EXIT_ERROR;
 	}	
 
-	sprintf(file_name, "eth0.%lu.pcap", (unsigned long)time(NULL));
+	sprintf(file_name, "wlan0.%lu.pcap", (unsigned long)time(NULL));
 
-	if ((desc = pcap_open_live("eth0", ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
+	if ((desc = pcap_open_live("wlan0", ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
 		fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
 		return EXIT_ERROR;
 	}
@@ -186,7 +190,7 @@ int pcap_analyze(int num, const char* trace){
 	desc = pcap_open_offline(trace, errbuf);
 	if(!desc) return EXIT_ERROR;
 
-	while(ret == PCAP_OK){
+	while(ret != PCAP_ERROR && ret != PCAP_FILE_END){
 		ret = pcap_next_ex(desc, &cabeceras, (const u_char **)&data);
 		
 		if(ret == PCAP_ERROR){
@@ -208,6 +212,9 @@ int pcap_analyze(int num, const char* trace){
 		contador++;
 	}
 
+	fprintf(stdout, "Fin del paquete. Se han leído %d paquetes.\n", contador);
+
+	pcap_close(desc);
 
 	return EXIT_OK;
 
