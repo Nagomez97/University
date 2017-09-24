@@ -48,11 +48,7 @@ int print_N_bytes(int num, char* data){
 
 	for(i=0; i<num; i++){
 		fprintf(stdout, "%02x", (unsigned char)data[i]);
-		printf("HOLA");
-
 	}
-
-
 
 	return EXIT_OK;
 
@@ -215,7 +211,7 @@ int pcap_analyze(int num, const char* trace){
 		contador++;
 	}
 
-	fprintf(stdout, "Fin del paquete. Se han leído %d paquetes.\n", contador);
+	fprintf(stdout, "Fin de la traza. Se han leído %d paquetes.\n", contador);
 
 	pcap_close(desc);
 
