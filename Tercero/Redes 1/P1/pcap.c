@@ -123,7 +123,7 @@ int live_capture(int num){
 	if (!descr2){
 		printf("Error al abrir el pcap dead.\n");
 		pcap_close(desc);
-		exit(ERROR);
+		return EXIT_ERROR;
 	}
 
 	pdumper=pcap_dump_open(descr2,file_name);
