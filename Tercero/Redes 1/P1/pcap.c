@@ -104,8 +104,7 @@ int live_capture(int num){
 	int pcap_err = PCAP_OK;
 	char errbuf[PCAP_ERRBUF_SIZE];
 	struct pcap_pkthdr *cabeceras = NULL;
-	char *data = NULL;
-	uint8_t *paquete=NULL;
+	uint8_t *data = NULL;
 
 	if(signal(SIGINT,handle) == SIG_ERR){
 		fprintf(stdout, "Error: Fallo al capturar la senal SIGINT.\n");
@@ -150,7 +149,7 @@ int live_capture(int num){
 		}
 		else{
 			cabeceras->ts.tv_sec += 172800;
-			pcap_dump((uint8_t *)pdumper, cabeceras, paquete);
+			pcap_dump((uint8_t *)pdumper, cabeceras, data);
 			contador = contador + 1;
 			if(print_N_bytes(num, data) == EXIT_ERROR){
 				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
