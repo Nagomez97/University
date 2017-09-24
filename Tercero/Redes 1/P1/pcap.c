@@ -85,6 +85,8 @@ void handle(int nsignal){
 	printf("Control C pulsado\n");
 	if(desc)
 		pcap_close(desc);
+	if(descr2)
+		pcap_close(descr2);
 	if(pdumper)
 		pcap_dump_close(pdumper);
 	fprintf(stdout, "Se han capturado %d paquetes en el archivo %s", contador, file_name);
@@ -107,7 +109,6 @@ int live_capture(int num){
 	char errbuf[PCAP_ERRBUF_SIZE];
 	struct pcap_pkthdr *cabeceras = NULL;
 	char *data = NULL;
-	uint8_t *paquete=NULL;
 
 	if(signal(SIGINT,handle) == SIG_ERR){
 		fprintf(stdout, "Error: Fallo al capturar la senal SIGINT.\n");
@@ -118,6 +119,13 @@ int live_capture(int num){
 
 	if ((desc = pcap_open_live("eth0", ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
 		fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
+		return EXIT_ERROR;
+	}
+
+	descr2=pcap_open_dead(DLT_EN10MB,ETH_FRAME_MAX);
+	if (!descr2){
+		printf("Error al abrir el pcap dead.\n");
+		pcap_close(desc);
 		return EXIT_ERROR;
 	}
 
@@ -145,7 +153,7 @@ int live_capture(int num){
 		}
 		else{
 			cabeceras->ts.tv_sec += 172800;
-			pcap_dump((uint8_t *)pdumper, cabeceras, paquete);
+			pcap_dump((uint8_t *)pdumper, cabeceras, data);
 			contador = contador + 1;
 			if(print_N_bytes(num, data) == EXIT_ERROR){
 				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
