@@ -37,9 +37,13 @@ Salida:
 ************************************************************/
 int print_N_bytes(int num, char* data){
 	char print[num];
-	int i;
+	int i, size;
 
 	if(!data) return EXIT_ERROR;
+
+	size = strlen(data);
+
+	if(num > size) num=size;
 
 	for(i=0; i<num; i++){
 		print[i] = data[i];
@@ -178,7 +182,7 @@ int pcap_analyze(int num, const char* trace){
 	desc = pcap_open_offline(trace, errbuf);
 	if(!desc) return EXIT_ERROR;
 
-	while(ret == PCAP_OK){
+	while(ret != PCAP_ERROR && ret != PCAP_FILE_END){
 		ret = pcap_next_ex(desc, &cabeceras, (const u_char **)&data);
 		
 		if(ret == PCAP_ERROR){
@@ -200,6 +204,9 @@ int pcap_analyze(int num, const char* trace){
 		contador++;
 	}
 
+	fprintf(stdout, "Fin del paquete. Se han leído %d paquetes.\n", contador);
+
+	pcap_close(desc);
 
 	return EXIT_OK;
 
