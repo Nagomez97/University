@@ -84,6 +84,9 @@ architecture rtl of processor is
 	signal pc_exit : std_logic_vector(31 downto 0);
 	signal pc_in	: std_logic_vector(31 downto 0);
 	signal PC4		: std_logic_vector(31 downto 0);
+	signal SL 		: std_logic_vector(31 downto 0);
+	signal PCadd 	: std_logic_vector(31 downto 0);
+	signal ANDBranch	: std_logic;
 	
 	-- Seniales de interconexion
 	-- alu
@@ -201,12 +204,61 @@ begin
 			OpB <= Rd2;
 		end if;
 	end process;
+
+	------------------------------------------------------
+   -- Shift Left para los Jumps
+   ------------------------------------------------------
+
+   SL <= SignEx (29 downto 0) & "00"; --Multiplicamos por 2
+
+   ------------------------------------------------------
+   -- Program Counter ADD
+   ------------------------------------------------------
+
+   PCadd <= PC4 + SL;
+
+	------------------------------------------------------
+   -- MUX Program Counter
+   ------------------------------------------------------
+   ANDBranch <= Branch AND ZFlag;
+   process (PC4, PCadd, ANDBranch)
+   begin
+   	if ANDBranch = 0 then
+   		pc_in <= PC4;
+   	else
+   		pc_in <= PCadd;
+   	end if;
+   end process;
+
+   ------------------------------------------------------
+   -- MUX WriteData
+   ------------------------------------------------------
 	
+   process(MemToReg, Result, DDataIn)
+   begin
+   	if MemToReg = 1 then
+   		Wd3 <= DDataIn;
+   	else
+   		Wd3 <= Result;
+   	end if;
+   end process;
+
 	------------------------------------------------------
    -- Extensor de Signo
    ------------------------------------------------------
 	
 	SignEx (31 downto 16) <= (others => IDataIn(15));	
 	SignEx (15 downto 0) <= IDataIn (15 downto 0);
+
+	------------------------------------------------------
+   -- Conexiones procesador
+   ------------------------------------------------------
+
+   IAddr <= pc_exit;
+   DAddr <= Result;
+   DRdEn <= MemRead;
+   DWrEn <= MemWrite;
+   DDataOut <= Rd2;
+
 	
 end architecture;
