@@ -108,6 +108,9 @@ architecture rtl of processor is
 	signal A3  : std_logic_vector(4 downto 0);   -- Dirección para el puerto Wd3
 	signal Wd3 : std_logic_vector(31 downto 0);  -- Dato de entrada Wd3
 	
+	-- extension de signo
+	signal SignEx : std_logic_vector (31 downto 0);
+	
 	
 begin  
 	
@@ -181,9 +184,29 @@ begin
 	begin
 		if RegDst = 1 then
 			A3 <= IDataIn(15 downto 11);
-		else if RegDst = 0 then
+		else
 			A3 <= IDataIn (20 downto 16);
 		end if;
 	end process;
+	
+	------------------------------------------------------
+   -- MUX Read Data 2
+   ------------------------------------------------------
+	
+	process (ALUSrc, Rd2, SignEx)
+	begin
+		if ALUSrc = 1 then
+			OpB <= SignEx;
+		else
+			OpB <= Rd2;
+		end if;
+	end process;
+	
+	------------------------------------------------------
+   -- Extensor de Signo
+   ------------------------------------------------------
+	
+	SignEx (31 downto 16) <= (others => IDataIn(15));	
+	SignEx (15 downto 0) <= IDataIn (15 downto 0);
 	
 end architecture;
