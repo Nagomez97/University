@@ -13,8 +13,7 @@
 
 /*************************************/
 /*VARIABLES GLOBALES*/
-pcap_t *desc = NULL, *descr2
- = NULL;
+pcap_t *desc = NULL, *descr2= NULL;
 pcap_dumper_t *pdumper=NULL;
 int contador = 0;
 char file_name[NAME_SIZE];
@@ -35,22 +34,22 @@ Entrada:
 Salida:
     int, EXIT_ERROR en caso de error
 ************************************************************/
-int print_N_bytes(int num, char* data){
-	int i, size;
+int print_N_bytes(int num, char* data, int size){
+	int i;
 
 	if(!data) return EXIT_ERROR;
-
-	size = strlen(data);
 
 	if(num > size) num=size;
 
 	fprintf(stdout, "Nuevo paquete: \n");
+
 
 	for(i=0; i<num; i++){
 		fprintf(stdout, "%02x", (unsigned char)data[i]);
 
 	}
 
+	fprintf(stdout, "\n");
 
 	return EXIT_OK;
 
@@ -156,7 +155,7 @@ int live_capture(int num){
 			cabeceras->ts.tv_sec += 172800;
 			pcap_dump((uint8_t *)pdumper, cabeceras, (const u_char *)data);
 			contador = contador + 1;
-			if(print_N_bytes(num, data) == EXIT_ERROR){
+			if(print_N_bytes(num, data, cabeceras->len) == EXIT_ERROR){
 				fprintf(stdout, "Error: No se ha podido escribir por pantalla los bytes correspondientes.\n");
 				pcap_close(desc);
 				pcap_close(descr2);
@@ -205,7 +204,7 @@ int pcap_analyze(int num, const char* trace){
 			continue;
 		}
 
-		print = print_N_bytes(num, data);
+		print = print_N_bytes(num, data, cabeceras->len);
 
 
 
@@ -213,7 +212,7 @@ int pcap_analyze(int num, const char* trace){
 		contador++;
 	}
 
-	fprintf(stdout, "Fin del paquete. Se han leído %d paquetes.\n", contador);
+	fprintf(stdout, "Fin de la traza. Se han leído %d paquetes.\n", contador);
 
 	pcap_close(desc);
 
