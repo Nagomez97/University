@@ -32,14 +32,85 @@ architecture rtl of control_unit is
 
    -- Tipo para los codigos de operacion:
    subtype t_opCode is std_logic_vector (5 downto 0);
+   subtype t_aluOp is std_logic_vector (1 downto 0);
 
    -- Codigos de operacion para las diferentes instrucciones:
    constant OP_RTYPE  : t_opCode := "000000";
+   constant OP_ADDI   : t_opCode := "001000";
    constant OP_BEQ    : t_opCode := "000100";
    constant OP_SW     : t_opCode := "101011";
    constant OP_LW     : t_opCode := "100011";
    constant OP_LUI    : t_opCode := "001111";
+   constant OP_SLTI   : t_opCode := "001010";
+   constant OP_J      : t_opCode := "000010";
+
+   -- Codigos de ALUOp
+   constant LSW   : t_aluOp := "00";
+   constant BEQ   : t_aluOp := "01";
+   constant RT    : t_aluOp := "10";
 
 begin
+
+   process (OpCode)
+   begin
+      case OpCode is 
+         when OP_RTYPE =>
+            RegDst <= 1;
+            Branch <= 0;
+            MemRead <= 0;
+            MemToReg <= 0;
+            ALUOp <= RT;
+            MemWrite <= 0;
+            ALUSrc <= 0;
+            RegWrite <= 1;
+
+         when OP_ADDI =>
+            RegDst <= 0;
+            Branch <= 0;
+            MemRead <= 0;
+            MemToReg <= 0;
+            ALUOp <= RT;
+            MemWrite <= 0;
+            ALUSrc <= 1;
+            RegWrite <= 1;
+
+         when OP_BEQ =>
+            RegDst <= 0;
+            Branch <= 1;
+            MemRead <= 0;
+            MemToReg <= 0;
+            ALUOp <= BEQ;
+            MemWrite <= 0;
+            ALUSrc <= 0;
+            RegWrite <= 0;
+
+         when OP_SW =>
+            RegDst <= 0;
+            Branch <= 0;
+            MemRead <= 0;
+            MemToReg <= 0;
+            ALUOp <= LSW;
+            MemWrite <= 1;
+            ALUSrc <= 1;
+            RegWrite <= 0;
+
+         when OP_LW =>
+            RegDst <= 0;
+            Branch <= 0;
+            MemRead <= 1;
+            MemToReg <= 1;
+            ALUOp <= LSW;
+            MemWrite <= 0;
+            ALUSrc <= 1;
+            RegWrite <= 1;
+
+         --when OP_LUI => por hacer
+
+         --when OP_SLTI =>
+            
+         --when OP_J =>
+            
+      end case;
+   end process;
 
 end architecture;
