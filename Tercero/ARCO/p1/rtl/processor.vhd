@@ -27,6 +27,20 @@ end processor;
 
 architecture rtl of processor is 
 	
+	component reg_bank
+		port(
+			Clk   : in std_logic; -- Reloj activo en flanco de subida
+			Reset : in std_logic; -- Reset asíncrono a nivel alto
+			A1    : in std_logic_vector(4 downto 0);   -- Dirección para el puerto Rd1
+			Rd1   : out std_logic_vector(31 downto 0); -- Dato del puerto Rd1
+			A2    : in std_logic_vector(4 downto 0);   -- Dirección para el puerto Rd2
+			Rd2   : out std_logic_vector(31 downto 0); -- Dato del puerto Rd2
+			A3    : in std_logic_vector(4 downto 0);   -- Dirección para el puerto Wd3
+			Wd3   : in std_logic_vector(31 downto 0);  -- Dato de entrada Wd3
+			We3   : in std_logic -- Habilitación de la escritura de Wd3
+		);
+	end component;
+	
 	component alu
 		port(
 			OpA     : in  std_logic_vector (31 downto 0); -- Operando A
@@ -80,7 +94,6 @@ architecture rtl of processor is
 	signal ZFlag   : std_logic;
 	
 	-- control_unit
-	signal OpCode	: std_logic_vector (5 downto 0);
 	signal Branch	: std_logic;
 	signal MemToReg: std_logic;
 	signal MemWrite: std_logic;
@@ -90,10 +103,11 @@ architecture rtl of processor is
 	signal RegWrite: std_logic;
 	signal RegDst  : std_logic;
 	
-	-- alu_control
-	signal Funct  : std_logic_vector (5 downto 0); -- Campo "funct" de la instruccion
-	-- Salida de control para la ALU:
-	signal ALUControl : std_logic_vector (3 downto 0); -- Define operacion a ejecutar por ALU
+	-- registros
+	signal Rd2 : std_logic_vector(31 downto 0);
+	signal A3  : std_logic_vector(4 downto 0);   -- Dirección para el puerto Wd3
+	signal Wd3 : std_logic_vector(31 downto 0);  -- Dato de entrada Wd3
+	
 	
 begin  
 	
@@ -112,15 +126,15 @@ begin
 	i_alu_control: alu_control
 		port map(
 			ALUOp => ALUOp,
-			Funct => Funct,
-			ALUControl => AluControl
+			Funct => IDataIn (5 downto 0),
+			ALUControl => Control
 		);
 		
 	-- instanciacion de control_unit
 	
 	i_control_unit : control_unit
 		port map (
-			OpCode => OpCode,
+			OpCode => IDataIn(31 downto 26),
 			Branch => Branch,
 			MemToReg => MemToReg,
 			MemWrite => MemWrite,
@@ -129,6 +143,21 @@ begin
 			ALUOp => ALUOp,
 			RegWrite => RegWrite,
 			RegDst => RegDst
+		);
+		
+	-- instanciacion de reg_bank
+		
+	i_reg_bank : reg_bank
+		port map (
+			Clk => Clk,
+			Reset => Reset,
+			A1 => IDataIn(25 downto 21),
+			Rd1 => OpA,
+			A2 => IDataIn (20 downto 16),
+			Rd2 => Rd2,
+			A3 => A3,
+			Wd3 => Wd3,
+			We3 => RegWrite
 		);
 
 	------------------------------------------------------
@@ -144,6 +173,17 @@ begin
 		end if;
 	end process;
 	
+	------------------------------------------------------
+   -- MUX Write Register
+   ------------------------------------------------------
 	
+	process(IDataIn, RegDst)
+	begin
+		if RegDst = 1 then
+			A3 <= IDataIn(15 downto 11);
+		else if RegDst = 0 then
+			A3 <= IDataIn (20 downto 16);
+		end if;
+	end process;
 	
 end architecture;
