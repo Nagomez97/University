@@ -13,8 +13,7 @@
 
 /*************************************/
 /*VARIABLES GLOBALES*/
-pcap_t *desc = NULL, *descr2
- = NULL;
+pcap_t *desc = NULL, *descr2= NULL;
 pcap_dumper_t *pdumper=NULL;
 int contador = 0;
 char file_name[NAME_SIZE];
@@ -47,7 +46,9 @@ int print_N_bytes(int num, char* data, int size){
 
 	for(i=0; i<num; i++){
 		fprintf(stdout, "%02x", (unsigned char)data[i]);
+
 	}
+
 	fprintf(stdout, "\n");
 
 	return EXIT_OK;
