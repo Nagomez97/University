@@ -45,7 +45,7 @@ int print_N_bytes(int num, char* data, int size){
 
 
 	for(i=0; i<num; i++){
-		fprintf(stdout, "%02x", (unsigned char)data[i]);
+		fprintf(stdout, "%02x ", (unsigned char)data[i]);
 
 	}
 
