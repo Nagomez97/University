@@ -185,7 +185,7 @@ begin
 	
 	process(IDataIn, RegDst)
 	begin
-		if RegDst = 1 then
+		if RegDst = '1' then
 			A3 <= IDataIn(15 downto 11);
 		else
 			A3 <= IDataIn (20 downto 16);
@@ -198,7 +198,7 @@ begin
 	
 	process (ALUSrc, Rd2, SignEx)
 	begin
-		if ALUSrc = 1 then
+		if ALUSrc = '1' then
 			OpB <= SignEx;
 		else
 			OpB <= Rd2;
@@ -223,7 +223,7 @@ begin
    ANDBranch <= Branch AND ZFlag;
    process (PC4, PCadd, ANDBranch)
    begin
-   	if ANDBranch = 0 then
+   	if ANDBranch = '0' then
    		pc_in <= PC4;
    	else
    		pc_in <= PCadd;
@@ -236,7 +236,7 @@ begin
 	
    process(MemToReg, Result, DDataIn)
    begin
-   	if MemToReg = 1 then
+   	if MemToReg = '1' then
    		Wd3 <= DDataIn;
    	else
    		Wd3 <= Result;

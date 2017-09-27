@@ -55,60 +55,70 @@ begin
    begin
       case OpCode is 
          when OP_RTYPE =>
-            RegDst <= 1;
-            Branch <= 0;
-            MemRead <= 0;
-            MemToReg <= 0;
+            RegDst <= '1';
+            Branch <= '0';
+            MemRead <= '0';
+            MemToReg <= '0';
             ALUOp <= RT;
-            MemWrite <= 0;
-            ALUSrc <= 0;
-            RegWrite <= 1;
+            MemWrite <= '0';
+            ALUSrc <= '0';
+            RegWrite <= '1';
 
          when OP_ADDI =>
-            RegDst <= 0;
-            Branch <= 0;
-            MemRead <= 0;
-            MemToReg <= 0;
+            RegDst <= '0';
+            Branch <= '0';
+            MemRead <= '0';
+            MemToReg <= '0';
             ALUOp <= RT;
-            MemWrite <= 0;
-            ALUSrc <= 1;
-            RegWrite <= 1;
+            MemWrite <= '0';
+            ALUSrc <= '1';
+            RegWrite <= '1';
 
          when OP_BEQ =>
-            RegDst <= 0;
-            Branch <= 1;
-            MemRead <= 0;
-            MemToReg <= 0;
+            RegDst <= '0';
+            Branch <= '1';
+            MemRead <= '0';
+            MemToReg <= '0';
             ALUOp <= BEQ;
-            MemWrite <= 0;
-            ALUSrc <= 0;
-            RegWrite <= 0;
+            MemWrite <= '0';
+            ALUSrc <= '0';
+            RegWrite <= '0';
 
          when OP_SW =>
-            RegDst <= 0;
-            Branch <= 0;
-            MemRead <= 0;
-            MemToReg <= 0;
+            RegDst <= '0';
+            Branch <= '0';
+            MemRead <= '0';
+            MemToReg <= '0';
             ALUOp <= LSW;
-            MemWrite <= 1;
-            ALUSrc <= 1;
-            RegWrite <= 0;
+            MemWrite <= '1';
+            ALUSrc <= '1';
+            RegWrite <= '0';
 
          when OP_LW =>
-            RegDst <= 0;
-            Branch <= 0;
-            MemRead <= 1;
-            MemToReg <= 1;
+            RegDst <= '0';
+            Branch <= '0';
+            MemRead <= '1';
+            MemToReg <= '1';
             ALUOp <= LSW;
-            MemWrite <= 0;
-            ALUSrc <= 1;
-            RegWrite <= 1;
+            MemWrite <= '0';
+            ALUSrc <= '1';
+            RegWrite <= '1';
 
          --when OP_LUI => por hacer
 
          --when OP_SLTI =>
             
          --when OP_J =>
+			
+			when others =>
+				RegDst <= '0';
+            Branch <= '0';
+            MemRead <= '0';
+            MemToReg <= '0';
+            ALUOp <= LSW;
+            MemWrite <= '0';
+            ALUSrc <= '0';
+            RegWrite <= '0';
             
       end case;
    end process;

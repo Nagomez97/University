@@ -64,7 +64,9 @@ begin
 					when F_OR => sigResult <= ALU_OR;
 					when F_SUB => sigResult <= ALU_SUB;
 					when F_XOR => sigResult <= ALU_XOR;
+					when others => sigResult <= "0000";
 				end case;
+			when others => sigResult <= "0000";
 			end case;
 	end process;
 		
