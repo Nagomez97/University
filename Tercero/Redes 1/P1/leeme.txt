@@ -1,0 +1,11 @@
+Autores:
+Óscar Gómez Borzdynski
+José Ignacio Gómez García
+Grupo 1301, pareja 01
+
+Archivos creados:
+practica.h : cabeceras para las funciones de todos los ficheros .c
+practica.c : fichero fuente con la función main.
+pcap.c : implementación personalizada de las funciones usadas en la practica usando la libreria pcap.h y practica.h
+
+Hemos decidido dividir el ejercicio en dos ficheros ".c" para permitir la modularidad para futuras prácticas o para poder ser utilizados en otro momento.
