@@ -45,7 +45,7 @@ int print_N_bytes(int num, char* data, int size){
 
 
 	for(i=0; i<num; i++){
-		fprintf(stdout, "%02x", (unsigned char)data[i]);
+		fprintf(stdout, "%02x ", (unsigned char)data[i]);
 
 	}
 
@@ -117,7 +117,7 @@ int live_capture(int num){
 
 	sprintf(file_name, "eth0.%lu.pcap", (unsigned long)time(NULL));
 
-	if ((desc = pcap_open_live("wlan0", ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
+	if ((desc = pcap_open_live("eth0", ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
 		fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
 		return EXIT_ERROR;
 	}

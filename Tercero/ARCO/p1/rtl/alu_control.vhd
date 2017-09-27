@@ -69,5 +69,7 @@ begin
 			when others => sigResult <= "0000";
 			end case;
 	end process;
+	
+	ALUControl <= sigResult;
 		
 end architecture;

@@ -1,7 +1,9 @@
 # Reading C:/Modeltech_pe_edu_10.4a/tcl/vsim/pref.tcl
 # do {processor_tb.fdo}
+# ** Warning: (vlib-34) Library already exists at "work".
+# 
 # Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
-# Start time: 13:01:22 on Sep 26,2017
+# Start time: 18:44:24 on Sep 27,2017
 # vcom -reportprogress 300 -explicit -93 rtl/reg_bank.vhd 
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
@@ -10,10 +12,10 @@
 # -- Loading package STD_LOGIC_UNSIGNED
 # -- Compiling entity reg_bank
 # -- Compiling architecture rtl of reg_bank
-# End time: 13:01:23 on Sep 26,2017, Elapsed time: 0:00:01
+# End time: 18:44:26 on Sep 27,2017, Elapsed time: 0:00:02
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
-# Start time: 13:01:23 on Sep 26,2017
+# Start time: 18:44:26 on Sep 27,2017
 # vcom -reportprogress 300 -explicit -93 rtl/control_unit.vhd 
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
@@ -22,10 +24,10 @@
 # -- Loading package STD_LOGIC_UNSIGNED
 # -- Compiling entity control_unit
 # -- Compiling architecture rtl of control_unit
-# End time: 13:01:23 on Sep 26,2017, Elapsed time: 0:00:00
+# End time: 18:44:27 on Sep 27,2017, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
-# Start time: 13:01:23 on Sep 26,2017
+# Start time: 18:44:27 on Sep 27,2017
 # vcom -reportprogress 300 -explicit -93 rtl/alu_control.vhd 
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
@@ -34,10 +36,10 @@
 # -- Loading package STD_LOGIC_UNSIGNED
 # -- Compiling entity alu_control
 # -- Compiling architecture rtl of alu_control
-# End time: 13:01:23 on Sep 26,2017, Elapsed time: 0:00:00
+# End time: 18:44:27 on Sep 27,2017, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
-# Start time: 13:01:23 on Sep 26,2017
+# Start time: 18:44:27 on Sep 27,2017
 # vcom -reportprogress 300 -explicit -93 rtl/alu.vhd 
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
@@ -46,10 +48,10 @@
 # -- Loading package STD_LOGIC_UNSIGNED
 # -- Compiling entity alu
 # -- Compiling architecture rtl of alu
-# End time: 13:01:24 on Sep 26,2017, Elapsed time: 0:00:01
+# End time: 18:44:28 on Sep 27,2017, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
-# Start time: 13:01:24 on Sep 26,2017
+# Start time: 18:44:28 on Sep 27,2017
 # vcom -reportprogress 300 -explicit -93 sim/memory.vhd 
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
@@ -59,10 +61,10 @@
 # -- Loading package std_logic_textio
 # -- Compiling entity memory
 # -- Compiling architecture Behavioral of memory
-# End time: 13:01:24 on Sep 26,2017, Elapsed time: 0:00:00
+# End time: 18:44:30 on Sep 27,2017, Elapsed time: 0:00:02
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
-# Start time: 13:01:24 on Sep 26,2017
+# Start time: 18:44:30 on Sep 27,2017
 # vcom -reportprogress 300 -explicit -93 rtl/processor.vhd 
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
@@ -71,10 +73,10 @@
 # -- Loading package STD_LOGIC_UNSIGNED
 # -- Compiling entity processor
 # -- Compiling architecture rtl of processor
-# End time: 13:01:25 on Sep 26,2017, Elapsed time: 0:00:01
+# End time: 18:44:30 on Sep 27,2017, Elapsed time: 0:00:00
 # Errors: 0, Warnings: 0
 # Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
-# Start time: 13:01:25 on Sep 26,2017
+# Start time: 18:44:30 on Sep 27,2017
 # vcom -reportprogress 300 -explicit -93 sim/processor_tb.vhd 
 # -- Loading package STANDARD
 # -- Loading package TEXTIO
@@ -83,7 +85,7 @@
 # -- Loading package STD_LOGIC_UNSIGNED
 # -- Compiling entity processor_tb
 # -- Compiling architecture tb of processor_tb
-# End time: 13:01:25 on Sep 26,2017, Elapsed time: 0:00:00
+# End time: 18:44:31 on Sep 27,2017, Elapsed time: 0:00:01
 # Errors: 0, Warnings: 0
 # //  ModelSim PE Student Edition 10.4a Apr  7 2015 
 # //
@@ -104,7 +106,7 @@
 # // FOR HIGHER EDUCATION PURPOSES ONLY
 # //
 # vsim -gui -do "do {processor_tb.fdo}" 
-# Start time: 13:01:25 on Sep 26,2017
+# Start time: 18:44:32 on Sep 27,2017
 # Loading std.standard
 # Loading std.textio(body)
 # Loading ieee.std_logic_1164(body)
@@ -118,17 +120,6 @@
 # Loading work.reg_bank(rtl)
 # Loading ieee.std_logic_textio(body)
 # Loading work.memory(behavioral)
-# ** Warning: (vsim-7) Failed to open VHDL file "instrucciones" in rb mode.
-# 
-# No such file or directory. (errno = ENOENT)
-#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_inst_mem
-# ** Warning: (vsim-7) Failed to open VHDL file "datos" in rb mode.
-# 
-# No such file or directory. (errno = ENOENT)
-#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_data_mem
-# ** Warning: (vsim-8683) Uninitialized out port /processor_tb/i_processor/i_alu_control/ALUControl(3 downto 0) has no driver.
-# 
-# This port will contribute value (4'hX) to the signal network.
 # .main_pane.wave.interior.cs.body.pw.wf
 # .main_pane.structure.interior.cs.body.struct
 # .main_pane.objects.interior.cs.body.tree
@@ -142,14 +133,92 @@
 #    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_data_mem
 # ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
 #    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_data_mem
-# ** Fatal: (vsim-7) Failed to open VHDL file "datos" in rb mode.
-# 
-# No such file or directory. (errno = ENOENT)
-#    Time: 0 ps  Iteration: 0  Process: /processor_tb/i_data_mem/line__42 File: sim/memory.vhd
-# Fatal error in Process line__42 at sim/memory.vhd line 57
-# 
-# HDL call sequence:
-# Stopped at sim/memory.vhd 57 Process line__42
-# 
-# End time: 13:02:19 on Sep 26,2017, Elapsed time: 0:00:54
-# Errors: 2, Warnings: 7
+# ** Note: Se ha cargado la memoria 'datos'
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_inst_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_inst_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_inst_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_inst_mem
+# ** Note: Se ha cargado la memoria 'instrucciones'
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_inst_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor/i_reg_bank
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor/i_reg_bank
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor/i_reg_bank
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor/i_reg_bank
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 0  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_inst_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_inst_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_inst_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_inst_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 1  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 2  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 2  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 3  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 3  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 3  Instance: /processor_tb/i_processor/i_alu
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 4  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 6  Instance: /processor_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 6  Instance: /processor_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 0 ps  Iteration: 6  Instance: /processor_tb/i_data_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 0 ps  Iteration: 6  Instance: /processor_tb/i_data_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 5 ns  Iteration: 2  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 5 ns  Iteration: 2  Instance: /processor_tb/i_processor
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 5 ns  Iteration: 4  Instance: /processor_tb/i_inst_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 5 ns  Iteration: 4  Instance: /processor_tb/i_inst_mem
+# ** Warning: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, the result will be 'X'(es).
+#    Time: 5 ns  Iteration: 4  Instance: /processor_tb/i_inst_mem
+# ** Warning: CONV_INTEGER: There is an 'U'|'X'|'W'|'Z'|'-' in an arithmetic operand, and it has been converted to 0.
+#    Time: 5 ns  Iteration: 4  Instance: /processor_tb/i_inst_mem
+step -current
+# End time: 18:48:14 on Sep 27,2017, Elapsed time: 0:03:42
+# Errors: 0, Warnings: 45
