@@ -24,7 +24,9 @@ entity control_unit is
       ALUOp  : out  std_logic_vector (1 downto 0); -- Tipo operacion para control de la ALU
       -- Seniales para el GPR
       RegWrite : out  std_logic; -- 1=Escribir registro
-      RegDst   : out  std_logic  -- 0=Reg. destino es rt, 1=rd
+      RegDst   : out  std_logic;  -- 0=Reg. destino es rt, 1=rd
+		LUICtrl	: out std_logic;	-- 1=LUI, 0 resto
+		Jump		: out std_logic	-- 1=Jump, 0 resto
    );
 end control_unit;
 
@@ -48,6 +50,7 @@ architecture rtl of control_unit is
    constant LSW   : t_aluOp := "00";
    constant BEQ   : t_aluOp := "01";
    constant RT    : t_aluOp := "10";
+	constant SLTI  : t_aluOp := "11";
 
 begin
 
@@ -63,6 +66,8 @@ begin
             MemWrite <= '0';
             ALUSrc <= '0';
             RegWrite <= '1';
+				LUICtrl <= '0';
+				Jump <= '0';
 
          when OP_ADDI =>
             RegDst <= '0';
@@ -73,6 +78,8 @@ begin
             MemWrite <= '0';
             ALUSrc <= '1';
             RegWrite <= '1';
+				LUICtrl <= '0';
+				Jump <= '0';
 
          when OP_BEQ =>
             RegDst <= '0';
@@ -83,6 +90,8 @@ begin
             MemWrite <= '0';
             ALUSrc <= '0';
             RegWrite <= '0';
+				LUICtrl <= '0';
+				Jump <= '0';
 
          when OP_SW =>
             RegDst <= '0';
@@ -93,6 +102,8 @@ begin
             MemWrite <= '1';
             ALUSrc <= '1';
             RegWrite <= '0';
+				LUICtrl <= '0';
+				Jump <= '0';
 
          when OP_LW =>
             RegDst <= '0';
@@ -103,12 +114,45 @@ begin
             MemWrite <= '0';
             ALUSrc <= '1';
             RegWrite <= '1';
+				LUICtrl <= '0';
+				Jump <= '0';
 
-         --when OP_LUI => por hacer
+         when OP_LUI => 
+				RegDst <= '0';
+            Branch <= '0';
+            MemRead <= '0';
+            MemToReg <= '0';
+            ALUOp <= LSW;
+            MemWrite <= '0';
+            ALUSrc <= '0';
+            RegWrite <= '1';
+				LUICtrl <= '1';
+				Jump <= '0';
 
-         --when OP_SLTI =>
+
+         when OP_SLTI =>
+				RegDst <= '0';
+            Branch <= '0';
+            MemRead <= '0';
+            MemToReg <= '0';
+            ALUOp <= SLTI;
+            MemWrite <= '0';
+            ALUSrc <= '1';
+            RegWrite <= '0';
+				LUICtrl <= '0';
+				Jump <= '0';
             
-         --when OP_J =>
+         when OP_J =>
+				RegDst <= '0';
+            Branch <= '0';
+            MemRead <= '0';
+            MemToReg <= '0';
+            ALUOp <= LSW;
+            MemWrite <= '0';
+            ALUSrc <= '0';
+            RegWrite <= '0';
+				LUICtrl <= '0';
+				Jump <= '1';
 			
 			when others =>
 				RegDst <= '0';
@@ -119,6 +163,8 @@ begin
             MemWrite <= '0';
             ALUSrc <= '0';
             RegWrite <= '0';
+				LUICtrl <= '0';
+				Jump <= '0';
             
       end case;
    end process;

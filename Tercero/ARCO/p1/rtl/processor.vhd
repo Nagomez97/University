@@ -66,7 +66,9 @@ architecture rtl of processor is
 			ALUOp  : out  std_logic_vector (1 downto 0); -- Tipo operacion para control de la ALU
 			-- Seniales para el GPR
 			RegWrite : out  std_logic; -- 1=Escribir registro
-			RegDst   : out  std_logic  -- 0=Reg. destino es rt, 1=rd
+			RegDst   : out  std_logic;  -- 0=Reg. destino es rt, 1=rd
+			LUICtrl	: out std_logic;	-- 1=LUI, 0 resto
+			Jump		: out std_logic	-- 1=Jump, 0 resto
 		);
 	end component;
 	
@@ -87,6 +89,9 @@ architecture rtl of processor is
 	signal SL 		: std_logic_vector(31 downto 0);
 	signal PCadd 	: std_logic_vector(31 downto 0);
 	signal ANDBranch	: std_logic;
+	signal DataToReg	: std_logic_vector(31 downto 0);
+	signal Jump		: std_logic;
+	signal pc_aux	: std_logic_vetor(31 downto 0);
 	
 	-- Seniales de interconexion
 	-- alu
@@ -105,6 +110,7 @@ architecture rtl of processor is
 	signal ALUOp   : std_logic_vector (1 downto 0);
 	signal RegWrite: std_logic;
 	signal RegDst  : std_logic;
+	signal LUICtrl	: std_logic;
 	
 	-- registros
 	signal Rd2 : std_logic_vector(31 downto 0);
@@ -148,7 +154,9 @@ begin
 			ALUSrc => ALUSrc,
 			ALUOp => ALUOp,
 			RegWrite => RegWrite,
-			RegDst => RegDst
+			RegDst => RegDst,
+			LUICtrl => LUICtrl,
+			Jump => Jump
 		);
 		
 	-- instanciacion de reg_bank
@@ -172,10 +180,12 @@ begin
 	
 	PC4 <= pc_exit + 4;
 	
-	process(Clk, pc_in)
+	process(Clk, pc_in, Reset)
 	begin
-		if rising_edge(Clk) then
-			pc_exit <= pc_in;
+		if Reset = '1' then
+			pc_exit <= (others => '0');
+		elsif rising_edge(Clk) then
+			pc_exit <= pc_in;			
 		end if;
 	end process;
 	
@@ -224,11 +234,38 @@ begin
    process (PC4, PCadd, ANDBranch)
    begin
    	if ANDBranch = '0' then
-   		pc_in <= PC4;
+   		pc_aux <= PC4;
    	else
-   		pc_in <= PCadd;
+   		pc_aux <= PCadd;
    	end if;
    end process;
+	
+	------------------------------------------------------
+   -- MUX LUI
+   ------------------------------------------------------
+	
+	process (LUICtrl, IDataIn, DataToReg)
+	begin
+		if LUICtrl = '1' then
+			Wd3 <= IDataIn (15 downto 0) & x"0000";
+		else
+			Wd3 <= DataToReg;
+		end if;
+	end process;
+	
+	------------------------------------------------------
+   -- MUX Jump
+   ------------------------------------------------------
+	
+	process (Jump, pc_aux, PC4, IDataIn)
+	begin
+		if Jump = '1' then
+			pc_in <= PC4(31 downto 28) & IDataIn(25 downto 0) & "00";
+		else
+			pc_in <= pc_aux;
+		end if;
+	end process;
+	
 
    ------------------------------------------------------
    -- MUX WriteData
@@ -237,9 +274,9 @@ begin
    process(MemToReg, Result, DDataIn)
    begin
    	if MemToReg = '1' then
-   		Wd3 <= DDataIn;
+   		DataToReg <= DDataIn;
    	else
-   		Wd3 <= Result;
+   		DataToReg <= Result;
    	end if;
    end process;
 
