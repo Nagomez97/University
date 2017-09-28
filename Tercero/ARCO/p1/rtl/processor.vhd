@@ -91,7 +91,7 @@ architecture rtl of processor is
 	signal ANDBranch	: std_logic;
 	signal DataToReg	: std_logic_vector(31 downto 0);
 	signal Jump		: std_logic;
-	signal pc_aux	: std_logic_vetor(31 downto 0);
+	signal pc_aux	: std_logic_vector(31 downto 0);
 	
 	-- Seniales de interconexion
 	-- alu

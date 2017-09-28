@@ -1,2 +1,5 @@
 xst -intstyle ise -ifn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.xst" -ofn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.syr" 
 xst -intstyle ise -ifn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.xst" -ofn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.syr" 
+xst -intstyle ise -ifn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.xst" -ofn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.syr" 
+xst -intstyle ise -ifn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.xst" -ofn "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/processor.syr" 
+netgen -intstyle ise -ar Structure -tm alu_control -w -dir netgen/synthesis -ofmt vhdl -sim processor.ngc alu_control_synthesis.vhd 

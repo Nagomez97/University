@@ -3,14 +3,14 @@ Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
 --> Parameter TMPDIR set to xst/projnav.tmp
 
 
-Total REAL time to Xst completion: 1.00 secs
-Total CPU time to Xst completion: 0.20 secs
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.63 secs
  
 --> Parameter xsthdpdir set to xst
 
 
-Total REAL time to Xst completion: 1.00 secs
-Total CPU time to Xst completion: 0.20 secs
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.63 secs
  
 --> Reading design: processor.prj
 
@@ -113,7 +113,8 @@ Architecture rtl of Entity control_unit is up to date.
 Compiling vhdl file "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/reg_bank.vhd" in Library work.
 Architecture rtl of Entity reg_bank is up to date.
 Compiling vhdl file "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/processor.vhd" in Library work.
-Architecture rtl of Entity processor is up to date.
+Entity <processor> compiled.
+Entity <processor> (Architecture <rtl>) compiled.
 
 =========================================================================
 *                     Design Hierarchy Analysis                         *
@@ -139,6 +140,7 @@ Analyzing Entity <alu> in library <work> (Architecture <rtl>).
 Entity <alu> analyzed. Unit <alu> generated.
 
 Analyzing Entity <alu_control> in library <work> (Architecture <rtl>).
+INFO:Xst:1561 - "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/alu_control.vhd" line 71: Mux is complete : default of case is discarded
 Entity <alu_control> analyzed. Unit <alu_control> generated.
 
 Analyzing Entity <control_unit> in library <work> (Architecture <rtl>).
@@ -167,8 +169,9 @@ Unit <alu> synthesized.
 
 Synthesizing Unit <alu_control>.
     Related source file is "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/alu_control.vhd".
-WARNING:Xst:1305 - Output <ALUControl> is never assigned. Tied to value 0000.
-WARNING:Xst:646 - Signal <sigResult> is assigned but never used. This unconnected signal will be trimmed during the optimization process.
+    Found 4-bit 4-to-1 multiplexer for signal <sigResult>.
+    Summary:
+	inferred   4 Multiplexer(s).
 Unit <alu_control> synthesized.
 
 
@@ -209,8 +212,9 @@ Macro Statistics
  33-bit subtractor                                     : 1
 # Registers                                            : 32
  32-bit register                                       : 32
-# Multiplexers                                         : 2
+# Multiplexers                                         : 3
  32-bit 32-to-1 multiplexer                            : 2
+ 4-bit 4-to-1 multiplexer                              : 1
 # Xors                                                 : 1
  32-bit xor2                                           : 1
 
@@ -220,8 +224,6 @@ Macro Statistics
 *                       Advanced HDL Synthesis                          *
 =========================================================================
 
-WARNING:Xst:1290 - Hierarchical block <i_alu_control> is unconnected in block <processor>.
-   It will be removed from the design.
 
 =========================================================================
 Advanced HDL Synthesis Report
@@ -232,8 +234,9 @@ Macro Statistics
  33-bit subtractor                                     : 1
 # Registers                                            : 1024
  Flip-Flops                                            : 1024
-# Multiplexers                                         : 64
+# Multiplexers                                         : 65
  1-bit 32-to-1 multiplexer                             : 64
+ 4-bit 4-to-1 multiplexer                              : 1
 # Xors                                                 : 1
  32-bit xor2                                           : 1
 
@@ -253,7 +256,7 @@ Optimizing unit <reg_bank> ...
 
 Mapping all equations...
 Building and optimizing final netlist ...
-Found area constraint ratio of 100 (+ 5) on block processor, actual ratio is 60.
+Found area constraint ratio of 100 (+ 5) on block processor, actual ratio is 66.
 
 Final Macro Processing ...
 
@@ -291,22 +294,26 @@ Design Statistics
 # IOs                              : 164
 
 Cell Usage :
-# BELS                             : 2414
+# BELS                             : 2803
 #      GND                         : 1
 #      INV                         : 1
 #      LUT1                        : 29
-#      LUT2                        : 113
-#      LUT3                        : 1062
-#      LUT4                        : 56
-#      MUXCY                       : 99
-#      MUXF5                       : 512
+#      LUT2                        : 101
+#      LUT2_L                      : 8
+#      LUT3                        : 1053
+#      LUT3_D                      : 5
+#      LUT3_L                      : 34
+#      LUT4                        : 294
+#      LUT4_L                      : 36
+#      MUXCY                       : 130
+#      MUXF5                       : 537
 #      MUXF6                       : 256
 #      MUXF7                       : 128
 #      MUXF8                       : 64
 #      VCC                         : 1
-#      XORCY                       : 92
+#      XORCY                       : 125
 # FlipFlops/Latches                : 1022
-#      FD                          : 30
+#      FDC                         : 30
 #      FDCE                        : 992
 # Clock Buffers                    : 1
 #      BUFGP                       : 1
@@ -320,9 +327,9 @@ Device utilization summary:
 
 Selected Device : 3s200ft256-4 
 
- Number of Slices:                     1152  out of   1920    60%  
+ Number of Slices:                     1268  out of   1920    66%  
  Number of Slice Flip Flops:           1022  out of   3840    26%  
- Number of 4 input LUTs:               1261  out of   3840    32%  
+ Number of 4 input LUTs:               1561  out of   3840    40%  
  Number of IOs:                         164
  Number of bonded IOBs:                 164  out of    173    94%  
  Number of GCLKs:                         1  out of      8    12%  
@@ -356,17 +363,17 @@ Asynchronous Control Signals Information:
 -----------------------------------+------------------------+-------+
 Control Signal                     | Buffer(FF name)        | Load  |
 -----------------------------------+------------------------+-------+
-Reset                              | IBUF                   | 992   |
+Reset                              | IBUF                   | 1022  |
 -----------------------------------+------------------------+-------+
 
 Timing Summary:
 ---------------
 Speed Grade: -4
 
-   Minimum period: 15.190ns (Maximum Frequency: 65.834MHz)
-   Minimum input arrival time before clock: 19.092ns
-   Maximum output required time after clock: 16.605ns
-   Maximum combinational path delay: 20.507ns
+   Minimum period: 16.481ns (Maximum Frequency: 60.677MHz)
+   Minimum input arrival time before clock: 20.626ns
+   Maximum output required time after clock: 18.175ns
+   Maximum combinational path delay: 22.077ns
 
 Timing Detail:
 --------------
@@ -374,10 +381,10 @@ All values displayed in nanoseconds (ns)
 
 =========================================================================
 Timing constraint: Default period analysis for Clock 'Clk'
-  Clock period: 15.190ns (frequency: 65.834MHz)
-  Total number of paths / destination ports: 2944752 / 1022
+  Clock period: 16.481ns (frequency: 60.677MHz)
+  Total number of paths / destination ports: 6244547 / 1022
 -------------------------------------------------------------------------
-Delay:               15.190ns (Levels of Logic = 41)
+Delay:               16.481ns (Levels of Logic = 42)
   Source:            i_reg_bank/regs_1_0 (FF)
   Destination:       pc_exit_2 (FF)
   Source Clock:      Clk rising
@@ -392,118 +399,90 @@ Delay:               15.190ns (Levels of Logic = 41)
      MUXF5:I0->O           1   0.360   0.000  i_reg_bank/mux32_8_f5 (i_reg_bank/mux32_8_f5)
      MUXF6:I0->O           1   0.342   0.000  i_reg_bank/mux32_6_f6 (i_reg_bank/mux32_6_f6)
      MUXF7:I0->O           1   0.342   0.000  i_reg_bank/mux32_4_f7 (i_reg_bank/mux32_4_f7)
-     MUXF8:I0->O           2   0.342   0.903  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
-     LUT4:I3->O            1   0.551   0.996  OpB<0>2 (OpB<0>)
-     LUT2:I1->O            1   0.551   0.000  i_alu/Madd_sigResult_addsub0000_lut<0> (i_alu/Madd_sigResult_addsub0000_lut<0>)
-     MUXCY:S->O            1   0.500   0.000  i_alu/Madd_sigResult_addsub0000_cy<0> (i_alu/Madd_sigResult_addsub0000_cy<0>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<1> (i_alu/Madd_sigResult_addsub0000_cy<1>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<2> (i_alu/Madd_sigResult_addsub0000_cy<2>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<3> (i_alu/Madd_sigResult_addsub0000_cy<3>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<4> (i_alu/Madd_sigResult_addsub0000_cy<4>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<5> (i_alu/Madd_sigResult_addsub0000_cy<5>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<6> (i_alu/Madd_sigResult_addsub0000_cy<6>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<7> (i_alu/Madd_sigResult_addsub0000_cy<7>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<8> (i_alu/Madd_sigResult_addsub0000_cy<8>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<9> (i_alu/Madd_sigResult_addsub0000_cy<9>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<10> (i_alu/Madd_sigResult_addsub0000_cy<10>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<11> (i_alu/Madd_sigResult_addsub0000_cy<11>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<12> (i_alu/Madd_sigResult_addsub0000_cy<12>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<13> (i_alu/Madd_sigResult_addsub0000_cy<13>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<14> (i_alu/Madd_sigResult_addsub0000_cy<14>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<15> (i_alu/Madd_sigResult_addsub0000_cy<15>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<16> (i_alu/Madd_sigResult_addsub0000_cy<16>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<17> (i_alu/Madd_sigResult_addsub0000_cy<17>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<18> (i_alu/Madd_sigResult_addsub0000_cy<18>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<19> (i_alu/Madd_sigResult_addsub0000_cy<19>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<20> (i_alu/Madd_sigResult_addsub0000_cy<20>)
-     XORCY:CI->O           3   0.904   1.246  i_alu/Madd_sigResult_addsub0000_xor<21> (DAddr_21_OBUF)
-     LUT2:I0->O            1   0.551   0.000  pc_in<10>1_wg_lut<0> (pc_in<10>1_wg_lut<0>)
-     MUXCY:S->O            1   0.500   0.000  pc_in<10>1_wg_cy<0> (pc_in<10>1_wg_cy<0>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<1> (pc_in<10>1_wg_cy<1>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<2> (pc_in<10>1_wg_cy<2>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<3> (pc_in<10>1_wg_cy<3>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<4> (pc_in<10>1_wg_cy<4>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<5> (pc_in<10>1_wg_cy<5>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<6> (pc_in<10>1_wg_cy<6>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<7> (pc_in<10>1_wg_cy<7>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<8> (pc_in<10>1_wg_cy<8>)
-     MUXCY:CI->O          30   0.303   1.910  pc_in<10>1_wg_cy<9> (pc_in<10>1_wg_cy<9>)
-     LUT3:I2->O            1   0.551   0.000  pc_in<9>1 (pc_in<9>)
-     FD:D                      0.203          pc_exit_9
+     MUXF8:I0->O           4   0.342   0.985  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
+     LUT4:I2->O            1   0.551   0.000  i_alu/Msub_subExt_lut<0> (i_alu/Msub_subExt_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  i_alu/Msub_subExt_cy<0> (i_alu/Msub_subExt_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<1> (i_alu/Msub_subExt_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<2> (i_alu/Msub_subExt_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<3> (i_alu/Msub_subExt_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<4> (i_alu/Msub_subExt_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<5> (i_alu/Msub_subExt_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<6> (i_alu/Msub_subExt_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<7> (i_alu/Msub_subExt_cy<7>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<8> (i_alu/Msub_subExt_cy<8>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<9> (i_alu/Msub_subExt_cy<9>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<10> (i_alu/Msub_subExt_cy<10>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<11> (i_alu/Msub_subExt_cy<11>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<12> (i_alu/Msub_subExt_cy<12>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<13> (i_alu/Msub_subExt_cy<13>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<14> (i_alu/Msub_subExt_cy<14>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<15> (i_alu/Msub_subExt_cy<15>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<16> (i_alu/Msub_subExt_cy<16>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<17> (i_alu/Msub_subExt_cy<17>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<18> (i_alu/Msub_subExt_cy<18>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<19> (i_alu/Msub_subExt_cy<19>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<20> (i_alu/Msub_subExt_cy<20>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<21> (i_alu/Msub_subExt_cy<21>)
+     XORCY:CI->O           1   0.904   0.827  i_alu/Msub_subExt_xor<22> (i_alu/subExt<22>)
+     LUT4:I3->O            1   0.551   0.869  i_alu/sigResult<22>110 (i_alu/sigResult<22>110)
+     LUT4:I2->O            3   0.551   1.246  i_alu/sigResult<22>124 (DAddr_22_OBUF)
+     LUT3:I0->O            1   0.551   0.000  ANDBranch_wg_lut<0> (ANDBranch_wg_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  ANDBranch_wg_cy<0> (ANDBranch_wg_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<1> (ANDBranch_wg_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<2> (ANDBranch_wg_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<3> (ANDBranch_wg_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<4> (ANDBranch_wg_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<5> (ANDBranch_wg_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<6> (ANDBranch_wg_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<7> (ANDBranch_wg_cy<7>)
+     MUXCY:CI->O          30   0.303   1.868  ANDBranch_wg_cy<8> (ANDBranch)
+     LUT4:I3->O            1   0.551   0.000  pc_in<9>34 (pc_in<9>)
+     FDC:D                     0.203          pc_exit_9
     ----------------------------------------
-    Total                     15.190ns (9.063ns logic, 6.127ns route)
-                                       (59.7% logic, 40.3% route)
+    Total                     16.481ns (9.614ns logic, 6.867ns route)
+                                       (58.3% logic, 41.7% route)
 
 =========================================================================
 Timing constraint: Default OFFSET IN BEFORE for Clock 'Clk'
-  Total number of paths / destination ports: 3508341 / 2014
+  Total number of paths / destination ports: 7509082 / 2014
 -------------------------------------------------------------------------
-Offset:              19.092ns (Levels of Logic = 42)
-  Source:            IDataIn<16> (PAD)
+Offset:              20.626ns (Levels of Logic = 13)
+  Source:            IDataIn<31> (PAD)
   Destination:       pc_exit_2 (FF)
   Destination Clock: Clk rising
 
-  Data Path: IDataIn<16> to pc_exit_2
+  Data Path: IDataIn<31> to pc_exit_2
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     IBUF:I->O           513   0.821   4.873  IDataIn_16_IBUF (IDataIn_16_IBUF)
-     LUT3:I0->O            1   0.551   0.000  i_reg_bank/mux32_6 (i_reg_bank/mux32_6)
-     MUXF5:I1->O           1   0.360   0.000  i_reg_bank/mux32_5_f5 (i_reg_bank/mux32_5_f5)
-     MUXF6:I1->O           1   0.342   0.000  i_reg_bank/mux32_4_f6 (i_reg_bank/mux32_4_f6)
-     MUXF7:I1->O           1   0.342   0.000  i_reg_bank/mux32_3_f7 (i_reg_bank/mux32_3_f7)
-     MUXF8:I1->O           2   0.342   0.903  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
-     LUT4:I3->O            1   0.551   0.996  OpB<0>2 (OpB<0>)
-     LUT2:I1->O            1   0.551   0.000  i_alu/Madd_sigResult_addsub0000_lut<0> (i_alu/Madd_sigResult_addsub0000_lut<0>)
-     MUXCY:S->O            1   0.500   0.000  i_alu/Madd_sigResult_addsub0000_cy<0> (i_alu/Madd_sigResult_addsub0000_cy<0>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<1> (i_alu/Madd_sigResult_addsub0000_cy<1>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<2> (i_alu/Madd_sigResult_addsub0000_cy<2>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<3> (i_alu/Madd_sigResult_addsub0000_cy<3>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<4> (i_alu/Madd_sigResult_addsub0000_cy<4>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<5> (i_alu/Madd_sigResult_addsub0000_cy<5>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<6> (i_alu/Madd_sigResult_addsub0000_cy<6>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<7> (i_alu/Madd_sigResult_addsub0000_cy<7>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<8> (i_alu/Madd_sigResult_addsub0000_cy<8>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<9> (i_alu/Madd_sigResult_addsub0000_cy<9>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<10> (i_alu/Madd_sigResult_addsub0000_cy<10>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<11> (i_alu/Madd_sigResult_addsub0000_cy<11>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<12> (i_alu/Madd_sigResult_addsub0000_cy<12>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<13> (i_alu/Madd_sigResult_addsub0000_cy<13>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<14> (i_alu/Madd_sigResult_addsub0000_cy<14>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<15> (i_alu/Madd_sigResult_addsub0000_cy<15>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<16> (i_alu/Madd_sigResult_addsub0000_cy<16>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<17> (i_alu/Madd_sigResult_addsub0000_cy<17>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<18> (i_alu/Madd_sigResult_addsub0000_cy<18>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<19> (i_alu/Madd_sigResult_addsub0000_cy<19>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<20> (i_alu/Madd_sigResult_addsub0000_cy<20>)
-     XORCY:CI->O           3   0.904   1.246  i_alu/Madd_sigResult_addsub0000_xor<21> (DAddr_21_OBUF)
-     LUT2:I0->O            1   0.551   0.000  pc_in<10>1_wg_lut<0> (pc_in<10>1_wg_lut<0>)
-     MUXCY:S->O            1   0.500   0.000  pc_in<10>1_wg_cy<0> (pc_in<10>1_wg_cy<0>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<1> (pc_in<10>1_wg_cy<1>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<2> (pc_in<10>1_wg_cy<2>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<3> (pc_in<10>1_wg_cy<3>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<4> (pc_in<10>1_wg_cy<4>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<5> (pc_in<10>1_wg_cy<5>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<6> (pc_in<10>1_wg_cy<6>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<7> (pc_in<10>1_wg_cy<7>)
-     MUXCY:CI->O           1   0.064   0.000  pc_in<10>1_wg_cy<8> (pc_in<10>1_wg_cy<8>)
-     MUXCY:CI->O          30   0.303   1.910  pc_in<10>1_wg_cy<9> (pc_in<10>1_wg_cy<9>)
-     LUT3:I2->O            1   0.551   0.000  pc_in<9>1 (pc_in<9>)
-     FD:D                      0.203          pc_exit_9
+     IBUF:I->O             7   0.821   1.405  IDataIn_31_IBUF (IDataIn_31_IBUF)
+     LUT3:I0->O            3   0.551   1.246  i_control_unit/RegWrite22 (i_control_unit/ALUOp_and0000)
+     LUT4:I0->O            3   0.551   0.933  i_control_unit/ALUOp<0>1 (ALUOp<0>)
+     LUT4:I3->O            1   0.551   0.827  i_alu_control/Mmux_sigResult2_SW0 (N22)
+     LUT4:I3->O           62   0.551   2.051  i_alu_control/Mmux_sigResult2 (Control<1>)
+     LUT4:I3->O           34   0.551   2.060  i_alu/sigResult<0>31 (i_alu/N33)
+     LUT4:I1->O            1   0.551   0.827  i_alu/sigResult<1>4 (i_alu/sigResult<1>4)
+     LUT4:I3->O            3   0.551   1.246  i_alu/sigResult<1>85 (DAddr_1_OBUF)
+     LUT3:I0->O            1   0.551   0.827  i_alu/sigResult<31>124_SW0 (N153)
+     LUT4:I3->O            1   0.551   0.000  ANDBranch_wg_lut<7> (ANDBranch_wg_lut<7>)
+     MUXCY:S->O            1   0.500   0.000  ANDBranch_wg_cy<7> (ANDBranch_wg_cy<7>)
+     MUXCY:CI->O          30   0.303   1.868  ANDBranch_wg_cy<8> (ANDBranch)
+     LUT4:I3->O            1   0.551   0.000  pc_in<9>34 (pc_in<9>)
+     FDC:D                     0.203          pc_exit_9
     ----------------------------------------
-    Total                     19.092ns (9.164ns logic, 9.928ns route)
-                                       (48.0% logic, 52.0% route)
+    Total                     20.626ns (7.337ns logic, 13.289ns route)
+                                       (35.6% logic, 64.4% route)
 
 =========================================================================
 Timing constraint: Default OFFSET OUT AFTER for Clock 'Clk'
-  Total number of paths / destination ports: 49134 / 94
+  Total number of paths / destination ports: 103229 / 94
 -------------------------------------------------------------------------
-Offset:              16.605ns (Levels of Logic = 40)
+Offset:              18.175ns (Levels of Logic = 42)
   Source:            i_reg_bank/regs_1_0 (FF)
-  Destination:       DAddr<31> (PAD)
+  Destination:       DAddr<0> (PAD)
   Source Clock:      Clk rising
 
-  Data Path: i_reg_bank/regs_1_0 to DAddr<31>
+  Data Path: i_reg_bank/regs_1_0 to DAddr<0>
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
@@ -512,114 +491,118 @@ Offset:              16.605ns (Levels of Logic = 40)
      MUXF5:I0->O           1   0.360   0.000  i_reg_bank/mux32_8_f5 (i_reg_bank/mux32_8_f5)
      MUXF6:I0->O           1   0.342   0.000  i_reg_bank/mux32_6_f6 (i_reg_bank/mux32_6_f6)
      MUXF7:I0->O           1   0.342   0.000  i_reg_bank/mux32_4_f7 (i_reg_bank/mux32_4_f7)
-     MUXF8:I0->O           2   0.342   0.903  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
-     LUT4:I3->O            1   0.551   0.996  OpB<0>2 (OpB<0>)
-     LUT2:I1->O            1   0.551   0.000  i_alu/Madd_sigResult_addsub0000_lut<0> (i_alu/Madd_sigResult_addsub0000_lut<0>)
-     MUXCY:S->O            1   0.500   0.000  i_alu/Madd_sigResult_addsub0000_cy<0> (i_alu/Madd_sigResult_addsub0000_cy<0>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<1> (i_alu/Madd_sigResult_addsub0000_cy<1>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<2> (i_alu/Madd_sigResult_addsub0000_cy<2>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<3> (i_alu/Madd_sigResult_addsub0000_cy<3>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<4> (i_alu/Madd_sigResult_addsub0000_cy<4>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<5> (i_alu/Madd_sigResult_addsub0000_cy<5>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<6> (i_alu/Madd_sigResult_addsub0000_cy<6>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<7> (i_alu/Madd_sigResult_addsub0000_cy<7>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<8> (i_alu/Madd_sigResult_addsub0000_cy<8>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<9> (i_alu/Madd_sigResult_addsub0000_cy<9>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<10> (i_alu/Madd_sigResult_addsub0000_cy<10>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<11> (i_alu/Madd_sigResult_addsub0000_cy<11>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<12> (i_alu/Madd_sigResult_addsub0000_cy<12>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<13> (i_alu/Madd_sigResult_addsub0000_cy<13>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<14> (i_alu/Madd_sigResult_addsub0000_cy<14>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<15> (i_alu/Madd_sigResult_addsub0000_cy<15>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<16> (i_alu/Madd_sigResult_addsub0000_cy<16>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<17> (i_alu/Madd_sigResult_addsub0000_cy<17>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<18> (i_alu/Madd_sigResult_addsub0000_cy<18>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<19> (i_alu/Madd_sigResult_addsub0000_cy<19>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<20> (i_alu/Madd_sigResult_addsub0000_cy<20>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<21> (i_alu/Madd_sigResult_addsub0000_cy<21>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<22> (i_alu/Madd_sigResult_addsub0000_cy<22>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<23> (i_alu/Madd_sigResult_addsub0000_cy<23>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<24> (i_alu/Madd_sigResult_addsub0000_cy<24>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<25> (i_alu/Madd_sigResult_addsub0000_cy<25>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<26> (i_alu/Madd_sigResult_addsub0000_cy<26>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<27> (i_alu/Madd_sigResult_addsub0000_cy<27>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<28> (i_alu/Madd_sigResult_addsub0000_cy<28>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<29> (i_alu/Madd_sigResult_addsub0000_cy<29>)
-     MUXCY:CI->O           0   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<30> (i_alu/Madd_sigResult_addsub0000_cy<30>)
-     XORCY:CI->O           3   0.904   0.907  i_alu/Madd_sigResult_addsub0000_xor<31> (DAddr_31_OBUF)
-     OBUF:I->O                 5.644          DAddr_31_OBUF (DAddr<31>)
+     MUXF8:I0->O           4   0.342   0.985  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
+     LUT4:I2->O            1   0.551   0.000  i_alu/Msub_subExt_lut<0> (i_alu/Msub_subExt_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  i_alu/Msub_subExt_cy<0> (i_alu/Msub_subExt_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<1> (i_alu/Msub_subExt_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<2> (i_alu/Msub_subExt_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<3> (i_alu/Msub_subExt_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<4> (i_alu/Msub_subExt_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<5> (i_alu/Msub_subExt_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<6> (i_alu/Msub_subExt_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<7> (i_alu/Msub_subExt_cy<7>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<8> (i_alu/Msub_subExt_cy<8>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<9> (i_alu/Msub_subExt_cy<9>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<10> (i_alu/Msub_subExt_cy<10>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<11> (i_alu/Msub_subExt_cy<11>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<12> (i_alu/Msub_subExt_cy<12>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<13> (i_alu/Msub_subExt_cy<13>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<14> (i_alu/Msub_subExt_cy<14>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<15> (i_alu/Msub_subExt_cy<15>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<16> (i_alu/Msub_subExt_cy<16>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<17> (i_alu/Msub_subExt_cy<17>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<18> (i_alu/Msub_subExt_cy<18>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<19> (i_alu/Msub_subExt_cy<19>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<20> (i_alu/Msub_subExt_cy<20>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<21> (i_alu/Msub_subExt_cy<21>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<22> (i_alu/Msub_subExt_cy<22>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<23> (i_alu/Msub_subExt_cy<23>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<24> (i_alu/Msub_subExt_cy<24>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<25> (i_alu/Msub_subExt_cy<25>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<26> (i_alu/Msub_subExt_cy<26>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<27> (i_alu/Msub_subExt_cy<27>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<28> (i_alu/Msub_subExt_cy<28>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<29> (i_alu/Msub_subExt_cy<29>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<30> (i_alu/Msub_subExt_cy<30>)
+     MUXCY:CI->O           0   0.064   0.000  i_alu/Msub_subExt_cy<31> (i_alu/Msub_subExt_cy<31>)
+     XORCY:CI->O           1   0.904   0.827  i_alu/Msub_subExt_xor<32> (i_alu/subExt<32>)
+     LUT4:I3->O            2   0.551   1.072  i_alu/sigResult<0>122 (i_alu/sigResult<0>122)
+     LUT2:I1->O            2   0.551   0.877  i_alu/sigResult<0>129 (DAddr_0_OBUF)
+     OBUF:I->O                 5.644          DAddr_0_OBUF (DAddr<0>)
     ----------------------------------------
-    Total                     16.605ns (12.727ns logic, 3.878ns route)
-                                       (76.6% logic, 23.4% route)
+    Total                     18.175ns (13.342ns logic, 4.833ns route)
+                                       (73.4% logic, 26.6% route)
 
 =========================================================================
 Timing constraint: Default path analysis
-  Total number of paths / destination ports: 57564 / 66
+  Total number of paths / destination ports: 122991 / 66
 -------------------------------------------------------------------------
-Delay:               20.507ns (Levels of Logic = 41)
+Delay:               22.077ns (Levels of Logic = 43)
   Source:            IDataIn<16> (PAD)
-  Destination:       DAddr<31> (PAD)
+  Destination:       DAddr<0> (PAD)
 
-  Data Path: IDataIn<16> to DAddr<31>
+  Data Path: IDataIn<16> to DAddr<0>
                                 Gate     Net
     Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
     ----------------------------------------  ------------
-     IBUF:I->O           513   0.821   4.873  IDataIn_16_IBUF (IDataIn_16_IBUF)
+     IBUF:I->O           514   0.821   4.873  IDataIn_16_IBUF (IDataIn_16_IBUF)
      LUT3:I0->O            1   0.551   0.000  i_reg_bank/mux32_6 (i_reg_bank/mux32_6)
      MUXF5:I1->O           1   0.360   0.000  i_reg_bank/mux32_5_f5 (i_reg_bank/mux32_5_f5)
      MUXF6:I1->O           1   0.342   0.000  i_reg_bank/mux32_4_f6 (i_reg_bank/mux32_4_f6)
      MUXF7:I1->O           1   0.342   0.000  i_reg_bank/mux32_3_f7 (i_reg_bank/mux32_3_f7)
-     MUXF8:I1->O           2   0.342   0.903  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
-     LUT4:I3->O            1   0.551   0.996  OpB<0>2 (OpB<0>)
-     LUT2:I1->O            1   0.551   0.000  i_alu/Madd_sigResult_addsub0000_lut<0> (i_alu/Madd_sigResult_addsub0000_lut<0>)
-     MUXCY:S->O            1   0.500   0.000  i_alu/Madd_sigResult_addsub0000_cy<0> (i_alu/Madd_sigResult_addsub0000_cy<0>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<1> (i_alu/Madd_sigResult_addsub0000_cy<1>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<2> (i_alu/Madd_sigResult_addsub0000_cy<2>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<3> (i_alu/Madd_sigResult_addsub0000_cy<3>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<4> (i_alu/Madd_sigResult_addsub0000_cy<4>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<5> (i_alu/Madd_sigResult_addsub0000_cy<5>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<6> (i_alu/Madd_sigResult_addsub0000_cy<6>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<7> (i_alu/Madd_sigResult_addsub0000_cy<7>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<8> (i_alu/Madd_sigResult_addsub0000_cy<8>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<9> (i_alu/Madd_sigResult_addsub0000_cy<9>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<10> (i_alu/Madd_sigResult_addsub0000_cy<10>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<11> (i_alu/Madd_sigResult_addsub0000_cy<11>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<12> (i_alu/Madd_sigResult_addsub0000_cy<12>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<13> (i_alu/Madd_sigResult_addsub0000_cy<13>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<14> (i_alu/Madd_sigResult_addsub0000_cy<14>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<15> (i_alu/Madd_sigResult_addsub0000_cy<15>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<16> (i_alu/Madd_sigResult_addsub0000_cy<16>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<17> (i_alu/Madd_sigResult_addsub0000_cy<17>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<18> (i_alu/Madd_sigResult_addsub0000_cy<18>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<19> (i_alu/Madd_sigResult_addsub0000_cy<19>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<20> (i_alu/Madd_sigResult_addsub0000_cy<20>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<21> (i_alu/Madd_sigResult_addsub0000_cy<21>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<22> (i_alu/Madd_sigResult_addsub0000_cy<22>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<23> (i_alu/Madd_sigResult_addsub0000_cy<23>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<24> (i_alu/Madd_sigResult_addsub0000_cy<24>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<25> (i_alu/Madd_sigResult_addsub0000_cy<25>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<26> (i_alu/Madd_sigResult_addsub0000_cy<26>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<27> (i_alu/Madd_sigResult_addsub0000_cy<27>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<28> (i_alu/Madd_sigResult_addsub0000_cy<28>)
-     MUXCY:CI->O           1   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<29> (i_alu/Madd_sigResult_addsub0000_cy<29>)
-     MUXCY:CI->O           0   0.064   0.000  i_alu/Madd_sigResult_addsub0000_cy<30> (i_alu/Madd_sigResult_addsub0000_cy<30>)
-     XORCY:CI->O           3   0.904   0.907  i_alu/Madd_sigResult_addsub0000_xor<31> (DAddr_31_OBUF)
-     OBUF:I->O                 5.644          DAddr_31_OBUF (DAddr<31>)
+     MUXF8:I1->O           4   0.342   0.985  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
+     LUT4:I2->O            1   0.551   0.000  i_alu/Msub_subExt_lut<0> (i_alu/Msub_subExt_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  i_alu/Msub_subExt_cy<0> (i_alu/Msub_subExt_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<1> (i_alu/Msub_subExt_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<2> (i_alu/Msub_subExt_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<3> (i_alu/Msub_subExt_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<4> (i_alu/Msub_subExt_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<5> (i_alu/Msub_subExt_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<6> (i_alu/Msub_subExt_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<7> (i_alu/Msub_subExt_cy<7>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<8> (i_alu/Msub_subExt_cy<8>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<9> (i_alu/Msub_subExt_cy<9>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<10> (i_alu/Msub_subExt_cy<10>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<11> (i_alu/Msub_subExt_cy<11>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<12> (i_alu/Msub_subExt_cy<12>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<13> (i_alu/Msub_subExt_cy<13>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<14> (i_alu/Msub_subExt_cy<14>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<15> (i_alu/Msub_subExt_cy<15>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<16> (i_alu/Msub_subExt_cy<16>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<17> (i_alu/Msub_subExt_cy<17>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<18> (i_alu/Msub_subExt_cy<18>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<19> (i_alu/Msub_subExt_cy<19>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<20> (i_alu/Msub_subExt_cy<20>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<21> (i_alu/Msub_subExt_cy<21>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<22> (i_alu/Msub_subExt_cy<22>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<23> (i_alu/Msub_subExt_cy<23>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<24> (i_alu/Msub_subExt_cy<24>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<25> (i_alu/Msub_subExt_cy<25>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<26> (i_alu/Msub_subExt_cy<26>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<27> (i_alu/Msub_subExt_cy<27>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<28> (i_alu/Msub_subExt_cy<28>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<29> (i_alu/Msub_subExt_cy<29>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<30> (i_alu/Msub_subExt_cy<30>)
+     MUXCY:CI->O           0   0.064   0.000  i_alu/Msub_subExt_cy<31> (i_alu/Msub_subExt_cy<31>)
+     XORCY:CI->O           1   0.904   0.827  i_alu/Msub_subExt_xor<32> (i_alu/subExt<32>)
+     LUT4:I3->O            2   0.551   1.072  i_alu/sigResult<0>122 (i_alu/sigResult<0>122)
+     LUT2:I1->O            2   0.551   0.877  i_alu/sigResult<0>129 (DAddr_0_OBUF)
+     OBUF:I->O                 5.644          DAddr_0_OBUF (DAddr<0>)
     ----------------------------------------
-    Total                     20.507ns (12.828ns logic, 7.679ns route)
-                                       (62.6% logic, 37.4% route)
+    Total                     22.077ns (13.443ns logic, 8.634ns route)
+                                       (60.9% logic, 39.1% route)
 
 =========================================================================
 
 
-Total REAL time to Xst completion: 27.00 secs
-Total CPU time to Xst completion: 26.98 secs
+Total REAL time to Xst completion: 50.00 secs
+Total CPU time to Xst completion: 50.29 secs
  
 --> 
 
-Total memory usage is 326008 kilobytes
+Total memory usage is 360440 kilobytes
 
 Number of errors   :    0 (   0 filtered)
-Number of warnings :    5 (   0 filtered)
-Number of infos    :    2 (   0 filtered)
+Number of warnings :    2 (   0 filtered)
+Number of infos    :    3 (   0 filtered)
 
