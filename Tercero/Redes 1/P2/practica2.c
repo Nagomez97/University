@@ -78,6 +78,12 @@ int main(int argc, char **argv)
 		if (strlen(argv[1]) < 256) {
 			strcpy(entrada, argv[1]);
 		}
+		else {
+			printf("Argumento demasiado largo.\n");
+			printf("Ejecucion: %s <-f traza.pcap / -i eth0> [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]\n", argv[0]);
+
+			exit(ERROR);
+		}
 
 	} else {
 		printf("Ejecucion: %s <-f traza.pcap / -i eth0> [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]\n", argv[0]);
