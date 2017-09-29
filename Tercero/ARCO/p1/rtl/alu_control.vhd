@@ -40,6 +40,7 @@ architecture rtl of alu_control is
 	constant LSW	: t_aluOp := "00";
 	constant BEQ	: t_aluOp := "01";
 	constant RT		: t_aluOp := "10";
+	constant SLTI	: t_aluOp := "11";
 	
 	-- Codigos de Funct
 	constant F_ADD	: t_funct := "100000";
@@ -47,6 +48,7 @@ architecture rtl of alu_control is
 	constant F_OR	: t_funct := "100101";
 	constant F_SUB	: t_funct := "100010";
 	constant F_XOR	: t_funct := "100110";
+	constant F_SLT	: t_funct := "101010";
 	
 	-- Seniales
 	signal sigResult: std_logic_vector (3 downto 0); --senial de salida dirigida a la ALU
@@ -57,6 +59,7 @@ begin
 		case ALUOp is
 			when LSW => sigResult <= ALU_ADD;
 			when BEQ => sigResult <= ALU_SUB;
+			when SLTI => sigResult <= ALU_SLT;
 			when RT =>
 				case Funct is
 					when F_ADD => sigResult <= ALU_ADD;
@@ -64,8 +67,13 @@ begin
 					when F_OR => sigResult <= ALU_OR;
 					when F_SUB => sigResult <= ALU_SUB;
 					when F_XOR => sigResult <= ALU_XOR;
+					when F_SLT => sigResult <= ALU_SLT;
+					when others => sigResult <= "0000";
 				end case;
+			when others => sigResult <= "0000";
 			end case;
 	end process;
+	
+	ALUControl <= sigResult;
 		
 end architecture;
