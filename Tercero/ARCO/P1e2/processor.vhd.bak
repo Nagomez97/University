@@ -229,6 +229,7 @@ begin
    ------------------------------------------------------
 	
 	PC4 <= pc_exit + "100";
+	PC4 <= PC4;
 	
 	process(Clk, pc_in, Reset)
 	begin
