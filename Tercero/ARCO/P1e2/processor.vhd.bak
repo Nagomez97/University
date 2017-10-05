@@ -108,6 +108,7 @@ architecture rtl of processor is
 	signal ALUSrc  : std_logic;
 	signal ALUOp   : std_logic_vector (1 downto 0);
 	signal RegWrite: std_logic;
+	signal RegWriteAux: stdlogic;
 	signal RegDst  : std_logic;
 	signal LUICtrl	: std_logic;
 	signal Jump		: std_logic;
@@ -229,7 +230,6 @@ begin
    ------------------------------------------------------
 	
 	PC4 <= pc_exit + "100";
-	PC4 <= PC4;
 	
 	process(Clk, pc_in, Reset)
 	begin
@@ -290,6 +290,19 @@ begin
    		pc_aux <= reg3_PCadd_out;
    	end if;
    end process;
+
+   ------------------------------------------------------
+   -- MUX Nop (si todo son ceros, pone RegWrite a 0)
+   ------------------------------------------------------
+
+	process (reg1_IDataIn_out, RegWrite)
+	begin
+		if reg1_IDataIn_out = x"00000000" then
+			RegWriteAux <= '0';
+		else
+			RegWriteAux <= RegWrite;
+		end if;
+	end process;
 	
 	------------------------------------------------------
    -- MUX LUI
@@ -367,7 +380,7 @@ begin
    ------------------------------------------------------
    -- Registro 2 segmentacion
    ------------------------------------------------------
-   	process(Clk, Reset, RegDst, Branch, MemRead, MemToReg, ALUOp, MemWrite, ALUSrc, RegWrite, LUICtrl, 
+   	process(Clk, Reset, RegDst, Branch, MemRead, MemToReg, ALUOp, MemWrite, ALUSrc, RegWriteAux, LUICtrl, 
    	Jump, reg1_PC4_out, Rd1, Rd2, SignEx, reg1_IDataIn_out)
    	begin
    			if Reset = '1' then
@@ -397,7 +410,7 @@ begin
 								reg2_ALUOp_out <= ALUOp;
 								reg2_MemWrite_out <= MemWrite;
 								reg2_ALUSrc_out <= ALUSrc;
-								reg2_RegWrite_out <= RegWrite;
+								reg2_RegWrite_out <= RegWriteAux;
 								reg2_Jump_out <= Jump;
 								reg2_Rd1_out <= Rd1;
 								reg2_Rd2_out <= Rd2;
