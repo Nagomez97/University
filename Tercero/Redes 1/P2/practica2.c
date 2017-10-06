@@ -30,13 +30,22 @@
 #define ETH_FRAME_MIN 60     /* Tamanio minimo la trama ethernet (sin CRC) */
 #define ETH_DATA_MAX  (ETH_FRAME_MAX - ETH_HLEN) /* Tamano maximo y minimo de los datos de una trama ethernet*/
 #define ETH_DATA_MIN  (ETH_FRAME_MIN - ETH_HLEN)
-#define IP_ALEN 4			/* Tamanio de la direccion IP					*/
+#define IP_ALEN 4			 /* Tamanio de la direccion IP					*/
+#define IP_TO_LENGHT 2		/*Distancia desde principio de IP hasta Longitud Total*/
+#define IP_TO_POSITION 4	/*Distancia desde Longitud hasta Posicion*/
 #define OK 0
 #define ERROR 1
 #define PACK_READ 1
 #define PACK_ERR -1
 #define TRACE_END -2
 #define NO_FILTER 0
+/*Promiscuidad de la interfaz*/
+#define PROMISCUO 1
+#define NOPROMISCUO 0
+
+/*Timeout*/
+#define TIMEOUT 5000
+
 void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack);
 
 void handleSignal(int nsignal);
@@ -110,13 +119,11 @@ int main(int argc, char **argv)
 				pcap_close(descr);
 				exit(ERROR);
 			}
-			printf("Descomente el código para leer y abrir de una interfaz\n");
-			exit(ERROR);
 			
-			//if ( (descr = ??(optarg, ??, ??, ??, errbuf)) == NULL){
-			//	printf("Error: ??(): Interface: %s, %s %s %d.\n", optarg,errbuf,__FILE__,__LINE__);
-			//	exit(ERROR);
-			//}
+			if ((descr = pcap_open_live(optarg, ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
+				fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
+				exit(ERROR);
+			}
 			break;
 
 		case 'f' :
@@ -125,13 +132,11 @@ int main(int argc, char **argv)
 				pcap_close(descr);
 				exit(ERROR);
 			}
-			printf("Descomente el código para leer y abrir una traza pcap\n");
-			exit(ERROR);
 
-			//if ((descr = pcap_open_offline(optarg, errbuf)) == NULL) {
-			//	printf("Error: pcap_open_offline(): File: %s, %s %s %d.\n", optarg, errbuf, __FILE__, __LINE__);
-			//	exit(ERROR);
-			//}
+			if ((descr = pcap_open_offline(optarg, errbuf)) == NULL) {
+				printf("Error: pcap_open_offline(): File: %s, %s %s %d.\n", optarg, errbuf, __FILE__, __LINE__);
+				exit(ERROR);
+			}
 
 			break;
 
@@ -226,6 +231,9 @@ int main(int argc, char **argv)
 
 void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 {
+	uint8_t aux;
+	uint16_t aux16;
+
 	printf("Nuevo paquete capturado el %s\n", ctime((const time_t *) & (hdr->ts.tv_sec)));
 
 	int i = 0;
@@ -248,10 +256,32 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 
 	printf("\n");
 
-	//pack+=ETH_ALEN;
-	// .....
-	// .....
-	// .....
+	pack+=ETH_ALEN;
+
+	printf("Tipo de Ethernet = 0x");
+	printf("%02X%02X ", pack[0], pack[1]); /*El tipo de ehternet en hexadecimal*/
+
+	if(pack[0] != 8 || pack[1] != 0){
+		printf("El protocolo no es IPv4 \n");
+		return;
+	}
 
 	printf("\n\n");
+
+	pack+=ETH_TLEN;
+
+	aux = (pack[0] & 0xF0)/16; /*Asi cogemos los 4 bits mas significativos del primer byte*/
+	printf("Version IP = %d\n", aux);
+
+	aux = pack[0] & 0x0F; /*Asi cogemos los 4 menos significativos*/
+	printf("Longitud de cabecera = %d\n", aux);
+
+	pack += IP_TO_LENGHT;
+	aux16 = htons(*(uint16_t*)pack);
+	printf("Longitud total = %d\n", aux16);
+
+	pack += IP_TO_POSITION;
+	aux16 = htons(*(uint16_t*)pack);
+	printf("Posicion = %d\n", aux16&0x1FFF);
+	
 }

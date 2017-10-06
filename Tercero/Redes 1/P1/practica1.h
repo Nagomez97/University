@@ -21,7 +21,7 @@
 /*Tamanio maximo trama ethernet*/
 #define ETH_FRAME_MAX 1520
 
-/*Promiscuidad de la itnerfaz*/
+/*Promiscuidad de la interfaz*/
 #define PROMISCUO 1
 #define NOPROMISCUO 0
 
