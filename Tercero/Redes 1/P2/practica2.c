@@ -33,6 +33,15 @@
 #define IP_ALEN 4			 /* Tamanio de la direccion IP					*/
 #define IP_TO_LENGHT 2		/*Distancia desde principio de IP hasta Longitud Total*/
 #define IP_TO_POSITION 4	/*Distancia desde Longitud hasta Posicion*/
+#define IP_TO_LIFE 2 		/*Distancia desde Posicion hasta Tiempo de vida*/
+#define IP_TO_PROTOCOL 1 	/*Distancia desde tiempo de vida hasta protocolo*/
+#define IP_TO_IP 3 			/*Disntacia desde protocolo hasta ip origen*/
+#define IP_STEP 1			/*Un byte para imprimir IPS*/
+#define END_IP 20 			/*Longitud hasta el final de la direccion destino*/
+#define TCP 6				/*Protocolo TCP*/
+#define UDP 17				/*Protocolo UDP*/
+#define PORT_LENGTH 2		/*Longitud puerto TCP y UDP*/
+#define TCP_TO_ACK 11		/*Distancia desde puerto destino hasta ACK*/
 #define OK 0
 #define ERROR 1
 #define PACK_READ 1
@@ -121,7 +130,7 @@ int main(int argc, char **argv)
 			}
 			
 			if ((descr = pcap_open_live(optarg, ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
-				fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
+				fprintf(stdout, "Error: No se pudo abrir la interfaz %s.\n", optarg);
 				exit(ERROR);
 			}
 			break;
@@ -233,7 +242,12 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 {
 	uint8_t aux;
 	uint16_t aux16;
+	uint8_t protocolo;
+	uint16_t posicion;
+	uint8_t IHL;
+	int flag = 0;
 
+	printf("\n--------------------------------------------------------------------\n");
 	printf("Nuevo paquete capturado el %s\n", ctime((const time_t *) & (hdr->ts.tv_sec)));
 
 	int i = 0;
@@ -271,6 +285,7 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 	pack+=ETH_TLEN;
 
 	aux = (pack[0] & 0xF0)/16; /*Asi cogemos los 4 bits mas significativos del primer byte*/
+	IHL = (pack[0] & 0x0F);
 	printf("Version IP = %d\n", aux);
 
 	aux = pack[0] & 0x0F; /*Asi cogemos los 4 menos significativos*/
@@ -281,7 +296,120 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 	printf("Longitud total = %d\n", aux16);
 
 	pack += IP_TO_POSITION;
-	aux16 = htons(*(uint16_t*)pack);
-	printf("Posicion = %d\n", aux16&0x1FFF);
+	posicion = htons(*(uint16_t*)pack) & 0x1FFF;
+	printf("Posicion = %d\n", posicion); /* Así cogemos los 13 bits que necesitamos*/
+
+	pack += IP_TO_LIFE;
+	printf("Tiempo de vida = %d\n", pack[0]);
+
+	pack += IP_TO_PROTOCOL;
+	protocolo = pack[0];
+	printf("Protocolo IP = %d\n", protocolo);
+
+	pack += IP_TO_IP;
+	printf("Direccion IP origen = ");
+	printf("%d", pack[0]);
+	if(pack[0] != ipsrc_filter[0]){
+		flag = 1;
+	}
+	pack += IP_STEP;
+	for( i = 1; i < IP_ALEN; i++){
+		printf(".%d", pack[0]);
+		if(pack[0] != ipsrc_filter[i]){
+			flag = 1;
+		}
+		pack += IP_STEP;
+	}
+	printf("\n");
+	if(ipsrc_filter[0] == NO_FILTER){
+		flag = 0;
+	}
+	if(flag == 1){
+		printf("La direccion IP origen no coincide con el filtro.\n");
+		return;
+	}
+
+	printf("Direccion IP destino = ");
+	printf("%d", pack[0]);
+	if(pack[0] != ipdst_filter[0]){
+		flag = 1;
+	}
+	pack += IP_STEP;
+	for( i = 1; i < IP_ALEN; i++){
+		printf(".%d", pack[0]);
+		if(pack[0] != ipdst_filter[i]){
+		flag = 1;
+	}
+		pack += IP_STEP;
+	}
+	printf("\n");
+	if(ipdst_filter[0] == NO_FILTER){
+		flag = 0;
+	}
+	if(flag == 1){
+		printf("La direccion IP destino no coincide con el filtro.\n");
+		return;
+	}
+
+	if (posicion != 0){
+		printf("El paquete no es el primer fragmento.\n");
+		return;
+	}
+	printf("\n");
+	pack += (IHL*4) - END_IP;
+
+	if(protocolo == TCP){
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de origen = %d\n", aux16);
+
+		if(aux16 != sport_filter && sport_filter != NO_FILTER){
+			printf("El puerto de origen no coincide con el filtro.\n");
+			return;
+		}
+
+		pack += PORT_LENGTH;
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de destino = %d\n", aux16);
+
+		if(aux16 != dport_filter && dport_filter != NO_FILTER){
+			printf("El puerto de destino no coincide con el filtro.\n");
+			return;
+		}
+
+		pack += TCP_TO_ACK;
+		printf("ACK = %c\n", (pack[0] & 0x10) == 16? '1' : '0');
+		printf("SYN = %c\n", (pack[0] & 0x02) == 2? '1' : '0');
+
+		return;
+	}
+	else if(protocolo == UDP){
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de origen = %d\n", aux16);
+
+		if(aux16 != sport_filter && sport_filter != NO_FILTER){
+			printf("El puerto de origen no coincide con el filtro.\n");
+			return;
+		}
+
+		pack += PORT_LENGTH;
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de destino = %d\n", aux16);
+
+		if(aux16 != dport_filter && dport_filter != NO_FILTER){
+			printf("El puerto de destino no coincide con el filtro.\n");
+			return;
+		}
+
+		pack += PORT_LENGTH;
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Longitud = %d\n", aux16);
+
+		return;
+	}
+	else{
+		printf("El paquete no utiliza protocolo TCP ni UDP.\n");
+		return;
+	}
+	
 	
 }
