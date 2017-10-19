@@ -1,0 +1,1 @@
+No le ha gustado como hacemos el LUI, dice que la ALU tiene una función LS16 que lo hace, deberíamos aumentar ALUOp un bit mas para detectar que es un LUI y hacerlo con la ALU en vez de lógica externa
