@@ -1,0 +1,9 @@
+[3;J[H[2JGenerando traza ([35m[1mtraza.pcap[0m) para la pareja [35m[1m1[0m del grupo [35m[1m1301[0m. (id=130101)
+Epoch de inicio: 1508495549
+
+Información [31m[1mútil[0m para el estudiante:
+La dirección MAC que deberá tener en cuenta es: [34m[1m00:11:88:CC:33:E5[0m
+La dirección IP (origen o destino) del flujo [35m[1mTCP[0m que deberá tener en cuenta es: [34m[1m119.25.90.131[0m
+El puerto (origen o destino) del flujo [35m[1mUDP[0m que deberá tener en cuenta es: [34m[1m27884[0m
+
+Generando pcap...PCAP generado con éxito!
