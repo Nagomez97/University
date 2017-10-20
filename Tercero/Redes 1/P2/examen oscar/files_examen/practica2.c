@@ -304,14 +304,31 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 	printf("Tipo de Ethernet = 0x");
 	printf("%02X%02X ", pack[0], pack[1]); /*El tipo de ehternet en hexadecimal*/
 
-	if(pack[0] != 8 || pack[1] != 0){
-		printf("El protocolo no es IPv4 \n");
+	if(!(pack[0] == 8 && pack[1] == 0) || !(pack[0] == 8 && pack[1] == 6)){
+		printf("El protocolo no es IPv4 ni ARP\n");
 		return;
 	}
 
 	printf("\n\n");
 
 	pack+=ETH_TLEN;
+
+	if(pack[1] == 6){ /*ARP*/
+		pack += 14;
+
+		printf("Direccion IP emisor = ");
+		printf("%d", pack[0]);
+		pack += IP_STEP;
+		for( i = 1; i < IP_ALEN; i++){	
+			printf(".%d", pack[0]);
+			pack += IP_STEP;
+		}
+		printf("\n");
+		return;
+
+
+	}	
+
 
 	/*Protocolo IPv4*/
 
