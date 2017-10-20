@@ -304,7 +304,9 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 	printf("Tipo de Ethernet = 0x");
 	printf("%02X%02X ", pack[0], pack[1]); /*El tipo de ehternet en hexadecimal*/
 
-	if(!(pack[0] == 8 && pack[1] == 0) || !(pack[0] == 8 && pack[1] == 6)){
+	if()
+
+	if(pack[0] != 8 || (pack[1] != 0 && pack[1] != 6)){
 		printf("El protocolo no es IPv4 ni ARP\n");
 		return;
 	}
