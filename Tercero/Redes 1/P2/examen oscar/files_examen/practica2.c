@@ -49,6 +49,7 @@
 #define UDP 17				/*Protocolo UDP*/
 #define PORT_LENGTH 2		/*Longitud puerto TCP y UDP*/
 #define TCP_TO_ACK 11		/*Distancia desde puerto destino hasta ACK*/
+#define TCP_TO_VENTANA 1
 
 /*Macros para pcap*/
 #define OK 0
@@ -66,6 +67,8 @@
 
 /*Timeout*/
 #define TIMEOUT 5000
+
+#define ARP_TO_IP_SENDER 14
 
 /*Definición de funciones*/
 void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack);
@@ -304,8 +307,6 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 	printf("Tipo de Ethernet = 0x");
 	printf("%02X%02X ", pack[0], pack[1]); /*El tipo de ehternet en hexadecimal*/
 
-	if()
-
 	if(pack[0] != 8 || (pack[1] != 0 && pack[1] != 6)){
 		printf("El protocolo no es IPv4 ni ARP\n");
 		return;
@@ -316,7 +317,7 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 	pack+=ETH_TLEN;
 
 	if(pack[1] == 6){ /*ARP*/
-		pack += 14;
+		pack += ARP_TO_IP_SENDER;
 
 		printf("Direccion IP emisor = ");
 		printf("%d", pack[0]);
@@ -445,7 +446,7 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 		printf("ACK = %c\n", (pack[0] & 0x10) == 16? '1' : '0');
 		printf("SYN = %c\n", (pack[0] & 0x02) == 2? '1' : '0');
 
-		pack += 1;
+		pack += TCP_TO_VENTANA;
 		aux16 = htons(*(uint16_t*)pack);
 		printf("Ventana = %d\n", aux16);
 
