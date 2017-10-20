@@ -314,9 +314,10 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 
 	printf("\n\n");
 
-	pack+=ETH_TLEN;
+	
 
 	if(pack[1] == 6){ /*ARP*/
+		pack+=ETH_TLEN;
 		pack += ARP_TO_IP_SENDER;
 
 		printf("Direccion IP emisor = ");
@@ -331,7 +332,7 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 
 
 	}	
-
+	pack+=ETH_TLEN;
 
 	/*Protocolo IPv4*/
 
