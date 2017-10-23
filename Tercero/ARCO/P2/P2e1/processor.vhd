@@ -568,4 +568,18 @@ begin
 
 	end process;
 
+	------------------------------------------------------
+   -- Hazard detection Unit: una instruccion utiliza un dato
+   -- que se ha cargado en la instruccion anterior
+   -- Por ejempo:
+   -- lw $2, 0($0)
+   -- add $3, $2, $2
+   -- En este caso hay que parar el pipeline un ciclo.
+   ------------------------------------------------------
+
+	process()
+	begin
+		
+	end process;
+
 end architecture;
