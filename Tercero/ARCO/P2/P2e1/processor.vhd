@@ -68,7 +68,8 @@ architecture rtl of processor is
 			RegWrite : out  std_logic; -- 1=Escribir registro
 			RegDst   : out  std_logic;  -- 0=Reg. destino es rt, 1=rd
 			LUICtrl	: out std_logic;	-- 1=LUI, 0 resto
-			Jump		: out std_logic	-- 1=Jump, 0 resto
+			Jump		: out std_logic;	-- 1=Jump, 0 resto
+			bubble 	: in std_logic 		-- 1=Bubble, 0 no
 		);
 	end component;
 	
@@ -177,7 +178,11 @@ architecture rtl of processor is
  	signal fwd_A   : std_logic_vector(1 downto 0); -- Control del mux de OpA
  	signal fwd_B   : std_logic_vector(1 downto 0); -- Control del mux de OpB
 	
-	
+	-- Hazard Detection Unit
+	signal reg1_Stop : std_logic; -- Señal de Stop del registro 1 para bubbles
+	signal PC_Stop	 : std_logic; -- Señal de Stop para el PC para bubbles
+	signal bubble 	 : std_logic; -- Señal para la Control Unit para crear un bubble
+
 begin  
 	
 	-- instanciacion de alu
@@ -213,7 +218,8 @@ begin
 			RegWrite => RegWrite,
 			RegDst => RegDst,
 			LUICtrl => LUICtrl,
-			Jump => Jump
+			Jump => Jump,
+			bubble => bubble
 		);
 		
 	-- instanciacion de reg_bank
@@ -237,11 +243,11 @@ begin
 	
 	PC4 <= pc_exit + "100";
 	
-	process(Clk, pc_in, Reset)
+	process(Clk, pc_in, Reset, PC_Stop)
 	begin
 		if Reset = '1' then
 			pc_exit <= (others => '0');
-		elsif rising_edge(Clk) then
+		elsif rising_edge(Clk) and PC_Stop /= '1' then
 			pc_exit <= pc_in;			
 		end if;
 	end process;
@@ -393,12 +399,12 @@ begin
    ------------------------------------------------------
    -- Registro 1 segmentacion
    ------------------------------------------------------
-   	process(PC4, Clk, Reset, IDataIn)
+   	process(PC4, Clk, Reset, IDataIn, reg1_Stop)
    	begin
    			if Reset = '1' then
    					reg1_IDataIn_out <= (others => '0');
    					reg1_PC4_out <= (others => '0');
-   			elsif rising_edge(Clk) then
+   			elsif rising_edge(Clk)  and reg1_Stop /= '1' then
    					reg1_PC4_out <= PC4;
    					reg1_IDataIn_out <= IDataIn;
    			end if;
@@ -577,9 +583,27 @@ begin
    -- En este caso hay que parar el pipeline un ciclo.
    ------------------------------------------------------
 
-	process()
+	process(reg2_MemRead_out, reg2_RegDst_out, reg1_IDataIn_out)
 	begin
-		
+		if reg2_MemRead_out = '1' then --Comprobación de que es un lw
+			if (reg2_RegDst_out = reg1_IDataIn_out(25 downto 21)) AND (reg2_RegDst_out /= "00000") then --Comprobación registro rs=rd
+				PC_Stop <= '1';
+				reg1_Stop <= '1';
+				bubble <= '1';
+			elsif (reg2_RegDst_out = reg1_IDataIn_out(20 downto 16)) AND (reg2_RegDst_out /= "00000") then
+				PC_Stop <= '1';
+				reg1_Stop <= '1';
+				bubble <= '1';
+			else
+				PC_Stop <= '0';
+				reg1_Stop <= '0';
+				bubble <= '0';
+			end if;
+		else
+			PC_Stop <= '0';
+			reg1_Stop <= '0';
+			bubble <= '0';
+		end if;
 	end process;
 
 end architecture;

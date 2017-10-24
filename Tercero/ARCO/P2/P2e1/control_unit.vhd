@@ -26,7 +26,8 @@ entity control_unit is
       RegWrite : out  std_logic; -- 1=Escribir registro
       RegDst   : out  std_logic;  -- 0=Reg. destino es rt, 1=rd
 		LUICtrl	: out std_logic;	-- 1=LUI, 0 resto
-		Jump		: out std_logic	-- 1=Jump, 0 resto
+		Jump		: out std_logic;	-- 1=Jump, 0 resto
+      bubble   : in std_logic    -- 1=Bubble, 0 no.   
    );
 end control_unit;
 
@@ -54,119 +55,132 @@ architecture rtl of control_unit is
 
 begin
 
-   process (OpCode)
+   process (OpCode, bubble)
    begin
-      case OpCode is 
-         when OP_RTYPE =>
-            RegDst <= '1';
-            Branch <= '0';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= RT;
-            MemWrite <= '0';
-            ALUSrc <= '0';
-            RegWrite <= '1';
-				LUICtrl <= '0';
-				Jump <= '0';
+      if(bubble = '1') then
+         RegDst <= '0';
+         Branch <= '0';
+         MemRead <= '0';
+         MemToReg <= '0';
+         ALUOp <= LSW;
+         MemWrite <= '0';
+         ALUSrc <= '0';
+         RegWrite <= '0';
+         LUICtrl <= '0';
+         Jump <= '0';
+      else
+         case OpCode is 
+            when OP_RTYPE =>
+               RegDst <= '1';
+               Branch <= '0';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= RT;
+               MemWrite <= '0';
+               ALUSrc <= '0';
+               RegWrite <= '1';
+   				LUICtrl <= '0';
+   				Jump <= '0';
 
-         when OP_ADDI =>
-            RegDst <= '0';
-            Branch <= '0';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= RT;
-            MemWrite <= '0';
-            ALUSrc <= '1';
-            RegWrite <= '1';
-				LUICtrl <= '0';
-				Jump <= '0';
+            when OP_ADDI =>
+               RegDst <= '0';
+               Branch <= '0';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= RT;
+               MemWrite <= '0';
+               ALUSrc <= '1';
+               RegWrite <= '1';
+   				LUICtrl <= '0';
+   				Jump <= '0';
 
-         when OP_BEQ =>
-            RegDst <= '0';
-            Branch <= '1';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= BEQ;
-            MemWrite <= '0';
-            ALUSrc <= '0';
-            RegWrite <= '0';
-				LUICtrl <= '0';
-				Jump <= '0';
+            when OP_BEQ =>
+               RegDst <= '0';
+               Branch <= '1';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= BEQ;
+               MemWrite <= '0';
+               ALUSrc <= '0';
+               RegWrite <= '0';
+   				LUICtrl <= '0';
+   				Jump <= '0';
 
-         when OP_SW =>
-            RegDst <= '0';
-            Branch <= '0';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= LSW;
-            MemWrite <= '1';
-            ALUSrc <= '1';
-            RegWrite <= '0';
-				LUICtrl <= '0';
-				Jump <= '0';
+            when OP_SW =>
+               RegDst <= '0';
+               Branch <= '0';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= LSW;
+               MemWrite <= '1';
+               ALUSrc <= '1';
+               RegWrite <= '0';
+   				LUICtrl <= '0';
+   				Jump <= '0';
 
-         when OP_LW =>
-            RegDst <= '0';
-            Branch <= '0';
-            MemRead <= '1';
-            MemToReg <= '1';
-            ALUOp <= LSW;
-            MemWrite <= '0';
-            ALUSrc <= '1';
-            RegWrite <= '1';
-				LUICtrl <= '0';
-				Jump <= '0';
+            when OP_LW =>
+               RegDst <= '0';
+               Branch <= '0';
+               MemRead <= '1';
+               MemToReg <= '1';
+               ALUOp <= LSW;
+               MemWrite <= '0';
+               ALUSrc <= '1';
+               RegWrite <= '1';
+   				LUICtrl <= '0';
+   				Jump <= '0';
 
-         when OP_LUI => 
-				RegDst <= '0';
-            Branch <= '0';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= LSW;
-            MemWrite <= '0';
-            ALUSrc <= '0';
-            RegWrite <= '1';
-				LUICtrl <= '1';
-				Jump <= '0';
+            when OP_LUI => 
+   				RegDst <= '0';
+               Branch <= '0';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= LSW;
+               MemWrite <= '0';
+               ALUSrc <= '0';
+               RegWrite <= '1';
+   				LUICtrl <= '1';
+   				Jump <= '0';
 
 
-         when OP_SLTI =>
-				RegDst <= '0';
-            Branch <= '0';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= SLTI;
-            MemWrite <= '0';
-            ALUSrc <= '1';
-            RegWrite <= '0';
-				LUICtrl <= '0';
-				Jump <= '0';
-            
-         when OP_J =>
-				RegDst <= '0';
-            Branch <= '0';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= LSW;
-            MemWrite <= '0';
-            ALUSrc <= '0';
-            RegWrite <= '0';
-				LUICtrl <= '0';
-				Jump <= '1';
-			
-			when others =>
-				RegDst <= '0';
-            Branch <= '0';
-            MemRead <= '0';
-            MemToReg <= '0';
-            ALUOp <= LSW;
-            MemWrite <= '0';
-            ALUSrc <= '0';
-            RegWrite <= '0';
-				LUICtrl <= '0';
-				Jump <= '0';
-            
-      end case;
+            when OP_SLTI =>
+   				RegDst <= '0';
+               Branch <= '0';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= SLTI;
+               MemWrite <= '0';
+               ALUSrc <= '1';
+               RegWrite <= '0';
+   				LUICtrl <= '0';
+   				Jump <= '0';
+               
+            when OP_J =>
+   				RegDst <= '0';
+               Branch <= '0';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= LSW;
+               MemWrite <= '0';
+               ALUSrc <= '0';
+               RegWrite <= '0';
+   				LUICtrl <= '0';
+   				Jump <= '1';
+   			
+   			when others =>
+   				RegDst <= '0';
+               Branch <= '0';
+               MemRead <= '0';
+               MemToReg <= '0';
+               ALUOp <= LSW;
+               MemWrite <= '0';
+               ALUSrc <= '0';
+               RegWrite <= '0';
+   				LUICtrl <= '0';
+   				Jump <= '0';
+               
+         end case;
+      end if;
    end process;
 
 end architecture;

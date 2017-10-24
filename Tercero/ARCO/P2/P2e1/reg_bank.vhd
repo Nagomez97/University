@@ -71,6 +71,9 @@ begin
          --else
             --Rd2 <= regs(conv_integer(A2));
          end if;
+      --else
+         --Rd1 <= regs(conv_integer(A1));
+         --Rd2 <= regs(conv_integer(A2));
       end if;
    end process;
 
