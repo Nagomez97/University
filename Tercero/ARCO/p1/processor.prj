@@ -1,5 +1,0 @@
-vhdl work "rtl/reg_bank.vhd"
-vhdl work "rtl/control_unit.vhd"
-vhdl work "rtl/alu_control.vhd"
-vhdl work "rtl/alu.vhd"
-vhdl work "rtl/processor.vhd"

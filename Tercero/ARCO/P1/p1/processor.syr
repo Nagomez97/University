@@ -1,0 +1,608 @@
+Release 14.7 - xst P.20131013 (nt64)
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+--> Parameter TMPDIR set to xst/projnav.tmp
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.63 secs
+ 
+--> Parameter xsthdpdir set to xst
+
+
+Total REAL time to Xst completion: 0.00 secs
+Total CPU time to Xst completion: 0.63 secs
+ 
+--> Reading design: processor.prj
+
+TABLE OF CONTENTS
+  1) Synthesis Options Summary
+  2) HDL Compilation
+  3) Design Hierarchy Analysis
+  4) HDL Analysis
+  5) HDL Synthesis
+     5.1) HDL Synthesis Report
+  6) Advanced HDL Synthesis
+     6.1) Advanced HDL Synthesis Report
+  7) Low Level Synthesis
+  8) Partition Report
+  9) Final Report
+	9.1) Device utilization summary
+	9.2) Partition Resource Summary
+	9.3) TIMING REPORT
+
+
+=========================================================================
+*                      Synthesis Options Summary                        *
+=========================================================================
+---- Source Parameters
+Input File Name                    : "processor.prj"
+Input Format                       : mixed
+Ignore Synthesis Constraint File   : NO
+
+---- Target Parameters
+Output File Name                   : "processor"
+Output Format                      : NGC
+Target Device                      : xc3s200-4-ft256
+
+---- Source Options
+Top Module Name                    : processor
+Automatic FSM Extraction           : YES
+FSM Encoding Algorithm             : Auto
+Safe Implementation                : No
+FSM Style                          : LUT
+RAM Extraction                     : Yes
+RAM Style                          : Auto
+ROM Extraction                     : Yes
+Mux Style                          : Auto
+Decoder Extraction                 : YES
+Priority Encoder Extraction        : Yes
+Shift Register Extraction          : YES
+Logical Shifter Extraction         : YES
+XOR Collapsing                     : YES
+ROM Style                          : Auto
+Mux Extraction                     : Yes
+Resource Sharing                   : YES
+Asynchronous To Synchronous        : NO
+Multiplier Style                   : Auto
+Automatic Register Balancing       : No
+
+---- Target Options
+Add IO Buffers                     : YES
+Global Maximum Fanout              : 100000
+Add Generic Clock Buffer(BUFG)     : 8
+Register Duplication               : YES
+Slice Packing                      : YES
+Optimize Instantiated Primitives   : NO
+Use Clock Enable                   : Yes
+Use Synchronous Set                : Yes
+Use Synchronous Reset              : Yes
+Pack IO Registers into IOBs        : Auto
+Equivalent register Removal        : YES
+
+---- General Options
+Optimization Goal                  : Speed
+Optimization Effort                : 1
+Keep Hierarchy                     : No
+Netlist Hierarchy                  : As_Optimized
+RTL Output                         : Yes
+Global Optimization                : AllClockNets
+Read Cores                         : YES
+Write Timing Constraints           : NO
+Cross Clock Analysis               : NO
+Hierarchy Separator                : /
+Bus Delimiter                      : <>
+Case Specifier                     : Maintain
+Slice Utilization Ratio            : 100
+BRAM Utilization Ratio             : 100
+Verilog 2001                       : YES
+Auto BRAM Packing                  : NO
+Slice Utilization Ratio Delta      : 5
+
+=========================================================================
+
+
+=========================================================================
+*                          HDL Compilation                              *
+=========================================================================
+Compiling vhdl file "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/alu.vhd" in Library work.
+Architecture rtl of Entity alu is up to date.
+Compiling vhdl file "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/alu_control.vhd" in Library work.
+Architecture rtl of Entity alu_control is up to date.
+Compiling vhdl file "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/control_unit.vhd" in Library work.
+Architecture rtl of Entity control_unit is up to date.
+Compiling vhdl file "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/reg_bank.vhd" in Library work.
+Architecture rtl of Entity reg_bank is up to date.
+Compiling vhdl file "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/processor.vhd" in Library work.
+Entity <processor> compiled.
+Entity <processor> (Architecture <rtl>) compiled.
+
+=========================================================================
+*                     Design Hierarchy Analysis                         *
+=========================================================================
+Analyzing hierarchy for entity <processor> in library <work> (architecture <rtl>).
+
+Analyzing hierarchy for entity <alu> in library <work> (architecture <rtl>).
+
+Analyzing hierarchy for entity <alu_control> in library <work> (architecture <rtl>).
+
+Analyzing hierarchy for entity <control_unit> in library <work> (architecture <rtl>).
+
+Analyzing hierarchy for entity <reg_bank> in library <work> (architecture <rtl>).
+
+
+=========================================================================
+*                            HDL Analysis                               *
+=========================================================================
+Analyzing Entity <processor> in library <work> (Architecture <rtl>).
+Entity <processor> analyzed. Unit <processor> generated.
+
+Analyzing Entity <alu> in library <work> (Architecture <rtl>).
+Entity <alu> analyzed. Unit <alu> generated.
+
+Analyzing Entity <alu_control> in library <work> (Architecture <rtl>).
+INFO:Xst:1561 - "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/alu_control.vhd" line 71: Mux is complete : default of case is discarded
+Entity <alu_control> analyzed. Unit <alu_control> generated.
+
+Analyzing Entity <control_unit> in library <work> (Architecture <rtl>).
+Entity <control_unit> analyzed. Unit <control_unit> generated.
+
+Analyzing Entity <reg_bank> in library <work> (Architecture <rtl>).
+Entity <reg_bank> analyzed. Unit <reg_bank> generated.
+
+
+=========================================================================
+*                           HDL Synthesis                               *
+=========================================================================
+
+Performing bidirectional port resolution...
+INFO:Xst:2679 - Register <regs<0>> in unit <reg_bank> has a constant value of 00000000000000000000000000000000 during circuit operation. The register is replaced by logic.
+
+Synthesizing Unit <alu>.
+    Related source file is "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/alu.vhd".
+    Found 32-bit adder for signal <sigResult$addsub0000> created at line 56.
+    Found 32-bit xor2 for signal <sigResult$xor0000> created at line 53.
+    Found 33-bit subtractor for signal <subExt>.
+    Summary:
+	inferred   2 Adder/Subtractor(s).
+Unit <alu> synthesized.
+
+
+Synthesizing Unit <alu_control>.
+    Related source file is "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/alu_control.vhd".
+    Found 4-bit 4-to-1 multiplexer for signal <sigResult>.
+    Summary:
+	inferred   4 Multiplexer(s).
+Unit <alu_control> synthesized.
+
+
+Synthesizing Unit <control_unit>.
+    Related source file is "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/control_unit.vhd".
+Unit <control_unit> synthesized.
+
+
+Synthesizing Unit <reg_bank>.
+    Related source file is "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/reg_bank.vhd".
+    Found 32-bit 32-to-1 multiplexer for signal <Rd1>.
+    Found 32-bit 32-to-1 multiplexer for signal <Rd2>.
+    Found 992-bit register for signal <regs<1:31>>.
+INFO:Xst:738 - HDL ADVISOR - 992 flip-flops were inferred for signal <regs>. You may be trying to describe a RAM in a way that is incompatible with block and distributed RAM resources available on Xilinx devices, or with a specific template that is not supported. Please review the Xilinx resources documentation and the XST user manual for coding guidelines. Taking advantage of RAM resources will lead to improved device usage and reduced synthesis time.
+    Summary:
+	inferred 992 D-type flip-flop(s).
+	inferred  64 Multiplexer(s).
+Unit <reg_bank> synthesized.
+
+
+Synthesizing Unit <processor>.
+    Related source file is "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/rtl/processor.vhd".
+    Found 32-bit adder for signal <PC4>.
+    Found 32-bit register for signal <pc_exit>.
+    Found 32-bit adder for signal <PCadd>.
+    Summary:
+	inferred  32 D-type flip-flop(s).
+	inferred   2 Adder/Subtractor(s).
+Unit <processor> synthesized.
+
+
+=========================================================================
+HDL Synthesis Report
+
+Macro Statistics
+# Adders/Subtractors                                   : 4
+ 32-bit adder                                          : 3
+ 33-bit subtractor                                     : 1
+# Registers                                            : 32
+ 32-bit register                                       : 32
+# Multiplexers                                         : 3
+ 32-bit 32-to-1 multiplexer                            : 2
+ 4-bit 4-to-1 multiplexer                              : 1
+# Xors                                                 : 1
+ 32-bit xor2                                           : 1
+
+=========================================================================
+
+=========================================================================
+*                       Advanced HDL Synthesis                          *
+=========================================================================
+
+
+=========================================================================
+Advanced HDL Synthesis Report
+
+Macro Statistics
+# Adders/Subtractors                                   : 4
+ 32-bit adder                                          : 3
+ 33-bit subtractor                                     : 1
+# Registers                                            : 1024
+ Flip-Flops                                            : 1024
+# Multiplexers                                         : 65
+ 1-bit 32-to-1 multiplexer                             : 64
+ 4-bit 4-to-1 multiplexer                              : 1
+# Xors                                                 : 1
+ 32-bit xor2                                           : 1
+
+=========================================================================
+
+=========================================================================
+*                         Low Level Synthesis                           *
+=========================================================================
+WARNING:Xst:1710 - FF/Latch <pc_exit_0> (without init value) has a constant value of 0 in block <processor>. This FF/Latch will be trimmed during the optimization process.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch <pc_exit_1> (without init value) has a constant value of 0 in block <processor>. This FF/Latch will be trimmed during the optimization process.
+
+Optimizing unit <processor> ...
+
+Optimizing unit <alu> ...
+
+Optimizing unit <reg_bank> ...
+
+Mapping all equations...
+Building and optimizing final netlist ...
+Found area constraint ratio of 100 (+ 5) on block processor, actual ratio is 66.
+
+Final Macro Processing ...
+
+=========================================================================
+Final Register Report
+
+Macro Statistics
+# Registers                                            : 1022
+ Flip-Flops                                            : 1022
+
+=========================================================================
+
+=========================================================================
+*                           Partition Report                            *
+=========================================================================
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+=========================================================================
+*                            Final Report                               *
+=========================================================================
+Final Results
+RTL Top Level Output File Name     : processor.ngr
+Top Level Output File Name         : processor
+Output Format                      : NGC
+Optimization Goal                  : Speed
+Keep Hierarchy                     : No
+
+Design Statistics
+# IOs                              : 164
+
+Cell Usage :
+# BELS                             : 2803
+#      GND                         : 1
+#      INV                         : 1
+#      LUT1                        : 29
+#      LUT2                        : 101
+#      LUT2_L                      : 8
+#      LUT3                        : 1053
+#      LUT3_D                      : 5
+#      LUT3_L                      : 34
+#      LUT4                        : 294
+#      LUT4_L                      : 36
+#      MUXCY                       : 130
+#      MUXF5                       : 537
+#      MUXF6                       : 256
+#      MUXF7                       : 128
+#      MUXF8                       : 64
+#      VCC                         : 1
+#      XORCY                       : 125
+# FlipFlops/Latches                : 1022
+#      FDC                         : 30
+#      FDCE                        : 992
+# Clock Buffers                    : 1
+#      BUFGP                       : 1
+# IO Buffers                       : 163
+#      IBUF                        : 65
+#      OBUF                        : 98
+=========================================================================
+
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s200ft256-4 
+
+ Number of Slices:                     1268  out of   1920    66%  
+ Number of Slice Flip Flops:           1022  out of   3840    26%  
+ Number of 4 input LUTs:               1561  out of   3840    40%  
+ Number of IOs:                         164
+ Number of bonded IOBs:                 164  out of    173    94%  
+ Number of GCLKs:                         1  out of      8    12%  
+
+---------------------------
+Partition Resource Summary:
+---------------------------
+
+  No Partitions were found in this design.
+
+---------------------------
+
+
+=========================================================================
+TIMING REPORT
+
+NOTE: THESE TIMING NUMBERS ARE ONLY A SYNTHESIS ESTIMATE.
+      FOR ACCURATE TIMING INFORMATION PLEASE REFER TO THE TRACE REPORT
+      GENERATED AFTER PLACE-and-ROUTE.
+
+Clock Information:
+------------------
+-----------------------------------+------------------------+-------+
+Clock Signal                       | Clock buffer(FF name)  | Load  |
+-----------------------------------+------------------------+-------+
+Clk                                | BUFGP                  | 1022  |
+-----------------------------------+------------------------+-------+
+
+Asynchronous Control Signals Information:
+----------------------------------------
+-----------------------------------+------------------------+-------+
+Control Signal                     | Buffer(FF name)        | Load  |
+-----------------------------------+------------------------+-------+
+Reset                              | IBUF                   | 1022  |
+-----------------------------------+------------------------+-------+
+
+Timing Summary:
+---------------
+Speed Grade: -4
+
+   Minimum period: 16.481ns (Maximum Frequency: 60.677MHz)
+   Minimum input arrival time before clock: 20.626ns
+   Maximum output required time after clock: 18.175ns
+   Maximum combinational path delay: 22.077ns
+
+Timing Detail:
+--------------
+All values displayed in nanoseconds (ns)
+
+=========================================================================
+Timing constraint: Default period analysis for Clock 'Clk'
+  Clock period: 16.481ns (frequency: 60.677MHz)
+  Total number of paths / destination ports: 6244547 / 1022
+-------------------------------------------------------------------------
+Delay:               16.481ns (Levels of Logic = 42)
+  Source:            i_reg_bank/regs_1_0 (FF)
+  Destination:       pc_exit_2 (FF)
+  Source Clock:      Clk rising
+  Destination Clock: Clk rising
+
+  Data Path: i_reg_bank/regs_1_0 to pc_exit_2
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     FDCE:C->Q             2   0.720   1.072  i_reg_bank/regs_1_0 (i_reg_bank/regs_1_0)
+     LUT2:I1->O            1   0.551   0.000  i_reg_bank/mux32_10 (i_reg_bank/mux32_10)
+     MUXF5:I0->O           1   0.360   0.000  i_reg_bank/mux32_8_f5 (i_reg_bank/mux32_8_f5)
+     MUXF6:I0->O           1   0.342   0.000  i_reg_bank/mux32_6_f6 (i_reg_bank/mux32_6_f6)
+     MUXF7:I0->O           1   0.342   0.000  i_reg_bank/mux32_4_f7 (i_reg_bank/mux32_4_f7)
+     MUXF8:I0->O           4   0.342   0.985  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
+     LUT4:I2->O            1   0.551   0.000  i_alu/Msub_subExt_lut<0> (i_alu/Msub_subExt_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  i_alu/Msub_subExt_cy<0> (i_alu/Msub_subExt_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<1> (i_alu/Msub_subExt_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<2> (i_alu/Msub_subExt_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<3> (i_alu/Msub_subExt_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<4> (i_alu/Msub_subExt_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<5> (i_alu/Msub_subExt_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<6> (i_alu/Msub_subExt_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<7> (i_alu/Msub_subExt_cy<7>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<8> (i_alu/Msub_subExt_cy<8>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<9> (i_alu/Msub_subExt_cy<9>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<10> (i_alu/Msub_subExt_cy<10>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<11> (i_alu/Msub_subExt_cy<11>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<12> (i_alu/Msub_subExt_cy<12>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<13> (i_alu/Msub_subExt_cy<13>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<14> (i_alu/Msub_subExt_cy<14>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<15> (i_alu/Msub_subExt_cy<15>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<16> (i_alu/Msub_subExt_cy<16>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<17> (i_alu/Msub_subExt_cy<17>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<18> (i_alu/Msub_subExt_cy<18>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<19> (i_alu/Msub_subExt_cy<19>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<20> (i_alu/Msub_subExt_cy<20>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<21> (i_alu/Msub_subExt_cy<21>)
+     XORCY:CI->O           1   0.904   0.827  i_alu/Msub_subExt_xor<22> (i_alu/subExt<22>)
+     LUT4:I3->O            1   0.551   0.869  i_alu/sigResult<22>110 (i_alu/sigResult<22>110)
+     LUT4:I2->O            3   0.551   1.246  i_alu/sigResult<22>124 (DAddr_22_OBUF)
+     LUT3:I0->O            1   0.551   0.000  ANDBranch_wg_lut<0> (ANDBranch_wg_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  ANDBranch_wg_cy<0> (ANDBranch_wg_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<1> (ANDBranch_wg_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<2> (ANDBranch_wg_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<3> (ANDBranch_wg_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<4> (ANDBranch_wg_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<5> (ANDBranch_wg_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<6> (ANDBranch_wg_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  ANDBranch_wg_cy<7> (ANDBranch_wg_cy<7>)
+     MUXCY:CI->O          30   0.303   1.868  ANDBranch_wg_cy<8> (ANDBranch)
+     LUT4:I3->O            1   0.551   0.000  pc_in<9>34 (pc_in<9>)
+     FDC:D                     0.203          pc_exit_9
+    ----------------------------------------
+    Total                     16.481ns (9.614ns logic, 6.867ns route)
+                                       (58.3% logic, 41.7% route)
+
+=========================================================================
+Timing constraint: Default OFFSET IN BEFORE for Clock 'Clk'
+  Total number of paths / destination ports: 7509082 / 2014
+-------------------------------------------------------------------------
+Offset:              20.626ns (Levels of Logic = 13)
+  Source:            IDataIn<31> (PAD)
+  Destination:       pc_exit_2 (FF)
+  Destination Clock: Clk rising
+
+  Data Path: IDataIn<31> to pc_exit_2
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     IBUF:I->O             7   0.821   1.405  IDataIn_31_IBUF (IDataIn_31_IBUF)
+     LUT3:I0->O            3   0.551   1.246  i_control_unit/RegWrite22 (i_control_unit/ALUOp_and0000)
+     LUT4:I0->O            3   0.551   0.933  i_control_unit/ALUOp<0>1 (ALUOp<0>)
+     LUT4:I3->O            1   0.551   0.827  i_alu_control/Mmux_sigResult2_SW0 (N22)
+     LUT4:I3->O           62   0.551   2.051  i_alu_control/Mmux_sigResult2 (Control<1>)
+     LUT4:I3->O           34   0.551   2.060  i_alu/sigResult<0>31 (i_alu/N33)
+     LUT4:I1->O            1   0.551   0.827  i_alu/sigResult<1>4 (i_alu/sigResult<1>4)
+     LUT4:I3->O            3   0.551   1.246  i_alu/sigResult<1>85 (DAddr_1_OBUF)
+     LUT3:I0->O            1   0.551   0.827  i_alu/sigResult<31>124_SW0 (N153)
+     LUT4:I3->O            1   0.551   0.000  ANDBranch_wg_lut<7> (ANDBranch_wg_lut<7>)
+     MUXCY:S->O            1   0.500   0.000  ANDBranch_wg_cy<7> (ANDBranch_wg_cy<7>)
+     MUXCY:CI->O          30   0.303   1.868  ANDBranch_wg_cy<8> (ANDBranch)
+     LUT4:I3->O            1   0.551   0.000  pc_in<9>34 (pc_in<9>)
+     FDC:D                     0.203          pc_exit_9
+    ----------------------------------------
+    Total                     20.626ns (7.337ns logic, 13.289ns route)
+                                       (35.6% logic, 64.4% route)
+
+=========================================================================
+Timing constraint: Default OFFSET OUT AFTER for Clock 'Clk'
+  Total number of paths / destination ports: 103229 / 94
+-------------------------------------------------------------------------
+Offset:              18.175ns (Levels of Logic = 42)
+  Source:            i_reg_bank/regs_1_0 (FF)
+  Destination:       DAddr<0> (PAD)
+  Source Clock:      Clk rising
+
+  Data Path: i_reg_bank/regs_1_0 to DAddr<0>
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     FDCE:C->Q             2   0.720   1.072  i_reg_bank/regs_1_0 (i_reg_bank/regs_1_0)
+     LUT2:I1->O            1   0.551   0.000  i_reg_bank/mux32_10 (i_reg_bank/mux32_10)
+     MUXF5:I0->O           1   0.360   0.000  i_reg_bank/mux32_8_f5 (i_reg_bank/mux32_8_f5)
+     MUXF6:I0->O           1   0.342   0.000  i_reg_bank/mux32_6_f6 (i_reg_bank/mux32_6_f6)
+     MUXF7:I0->O           1   0.342   0.000  i_reg_bank/mux32_4_f7 (i_reg_bank/mux32_4_f7)
+     MUXF8:I0->O           4   0.342   0.985  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
+     LUT4:I2->O            1   0.551   0.000  i_alu/Msub_subExt_lut<0> (i_alu/Msub_subExt_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  i_alu/Msub_subExt_cy<0> (i_alu/Msub_subExt_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<1> (i_alu/Msub_subExt_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<2> (i_alu/Msub_subExt_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<3> (i_alu/Msub_subExt_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<4> (i_alu/Msub_subExt_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<5> (i_alu/Msub_subExt_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<6> (i_alu/Msub_subExt_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<7> (i_alu/Msub_subExt_cy<7>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<8> (i_alu/Msub_subExt_cy<8>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<9> (i_alu/Msub_subExt_cy<9>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<10> (i_alu/Msub_subExt_cy<10>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<11> (i_alu/Msub_subExt_cy<11>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<12> (i_alu/Msub_subExt_cy<12>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<13> (i_alu/Msub_subExt_cy<13>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<14> (i_alu/Msub_subExt_cy<14>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<15> (i_alu/Msub_subExt_cy<15>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<16> (i_alu/Msub_subExt_cy<16>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<17> (i_alu/Msub_subExt_cy<17>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<18> (i_alu/Msub_subExt_cy<18>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<19> (i_alu/Msub_subExt_cy<19>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<20> (i_alu/Msub_subExt_cy<20>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<21> (i_alu/Msub_subExt_cy<21>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<22> (i_alu/Msub_subExt_cy<22>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<23> (i_alu/Msub_subExt_cy<23>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<24> (i_alu/Msub_subExt_cy<24>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<25> (i_alu/Msub_subExt_cy<25>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<26> (i_alu/Msub_subExt_cy<26>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<27> (i_alu/Msub_subExt_cy<27>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<28> (i_alu/Msub_subExt_cy<28>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<29> (i_alu/Msub_subExt_cy<29>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<30> (i_alu/Msub_subExt_cy<30>)
+     MUXCY:CI->O           0   0.064   0.000  i_alu/Msub_subExt_cy<31> (i_alu/Msub_subExt_cy<31>)
+     XORCY:CI->O           1   0.904   0.827  i_alu/Msub_subExt_xor<32> (i_alu/subExt<32>)
+     LUT4:I3->O            2   0.551   1.072  i_alu/sigResult<0>122 (i_alu/sigResult<0>122)
+     LUT2:I1->O            2   0.551   0.877  i_alu/sigResult<0>129 (DAddr_0_OBUF)
+     OBUF:I->O                 5.644          DAddr_0_OBUF (DAddr<0>)
+    ----------------------------------------
+    Total                     18.175ns (13.342ns logic, 4.833ns route)
+                                       (73.4% logic, 26.6% route)
+
+=========================================================================
+Timing constraint: Default path analysis
+  Total number of paths / destination ports: 122991 / 66
+-------------------------------------------------------------------------
+Delay:               22.077ns (Levels of Logic = 43)
+  Source:            IDataIn<16> (PAD)
+  Destination:       DAddr<0> (PAD)
+
+  Data Path: IDataIn<16> to DAddr<0>
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     IBUF:I->O           514   0.821   4.873  IDataIn_16_IBUF (IDataIn_16_IBUF)
+     LUT3:I0->O            1   0.551   0.000  i_reg_bank/mux32_6 (i_reg_bank/mux32_6)
+     MUXF5:I1->O           1   0.360   0.000  i_reg_bank/mux32_5_f5 (i_reg_bank/mux32_5_f5)
+     MUXF6:I1->O           1   0.342   0.000  i_reg_bank/mux32_4_f6 (i_reg_bank/mux32_4_f6)
+     MUXF7:I1->O           1   0.342   0.000  i_reg_bank/mux32_3_f7 (i_reg_bank/mux32_3_f7)
+     MUXF8:I1->O           4   0.342   0.985  i_reg_bank/mux32_2_f8 (DDataOut_0_OBUF)
+     LUT4:I2->O            1   0.551   0.000  i_alu/Msub_subExt_lut<0> (i_alu/Msub_subExt_lut<0>)
+     MUXCY:S->O            1   0.500   0.000  i_alu/Msub_subExt_cy<0> (i_alu/Msub_subExt_cy<0>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<1> (i_alu/Msub_subExt_cy<1>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<2> (i_alu/Msub_subExt_cy<2>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<3> (i_alu/Msub_subExt_cy<3>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<4> (i_alu/Msub_subExt_cy<4>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<5> (i_alu/Msub_subExt_cy<5>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<6> (i_alu/Msub_subExt_cy<6>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<7> (i_alu/Msub_subExt_cy<7>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<8> (i_alu/Msub_subExt_cy<8>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<9> (i_alu/Msub_subExt_cy<9>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<10> (i_alu/Msub_subExt_cy<10>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<11> (i_alu/Msub_subExt_cy<11>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<12> (i_alu/Msub_subExt_cy<12>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<13> (i_alu/Msub_subExt_cy<13>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<14> (i_alu/Msub_subExt_cy<14>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<15> (i_alu/Msub_subExt_cy<15>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<16> (i_alu/Msub_subExt_cy<16>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<17> (i_alu/Msub_subExt_cy<17>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<18> (i_alu/Msub_subExt_cy<18>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<19> (i_alu/Msub_subExt_cy<19>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<20> (i_alu/Msub_subExt_cy<20>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<21> (i_alu/Msub_subExt_cy<21>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<22> (i_alu/Msub_subExt_cy<22>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<23> (i_alu/Msub_subExt_cy<23>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<24> (i_alu/Msub_subExt_cy<24>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<25> (i_alu/Msub_subExt_cy<25>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<26> (i_alu/Msub_subExt_cy<26>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<27> (i_alu/Msub_subExt_cy<27>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<28> (i_alu/Msub_subExt_cy<28>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<29> (i_alu/Msub_subExt_cy<29>)
+     MUXCY:CI->O           1   0.064   0.000  i_alu/Msub_subExt_cy<30> (i_alu/Msub_subExt_cy<30>)
+     MUXCY:CI->O           0   0.064   0.000  i_alu/Msub_subExt_cy<31> (i_alu/Msub_subExt_cy<31>)
+     XORCY:CI->O           1   0.904   0.827  i_alu/Msub_subExt_xor<32> (i_alu/subExt<32>)
+     LUT4:I3->O            2   0.551   1.072  i_alu/sigResult<0>122 (i_alu/sigResult<0>122)
+     LUT2:I1->O            2   0.551   0.877  i_alu/sigResult<0>129 (DAddr_0_OBUF)
+     OBUF:I->O                 5.644          DAddr_0_OBUF (DAddr<0>)
+    ----------------------------------------
+    Total                     22.077ns (13.443ns logic, 8.634ns route)
+                                       (60.9% logic, 39.1% route)
+
+=========================================================================
+
+
+Total REAL time to Xst completion: 50.00 secs
+Total CPU time to Xst completion: 50.29 secs
+ 
+--> 
+
+Total memory usage is 360440 kilobytes
+
+Number of errors   :    0 (   0 filtered)
+Number of warnings :    2 (   0 filtered)
+Number of infos    :    3 (   0 filtered)
+

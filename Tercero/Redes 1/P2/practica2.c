@@ -23,6 +23,7 @@
 #include <inttypes.h>
 
 /*Definicion de constantes *************************************************/
+/*Macros Ethernet*/
 #define ETH_ALEN      6      /* Tamanio de la direccion ethernet           */
 #define ETH_HLEN      14     /* Tamanio de la cabecera ethernet            */
 #define ETH_TLEN      2      /* Tamanio del campo tipo ethernet            */
@@ -30,15 +31,33 @@
 #define ETH_FRAME_MIN 60     /* Tamanio minimo la trama ethernet (sin CRC) */
 #define ETH_DATA_MAX  (ETH_FRAME_MAX - ETH_HLEN) /* Tamano maximo y minimo de los datos de una trama ethernet*/
 #define ETH_DATA_MIN  (ETH_FRAME_MIN - ETH_HLEN)
+
+/*Macros IP*/
 #define IP_ALEN 4			 /* Tamanio de la direccion IP					*/
 #define IP_TO_LENGHT 2		/*Distancia desde principio de IP hasta Longitud Total*/
 #define IP_TO_POSITION 4	/*Distancia desde Longitud hasta Posicion*/
+#define IP_TO_LIFE 2 		/*Distancia desde Posicion hasta Tiempo de vida*/
+#define IP_TO_PROTOCOL 1 	/*Distancia desde tiempo de vida hasta protocolo*/
+#define IP_TO_IP 3 			/*Disntacia desde protocolo hasta ip origen*/
+#define IP_STEP 1			/*Un byte para imprimir IPS*/
+#define END_IP 20 			/*Longitud hasta el final de la direccion destino*/
+
+/*Macros TCP UDP*/
+#define TCP 6				/*Protocolo TCP*/
+#define UDP 17				/*Protocolo UDP*/
+#define PORT_LENGTH 2		/*Longitud puerto TCP y UDP*/
+#define TCP_TO_ACK 11		/*Distancia desde puerto destino hasta ACK*/
+
+/*Macros para pcap*/
 #define OK 0
 #define ERROR 1
 #define PACK_READ 1
 #define PACK_ERR -1
 #define TRACE_END -2
+
+/*Macro para filtro*/
 #define NO_FILTER 0
+
 /*Promiscuidad de la interfaz*/
 #define PROMISCUO 1
 #define NOPROMISCUO 0
@@ -46,17 +65,21 @@
 /*Timeout*/
 #define TIMEOUT 5000
 
+/*Definición de funciones*/
 void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack);
 
 void handleSignal(int nsignal);
 
+/*Variables globales*/
 pcap_t *descr = NULL;
-uint64_t contador = 0;
+uint64_t contador = 0; /*Contador de paquetes*/
+/*Filtros*/
 uint8_t ipsrc_filter[IP_ALEN] = {NO_FILTER};
 uint8_t ipdst_filter[IP_ALEN] = {NO_FILTER};
 uint16_t sport_filter= NO_FILTER;
 uint16_t dport_filter = NO_FILTER;
 
+/*Función que controla la señal CTRL-C, mostrará todos los paquetes leidos*/
 void handleSignal(int nsignal)
 {
 	(void) nsignal; // indicamos al compilador que no nos importa que nsignal no se utilice
@@ -66,6 +89,8 @@ void handleSignal(int nsignal)
 	exit(OK);
 }
 
+
+/*Main*/
 int main(int argc, char **argv)
 {
 	uint8_t *pack = NULL;
@@ -76,13 +101,13 @@ int main(int argc, char **argv)
 	int long_index = 0, retorno = 0;
 	char opt;
 	
-	(void) errbuf; //indicamos al compilador que no nos importa que errbuf no se utilice. Esta linea debe ser eliminada en la entrega final.
-
+	/*Handler de CTRL-C*/
 	if (signal(SIGINT, handleSignal) == SIG_ERR) {
 		printf("Error: Fallo al capturar la senal SIGINT.\n");
 		exit(ERROR);
 	}
 
+	/*Control de argumentos y flags*/
 	if (argc > 1) {
 		if (strlen(argv[1]) < 256) {
 			strcpy(entrada, argv[1]);
@@ -110,7 +135,6 @@ int main(int argc, char **argv)
 		{0, 0, 0, 0}
 	};
 
-	//Simple lectura por parametros por completar casos de error, ojo no cumple 100% los requisitos del enunciado!
 	while ((opt = getopt_long_only(argc, argv, "f:i:1:2:3:4:5", options, &long_index)) != -1) {
 		switch (opt) {
 		case 'i' :
@@ -119,9 +143,9 @@ int main(int argc, char **argv)
 				pcap_close(descr);
 				exit(ERROR);
 			}
-			
+			/*Abrimos la interfaz*/
 			if ((descr = pcap_open_live(optarg, ETH_FRAME_MAX, PROMISCUO, TIMEOUT, errbuf)) == NULL){
-				fprintf(stdout, "Error: No se pudo abrir la interfaz eth0.\n");
+				fprintf(stdout, "Error: No se pudo abrir la interfaz %s.\n", optarg);
 				exit(ERROR);
 			}
 			break;
@@ -132,7 +156,7 @@ int main(int argc, char **argv)
 				pcap_close(descr);
 				exit(ERROR);
 			}
-
+			/*Abrimos el fichero*/
 			if ((descr = pcap_open_offline(optarg, errbuf)) == NULL) {
 				printf("Error: pcap_open_offline(): File: %s, %s %s %d.\n", optarg, errbuf, __FILE__, __LINE__);
 				exit(ERROR);
@@ -140,6 +164,7 @@ int main(int argc, char **argv)
 
 			break;
 
+		/*Caso de IPO*/
 		case '1' :
 			if (sscanf(optarg, "%"SCNu8".%"SCNu8".%"SCNu8".%"SCNu8"", &(ipsrc_filter[0]), &(ipsrc_filter[1]), &(ipsrc_filter[2]), &(ipsrc_filter[3])) != IP_ALEN) {
 				printf("Error ipo_filtro. Ejecucion: %s /ruta/captura_pcap [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]: %d\n", argv[0], argc);
@@ -148,6 +173,7 @@ int main(int argc, char **argv)
 
 			break;
 
+		/*Caso de IPD*/
 		case '2' :
 			if (sscanf(optarg, "%"SCNu8".%"SCNu8".%"SCNu8".%"SCNu8"", &(ipdst_filter[0]), &(ipdst_filter[1]), &(ipdst_filter[2]), &(ipdst_filter[3])) != IP_ALEN) {
 				printf("Error ipd_filtro. Ejecucion: %s /ruta/captura_pcap [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]: %d\n", argv[0], argc);
@@ -156,6 +182,7 @@ int main(int argc, char **argv)
 
 			break;
 
+		/*Caso de PO*/
 		case '3' :
 			if ((sport_filter= atoi(optarg)) == 0) {
 				printf("Error po_filtro.Ejecucion: %s /ruta/captura_pcap [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]: %d\n", argv[0], argc);
@@ -164,6 +191,7 @@ int main(int argc, char **argv)
 
 			break;
 
+		/*Caso de PD*/
 		case '4' :
 			if ((dport_filter = atoi(optarg)) == 0) {
 				printf("Error pd_filtro. Ejecucion: %s /ruta/captura_pcap [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]: %d\n", argv[0], argc);
@@ -172,11 +200,13 @@ int main(int argc, char **argv)
 
 			break;
 
+		/*Caso help*/
 		case '5' :
 			printf("Ayuda. Ejecucion: %s <-f traza.pcap / -i eth0> [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]: %d\n", argv[0], argc);
 			exit(ERROR);
 			break;
 
+		/*Flag desconocido*/
 		case '?' :
 		default:
 			printf("Error. Ejecucion: %s <-f traza.pcap / -i eth0> [-ipo IPO] [-ipd IPD] [-po PO] [-pd PD]: %d\n", argv[0], argc);
@@ -185,6 +215,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+	/*Comprobar que hay origen de paquetes abierto*/
 	if (!descr) {
 		printf("No selecciono ningún origen de paquetes.\n");
 		return ERROR;
@@ -207,6 +238,7 @@ int main(int argc, char **argv)
 
 	printf("\n\n");
 
+	/*Bucle que lee paquetes y los manda a la función correspondiente para analizarlos*/
 	do {
 		retorno = pcap_next_ex(descr, &hdr, (const u_char **)&pack);
 
@@ -222,21 +254,28 @@ int main(int argc, char **argv)
 		}
 	} while (retorno != TRACE_END);
 
+	/*Cuando se acaban los paquetes de la traza se mostrarán los paquetes leidos.*/
 	printf("Se procesaron %"PRIu64" paquetes.\n\n", contador);
 	pcap_close(descr);
 	return OK;
 }
 
 
-
+/*Funcion que analiza los paquetes capturados en el main*/
 void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 {
-	uint8_t aux;
-	uint16_t aux16;
+	uint8_t aux; /*Auxiliar de 8 bits*/
+	uint16_t aux16; /*Auxiliar de 16 bits*/
+	uint8_t protocolo; /*Protocolo del paquete*/
+	uint16_t posicion; /*Posición del paquete*/
+	uint8_t IHL; /*Header length del paquete*/
+	int flag = 0; 
 
+	printf("\n--------------------------------------------------------------------\n");
 	printf("Nuevo paquete capturado el %s\n", ctime((const time_t *) & (hdr->ts.tv_sec)));
 
 	int i = 0;
+	/*Imprimimos ip destino*/
 	printf("Direccion ETH destino= ");
 	printf("%02X", pack[0]);
 
@@ -247,6 +286,7 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 	printf("\n");
 	pack += ETH_ALEN;
 
+	/*Imprimimos ip origen*/
 	printf("Direccion ETH origen = ");
 	printf("%02X", pack[0]);
 
@@ -258,6 +298,7 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 
 	pack+=ETH_ALEN;
 
+	/*imprimimos el protocolo de ethernet utilizado*/
 	printf("Tipo de Ethernet = 0x");
 	printf("%02X%02X ", pack[0], pack[1]); /*El tipo de ehternet en hexadecimal*/
 
@@ -270,18 +311,155 @@ void analizar_paquete(const struct pcap_pkthdr *hdr, const uint8_t *pack)
 
 	pack+=ETH_TLEN;
 
+	/*Protocolo IPv4*/
+
+	/*Version IP*/
 	aux = (pack[0] & 0xF0)/16; /*Asi cogemos los 4 bits mas significativos del primer byte*/
+	IHL = (pack[0] & 0x0F);
 	printf("Version IP = %d\n", aux);
 
+	/*Longitud de cabecera*/
 	aux = pack[0] & 0x0F; /*Asi cogemos los 4 menos significativos*/
 	printf("Longitud de cabecera = %d\n", aux);
 
+	/*Longitud total*/
 	pack += IP_TO_LENGHT;
 	aux16 = htons(*(uint16_t*)pack);
 	printf("Longitud total = %d\n", aux16);
 
+	/*Posicion del paquete*/
 	pack += IP_TO_POSITION;
-	aux16 = htons(*(uint16_t*)pack);
-	printf("Posicion = %d\n", aux16&0x1FFF);
-	
+	posicion = htons(*(uint16_t*)pack) & 0x1FFF;
+	printf("Posicion = %d\n", posicion); /* Así cogemos los 13 bits que necesitamos*/
+
+	/*Tiempo de vida del paquete*/
+	pack += IP_TO_LIFE;
+	printf("Tiempo de vida = %d\n", pack[0]);
+
+	/*Protocolo IP*/
+	pack += IP_TO_PROTOCOL;
+	protocolo = pack[0];
+	printf("Protocolo IP = %d\n", protocolo);
+
+	/*Direccion IP origen con comprobacion de filtros*/
+	pack += IP_TO_IP;
+	printf("Direccion IP origen = ");
+	printf("%d", pack[0]);
+	if(pack[0] != ipsrc_filter[0]){
+		flag = 1;
+	}
+	pack += IP_STEP;
+	for( i = 1; i < IP_ALEN; i++){
+		printf(".%d", pack[0]);
+		if(pack[0] != ipsrc_filter[i]){
+			flag = 1;
+		}
+		pack += IP_STEP;
+	}
+	printf("\n");
+	if(ipsrc_filter[0] == NO_FILTER){
+		flag = 0;
+	}
+	if(flag == 1){
+		printf("La direccion IP origen no coincide con el filtro.\n");
+		return;
+	}
+
+	/*Direccion IP destino con comprobacion de filtros*/
+	printf("Direccion IP destino = ");
+	printf("%d", pack[0]);
+	if(pack[0] != ipdst_filter[0]){
+		flag = 1;
+	}
+	pack += IP_STEP;
+	for( i = 1; i < IP_ALEN; i++){
+		printf(".%d", pack[0]);
+		if(pack[0] != ipdst_filter[i]){
+		flag = 1;
+	}
+		pack += IP_STEP;
+	}
+	printf("\n");
+	if(ipdst_filter[0] == NO_FILTER){
+		flag = 0;
+	}
+	if(flag == 1){
+		printf("La direccion IP destino no coincide con el filtro.\n");
+		return;
+	}
+
+	/*Comprobacion de que la posicion sea 0, en caso de que no lo sea no es el primer fragmento*/
+	if (posicion != 0){
+		printf("El paquete no es el primer fragmento.\n");
+		return;
+	}
+	printf("\n");
+	/*Nos situamos en el final de la cabecera IP*/
+	pack += (IHL*4) - END_IP;
+
+	/*Si el protocolo es TCP:*/
+	if(protocolo == TCP){
+
+		/*Puerto de origen con comprobación de filtros*/
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de origen = %d\n", aux16);
+
+		if(aux16 != sport_filter && sport_filter != NO_FILTER){
+			printf("El puerto de origen no coincide con el filtro.\n");
+			return;
+		}
+
+		/*Puerto de destino con comprobación de filtros*/
+		pack += PORT_LENGTH;
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de destino = %d\n", aux16);
+
+		if(aux16 != dport_filter && dport_filter != NO_FILTER){
+			printf("El puerto de destino no coincide con el filtro.\n");
+			return;
+		}
+
+		/*Flags ACK y SYN*/
+		pack += TCP_TO_ACK;
+		printf("ACK = %c\n", (pack[0] & 0x10) == 16? '1' : '0');
+		printf("SYN = %c\n", (pack[0] & 0x02) == 2? '1' : '0');
+
+		return;
+	}
+
+	/*Si el protocolo es UDP:*/
+	else if(protocolo == UDP){
+
+		/*Puerto de origen con comprobacion de filtros*/
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de origen = %d\n", aux16);
+
+		if(aux16 != sport_filter && sport_filter != NO_FILTER){
+			printf("El puerto de origen no coincide con el filtro.\n");
+			return;
+		}
+
+		/*Puerto de destino con comprobacion de filtros*/
+		pack += PORT_LENGTH;
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Puerto de destino = %d\n", aux16);
+
+		if(aux16 != dport_filter && dport_filter != NO_FILTER){
+			printf("El puerto de destino no coincide con el filtro.\n");
+			return;
+		}
+
+		/*Longitud*/
+		pack += PORT_LENGTH;
+		aux16 = htons(*(uint16_t*)pack);
+		printf("Longitud = %d\n", aux16);
+
+		return;
+	}
+
+	/*Si el protocolo no es ni TCP ni UDP*/
+	else{
+		printf("El paquete no utiliza protocolo TCP ni UDP.\n");
+		return;
+	}
 }

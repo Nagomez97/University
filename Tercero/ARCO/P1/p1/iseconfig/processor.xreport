@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<report-views version="2.0" >
+ <header>
+  <ImplementationReportsDirectory>C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1\</ImplementationReportsDirectory>
+  <ModuleName>processor</ModuleName>
+  <DateModified>2017-09-28T23:00:20</DateModified>
+  <SavedFilePath>C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/iseconfig/processor.xreport</SavedFilePath>
+  <DateInitialized>2017-09-27T11:11:44</DateInitialized>
+  <EnableMessageFiltering>false</EnableMessageFiltering>
+ </header>
+</report-views>

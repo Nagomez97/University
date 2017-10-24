@@ -1,0 +1,5 @@
+set -tmpdir "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/xst/projnav.tmp"
+set -xsthdpdir "C:/Users/Nacho/Desktop/University/Tercero/ARCO/p1/xst"
+elaborate
+-ifn alu.prj
+-ifmt mixed
