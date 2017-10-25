@@ -166,7 +166,6 @@ architecture rtl of processor is
 	signal reg3_PC4_out : std_logic_vector(31 downto 0);
 
 	-- Registro 4 segmentacion
-	signal reg4_IDataIn_out : std_logic_vector(31 downto 0);
 	signal reg4_MemToReg_out : std_logic;
  	signal reg4_RegWrite_out : std_logic;
  	signal reg4_LUIextended_out : std_logic_vector(31 downto 0);
@@ -584,17 +583,17 @@ begin
    -- En este caso hay que parar el pipeline un ciclo.
    ------------------------------------------------------
 
-	process(reg2_MemRead_out, reg2_RegDst_out, reg1_IDataIn_out, Branch, ZFlag)
+	process(reg2_MemRead_out, reg4_A3_out, reg1_IDataIn_out)
 	begin
 
 		-- Condiciones de parada ante un lw seguido de una instruccion que requiera informacion del load
 
 		if reg2_MemRead_out = '1' then --Comprobación de que es un lw
-			if (reg2_RegDst_out == reg1_IDataIn_out(25 downto 21)) AND (reg2_RegDst_out /= "00000") then --Comprobación registro rs=rd
+			if (reg4_A3_out = reg1_IDataIn_out(25 downto 21)) AND (reg4_A3_out /= "00000") then --Comprobación registro rs=rd
 				PC_Stop <= '1';
 				reg1_Stop <= '1';
 				bubble <= '1';
-			elsif (reg2_RegDst_out == reg1_IDataIn_out(20 downto 16)) AND (reg2_RegDst_out /= "00000") then
+			elsif (reg4_A3_out = reg1_IDataIn_out(20 downto 16)) AND (reg4_A3_out /= "00000") then
 				PC_Stop <= '1';
 				reg1_Stop <= '1';
 				bubble <= '1';
@@ -608,7 +607,10 @@ begin
 			reg1_Stop <= '0';
 			bubble <= '0';
 		end if;
+	end process;
 
+	process (reg2_Branch_out, Branch, ZFlag)
+	begin
 		-- Condiciones de parada cuando tenemos un branch
 
 		if Branch = '1' then -- Comprobamos, antes de llegar al segundo registro, si la instruccion va a ser un salto
@@ -617,13 +619,7 @@ begin
 			reg1_Stop <= '1'; -- La instruccion siguiente al branch se queda en el registro 1 a la espera de conocer la resolucion del salto
 			bubble <= '0';
 
-			if reg2_Branch_out = '1' then -- Esto es para que, si hay dos branch consecutivos, cuando el primero pase a ejecucion se meta un bubble
-										  -- en el registro 2
-				bubble <= '1';
-			else
-				bubble <= '0';
-			end if;
-		else if reg2_Branch_out = '1' then -- Cuando el branch pase a ejecucion queremos que se cree un bubble y se siga manteniendo
+		elsif reg2_Branch_out = '1' then -- Cuando el branch pase a ejecucion queremos que se cree un bubble y se siga manteniendo
 										   -- el bloqueo del PC y del Registro 1
 			PC_Stop <= '1';
 			reg1_Stop <= '1';
@@ -633,15 +629,13 @@ begin
 								-- la instruccion almacenada en el registro 1
 				reg1_reset <= '1';
 			else
-				reg1_ reset <= '0';
-
+				reg1_reset <= '0';
+			end if;
 		else
 			PC_Stop <= '0';
 			reg1_Stop <= '0';
 			bubble <= '0';
 			reg1_reset <= '0';
-
 		end if;
 	end process;
-
 end architecture;

@@ -1,0 +1,52 @@
+C:/Users/Nacho/Desktop/prueba/control_unit.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Nacho/Desktop/prueba/control_unit.vhd
+Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity control_unit
+-- Compiling architecture rtl of control_unit
+
+} {} {}} C:/Users/Nacho/Desktop/prueba/processor_tb.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Nacho/Desktop/prueba/processor_tb.vhd
+Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity processor_tb
+-- Compiling architecture tb of processor_tb
+
+} {} {}} C:/Users/Nacho/Desktop/prueba/memory.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Nacho/Desktop/prueba/memory.vhd
+Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package std_logic_textio
+-- Compiling entity memory
+-- Compiling architecture Behavioral of memory
+
+} {} {}} C:/Users/Nacho/Desktop/prueba/alu_control.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Nacho/Desktop/prueba/alu_control.vhd
+Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity alu_control
+-- Compiling architecture rtl of alu_control
+
+} {} {}} C:/Users/Nacho/Desktop/prueba/alu.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Nacho/Desktop/prueba/alu.vhd
+Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity alu
+-- Compiling architecture rtl of alu
+
+} {} {}}
