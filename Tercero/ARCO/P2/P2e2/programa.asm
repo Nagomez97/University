@@ -39,18 +39,18 @@ next:
   add $t1, $t2, $t2 # -> r9 = 4. Se va a hacer adelantamiento desde ejecucion
   beq $t1, $t2, jump # no deberia saltar
   # Estos and deberian ejecutarse
-  and $t6, $t5, $t5 # -> r13 = 16
-  and $t6, $t4, $t4 # -> r13 = 8
-  and $t6, $t5, $t5 # -> r13 = 16
+  and $t6, $t5, $t5 # -> r14 = 16
+  and $t6, $t4, $t4 # -> r14 = 8
+  and $t6, $t5, $t5 # -> r14 = 16
   # Instruccion tipo R seguida de un beq que SI salta
-  and $t2, $t4, $t4 # -> r13 = 8
+  and $t2, $t4, $t4 # -> r10 = 8
   beq $t2, $t2, jump # -> salta a jump
   # Esto no deberia ejecutarse
-  and $t6, $t2, $t2 # -> r13 = 2
+  and $t6, $t2, $t2 # -> r14 = 2
   and $t2, $t1, $t1 # -> r10 = 1
   nop
   nop
   nop
   nop
 jump:
-  and $t7, $t4, $t4 # -> r14 = 8
+  and $t7, $t4, $t4 # -> r15 = 8
