@@ -49,6 +49,16 @@ Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 
 -- Compiling entity alu
 -- Compiling architecture rtl of alu
 
+} {} {}} C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/processor.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/processor.vhd
+Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity processor
+-- Compiling architecture rtl of processor
+
 } {} {}} C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/control_unit.vhd {1 {vcom -work work -2002 -explicit -stats=none C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/control_unit.vhd
 Model Technology ModelSim PE Student Edition vcom 10.4a Compiler 2015.03 Apr  7 2015
 -- Loading package STANDARD
