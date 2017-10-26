@@ -4,3 +4,5 @@ José Ignacio Gómez García
 
 Comentarios:
 En el ejercicio 2 de esta práctica hemos decidido hacer una suposición estática no efectiva. Es decir, dejamos que las siguientes instrucciones pasen a los registros sin bloquear el procesador. Aún así, vemos necesario introducir un nop virtual en el segundo registro para que no se ejecute la instrucción siguiente al beq. De este modo solo perdemos un ciclo de ejecución en caso de que no salte y evitamos un posible error al introducir una instrucción justo despues del beq sin un nop entre medias.
+
+En el fichero instrucciones_nonop contemplamos el caso en el que el compilador no introduce un nop despues de un beq. Para ejecutarlo, renombre el fichero a "instrucciones".
