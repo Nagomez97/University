@@ -19,11 +19,34 @@ main:
   lw $t2, 4($zero)  # lw $r10, 4($r0)  -> r10 = 2
   lw $t3, 8($zero)  # lw $r11, 8($r0)  -> r11 = 4 
   lw $t4, 12($zero) # lw $r12, 12($r0) -> r12 = 8 
-  lw $t5, 16($zero) # lw $r13, 16($r0) -> r13 = 16
-  lw $t6, 20($zero) # lw $r14, 20($r0) -> r14 = 32
-  add $t1, $t2, $t2 # -> r9 = 4
-  beq $t2, $t2, jump # -> salta a jump
+  # Loads seguidos de un beq que no salta
+  lw $t5, 16($zero) # lw $r13, 16($r0) -> r13 = 16. Adelantamiento desde registro
+  lw $t6, 20($zero) # lw $r14, 20($r0) -> r14 = 32. Se va a hacer adelantamiento desde memoria(con bubble)
+  beq $t5, $t6, next # no deberia saltar
+  # Load seguido de un beq que salta
+  lw $t7, 0($zero) # r15 = 1. Se va a hacer adelantamiento desde memoria(con bubble)
+  beq $t7, $t7, next # deberia saltar a next
+  nop
+  nop
+  nop
+  nop
+next:
+  # Instruccion tipo R seguida de un beq que NO salta
+  add $t1, $t2, $t2 # -> r9 = 4. Se va a hacer adelantamiento desde ejecucion
+  beq $t1, $t2, jump # no deberia saltar
+  # Estos and deberian ejecutarse
   and $t6, $t5, $t5 # -> r13 = 16
-  and $t2, $t5, $t5 # -> r10 = 16
+  and $t6, $t4, $t4 # -> r13 = 8
+  and $t6, $t5, $t5 # -> r13 = 16
+  # Instruccion tipo R seguida de un beq que SI salta
+  and $t2, $t4, $t4 # -> r13 = 8
+  beq $t2, $t2, jump # -> salta a jump
+  # Esto no deberia ejecutarse
+  and $t6, $t2, $t2 # -> r13 = 2
+  and $t2, $t1, $t1 # -> r10 = 1
+  nop
+  nop
+  nop
+  nop
 jump:
-  and $t6, $t4, $t4 # -> r14 = 8
+  and $t7, $t4, $t4 # -> r14 = 8

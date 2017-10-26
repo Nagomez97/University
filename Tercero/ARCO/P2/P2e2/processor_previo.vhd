@@ -30,14 +30,14 @@ architecture rtl of processor is
 	component reg_bank
 		port(
 			Clk   : in std_logic; -- Reloj activo en flanco de subida
-			Reset : in std_logic; -- Reset as铆ncrono a nivel alto
-			A1    : in std_logic_vector(4 downto 0);   -- Direcci贸n para el puerto Rd1
+			Reset : in std_logic; -- Reset as韓crono a nivel alto
+			A1    : in std_logic_vector(4 downto 0);   -- Direcci髇 para el puerto Rd1
 			Rd1   : out std_logic_vector(31 downto 0); -- Dato del puerto Rd1
-			A2    : in std_logic_vector(4 downto 0);   -- Direcci贸n para el puerto Rd2
+			A2    : in std_logic_vector(4 downto 0);   -- Direcci髇 para el puerto Rd2
 			Rd2   : out std_logic_vector(31 downto 0); -- Dato del puerto Rd2
-			A3    : in std_logic_vector(4 downto 0);   -- Direcci贸n para el puerto Wd3
+			A3    : in std_logic_vector(4 downto 0);   -- Direcci髇 para el puerto Wd3
 			Wd3   : in std_logic_vector(31 downto 0);  -- Dato de entrada Wd3
-			We3   : in std_logic -- Habilitaci贸n de la escritura de Wd3
+			We3   : in std_logic -- Habilitaci髇 de la escritura de Wd3
 		);
 	end component;
 	
@@ -117,7 +117,7 @@ architecture rtl of processor is
 	-- registros
 	signal Rd1 : std_logic_vector (31 downto 0);
 	signal Rd2 : std_logic_vector(31 downto 0);
-	signal A3  : std_logic_vector(4 downto 0);   -- Direcci贸n para el puerto Wd3
+	signal A3  : std_logic_vector(4 downto 0);   -- Direcci髇 para el puerto Wd3
 	signal Wd3 : std_logic_vector(31 downto 0);  -- Dato de entrada Wd3
 	
 	-- extension de signo
@@ -180,11 +180,9 @@ architecture rtl of processor is
  	signal fwd_B   : std_logic_vector(1 downto 0); -- Control del mux de OpB
 	
 	-- Hazard Detection Unit
-	signal reg1_Stop : std_logic; -- Se帽al de Stop del registro 1 para bubbles
-	signal PC_Stop	 : std_logic; -- Se帽al de Stop para el PC para bubbles
-	signal bubble 	 : std_logic; -- Se帽al para la Control Unit para crear un bubble
-	signal reg_reset_sincrono : std_logic; -- Se帽al para resetear los registros 1 y 2 ante un 
-										   -- BEQ exitoso
+	signal reg1_Stop : std_logic; -- Se馻l de Stop del registro 1 para bubbles
+	signal PC_Stop	 : std_logic; -- Se馻l de Stop para el PC para bubbles
+	signal bubble 	 : std_logic; -- Se馻l para la Control Unit para crear un bubble
 
 begin  
 	
@@ -318,8 +316,6 @@ begin
    -- MUX Program Counter
    ------------------------------------------------------
    ANDBranch <= reg3_Branch_out AND reg3_ZFlag_out;
-   reg_reset_sincrono <= ANDBranch; -- Si ANDBranch vale 1, entonces se produce salto y 
-   									-- reseteamos los registros 1 y 2
    process (PC4, reg3_PCadd_out, ANDBranch)
    begin
    	if ANDBranch = '0' then
@@ -404,9 +400,9 @@ begin
    ------------------------------------------------------
    -- Registro 1 segmentacion
    ------------------------------------------------------
-   	process(PC4, Clk, Reset, IDataIn, reg1_Stop)
+   	process(PC4, Clk, Reset, IDataIn, reg1_Stop, reg1_reset)
    	begin
-   			if Reset = '1' or (rising_edge(Clk) and reg_reset_sincrono = '1') then
+   			if Reset = '1'  or reg1_reset = '0' then
    					reg1_IDataIn_out <= (others => '0');
    					reg1_PC4_out <= (others => '0');
    			elsif rising_edge(Clk)  and reg1_Stop /= '1' then
@@ -421,7 +417,7 @@ begin
    	process(Clk, Reset, RegDst, Branch, MemRead, MemToReg, ALUOp, MemWrite, ALUSrc, RegWriteAux, LUICtrl, 
    	Jump, reg1_PC4_out, Rd1, Rd2, SignEx, reg1_IDataIn_out)
    	begin
-   			if Reset = '1' or (rising_edge(Clk) and reg_reset_sincrono = '1') then
+   			if Reset = '1' then
    					reg2_IDataIn_out <= (others => '0');
    					reg2_PC4_out <= (others => '0');
    					reg2_RegDst_out <= '0';
@@ -527,24 +523,56 @@ begin
    -- Forwarding Unit
    ------------------------------------------------------
 
-	process(reg4_A3_out, reg3_A3_out, reg2_IDataIn_out(25 downto 21), reg2_IDataIn_out(20 downto 16), reg3_RegWrite_out, reg4_RegWrite_out)
+	process(reg4_A3_out, reg3_A3_out, reg1_IDataIn_out(25 downto 21), reg1_IDataIn_out(20 downto 16), reg3_RegWrite_out, reg4_RegWrite_out)
 		begin
-		
-		if (reg3_A3_out /= "00000") and (reg3_RegWrite_Out = '1') and (reg3_A3_out = reg2_IDataIn_out(25 downto 21)) then
-			fwd_A <= "10";
-		elsif (reg4_A3_out /= "00000") and (reg4_RegWrite_Out = '1') and (reg4_A3_out = reg2_IDataIn_out(25 downto 21)) then
-			fwd_A <= "01";
-		else 
-			fwd_A <= "00";
-		end if;
+		-- Forwarding desde MEM, se realiza antes para darle preferencia a EX por ser mas reciente
 
-		if (reg3_A3_out /= "00000") and (reg3_RegWrite_Out = '1') and (reg3_A3_out = reg2_IDataIn_out(20 downto 16)) then
-			fwd_B <= "10";
-		elsif (reg4_A3_out /= "00000") and (reg4_RegWrite_Out = '1') and (reg4_A3_out = reg2_IDataIn_out(20 downto 16)) then
-			fwd_B <= "01";
-		else 
+		-- Forwarding de RS, se comprueba que se escriba en registro y que no se escriba en el 0
+		if (reg4_RegWrite_out = '1' AND reg4_A3_out /= "00000") then
+			if (reg4_A3_out = reg1_IDataIn_out(25 downto 21)) then
+				fwd_A <= "01";
+			else
+				fwd_A <= "00";
+			end if;
+		else
+			fwd_A <= "00";
+		end if ;
+
+		-- Forwarding de RT, se comprueba que se escriba en registro y que no se escriba en el 0
+		if (reg4_RegWrite_out = '1' AND reg4_A3_out /= "00000") then
+			if (reg4_A3_out = reg1_IDataIn_out(20 downto 16)) then
+				fwd_B <= "01";
+			else
+				fwd_B <= "00";
+			end if;
+		else
 			fwd_B <= "00";
-		end if;
+		end if ;
+
+		-- Forwarding desde EX
+
+		-- Forwarding de RS, se comprueba que se escriba en registro y que no se escriba en el 0
+		if (reg3_RegWrite_out = '1' AND reg3_A3_out /= "00000") then
+			if (reg3_A3_out = reg1_IDataIn_out(25 downto 21)) then
+				fwd_A <= "10";
+			else
+				fwd_A <= "00";
+			end if;
+		else
+			fwd_A <= "00";
+		end if ;
+
+		-- Forwarding de RT, se comprueba que se escriba en registro y que no se escriba en el 0
+		if (reg3_RegWrite_out = '1' AND reg3_A3_out /= "00000") then
+			if (reg3_A3_out = reg1_IDataIn_out(20 downto 16)) then
+				fwd_B <= "10";
+			else
+				fwd_B <= "00";
+			end if;
+		else
+			fwd_B <= "00";
+		end if ;
+
 	end process;
 
 	------------------------------------------------------
@@ -556,14 +584,17 @@ begin
    -- En este caso hay que parar el pipeline un ciclo.
    ------------------------------------------------------
 
-	process(reg2_MemRead_out, reg2_IDataIN_out, reg1_IDataIn_out)
+	process(reg2_MemRead_out, reg2_RegDst_out, reg1_IDataIn_out, Branch, ZFlag)
 	begin
-		if reg2_MemRead_out = '1' then --Comprobacion de que es un lw
-			if (reg2_IDataIN_out(20 downto 16) = reg1_IDataIn_out(25 downto 21)) AND (reg2_IDataIN_out(20 downto 16) /= "00000") then --Comprobaci贸n registro rs=rd
+
+		-- Condiciones de parada ante un lw seguido de una instruccion que requiera informacion del load
+
+		if reg2_MemRead_out = '1' then --Comprobaci髇 de que es un lw
+			if (reg2_RegDst_out == reg1_IDataIn_out(25 downto 21)) AND (reg2_RegDst_out /= "00000") then --Comprobaci髇 registro rs=rd
 				PC_Stop <= '1';
 				reg1_Stop <= '1';
 				bubble <= '1';
-			elsif (reg2_IDataIN_out(20 downto 16) = reg1_IDataIn_out(20 downto 16)) AND (reg2_IDataIN_out(20 downto 16) /= "00000") then
+			elsif (reg2_RegDst_out == reg1_IDataIn_out(20 downto 16)) AND (reg2_RegDst_out /= "00000") then
 				PC_Stop <= '1';
 				reg1_Stop <= '1';
 				bubble <= '1';
@@ -572,14 +603,44 @@ begin
 				reg1_Stop <= '0';
 				bubble <= '0';
 			end if;
-		elsif reg2_Branch_out = '1' then
-			PC_Stop <= '1';
-			reg1_Stop <= '1';
-			bubble <= '1';
 		else
 			PC_Stop <= '0';
 			reg1_Stop <= '0';
 			bubble <= '0';
+		end if;
+
+		-- Condiciones de parada cuando tenemos un branch
+
+		if Branch = '1' then -- Comprobamos, antes de llegar al segundo registro, si la instruccion va a ser un salto
+							 -- Esto lo hacemos para que, si es un salto, no se ejecute la siguiente instruccion
+			PC_Stop <= '1'; -- Queremos parar el PC para que, en caso de no producirse el salto, no se salte instrucciones
+			reg1_Stop <= '1'; -- La instruccion siguiente al branch se queda en el registro 1 a la espera de conocer la resolucion del salto
+			bubble <= '0';
+
+			if reg2_Branch_out = '1' then -- Esto es para que, si hay dos branch consecutivos, cuando el primero pase a ejecucion se meta un bubble
+										  -- en el registro 2
+				bubble <= '1';
+			else
+				bubble <= '0';
+			end if;
+		else if reg2_Branch_out = '1' then -- Cuando el branch pase a ejecucion queremos que se cree un bubble y se siga manteniendo
+										   -- el bloqueo del PC y del Registro 1
+			PC_Stop <= '1';
+			reg1_Stop <= '1';
+			bubble <= '1';
+
+			if ZFlag = '1' then -- Si el salto es efectivo (los registros son iguales y, por tanto, ZFlag vale '1') queremos borrar
+								-- la instruccion almacenada en el registro 1
+				reg1_reset <= '1';
+			else
+				reg1_ reset <= '0';
+
+		else
+			PC_Stop <= '0';
+			reg1_Stop <= '0';
+			bubble <= '0';
+			reg1_reset <= '0';
+
 		end if;
 	end process;
 

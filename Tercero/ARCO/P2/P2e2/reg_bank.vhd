@@ -60,26 +60,26 @@ begin
    -- Caso en el que se escribe en el mismo registro en el que se lee, forwarding de registros
    process(A1, A2, We3, Wd3, A3)
    begin
-      if rising_edge(Clk) AND (We3 = '1') then
+      if (We3 = '1') then
          if(A1 = A3) AND (A1 /= "00000") then
             Rd1 <= Wd3;
-         --else
-            --Rd1 <= regs(conv_integer(A1));
+         else
+            Rd1 <= regs(conv_integer(A1));
          end if;
          if(A2 = A3) AND (A2/= "00000") then
             Rd2 <= Wd3;
-         --else
-            --Rd2 <= regs(conv_integer(A2));
+         else
+            Rd2 <= regs(conv_integer(A2));
          end if;
-      --else
-         --Rd1 <= regs(conv_integer(A1));
-         --Rd2 <= regs(conv_integer(A2));
+      else
+         Rd1 <= regs(conv_integer(A1));
+         Rd2 <= regs(conv_integer(A2));
       end if;
    end process;
 
    -- Lectura Asíncrona en el resto del tiempo.
-   Rd1 <= regs(conv_integer(A1));
-   Rd2 <= regs(conv_integer(A2));
+   --Rd1 <= regs(conv_integer(A1));
+   --Rd2 <= regs(conv_integer(A2));
 
 end architecture;
 
