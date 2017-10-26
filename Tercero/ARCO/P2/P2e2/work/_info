@@ -23,9 +23,9 @@ VJfhG@F7GIC]=<bge`Ue_K0
 !s100 PZenWJ@F@Xc]_f<F91A7N1
 Z8 OP;C;10.4a;61
 32
-Z9 !s110 1509013603
+Z9 !s110 1509015242
 !i10b 1
-Z10 !s108 1509013603.000000
+Z10 !s108 1509015242.000000
 Z11 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/alu.vhd|
 Z12 !s107 C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/alu.vhd|
 !i113 1
@@ -109,11 +109,11 @@ VC^iDmOd@c8C[WC2cYkIT`3
 !s100 NI:iS0<mM?jOjzH8>=Ekh0
 R8
 32
-Z21 !s110 1509013604
+R9
 !i10b 1
 R10
-Z22 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/control_unit.vhd|
-Z23 !s107 C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/control_unit.vhd|
+Z21 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/control_unit.vhd|
+Z22 !s107 C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/control_unit.vhd|
 !i113 1
 R13
 R14
@@ -129,11 +129,11 @@ V5NJAW0EcMDBgAJl50IEDF1
 !s100 :>LI5[j_0A]]k0dj2Lz<e3
 R8
 32
-R21
+Z23 !s110 1509015243
 !i10b 1
 R10
+R21
 R22
-R23
 !i113 1
 R13
 R14
@@ -153,9 +153,9 @@ VSUe7POEDTIg<EjYIdM=hJ0
 !s100 DWj_g:Oh1NEB9L?NJ3>S33
 R8
 32
-R21
+R23
 !i10b 1
-Z27 !s108 1509013604.000000
+Z27 !s108 1509015243.000000
 Z28 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/memory.vhd|
 Z29 !s107 C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/memory.vhd|
 !i113 1
@@ -174,7 +174,7 @@ V^FOdbXdj1Fi74g:HJPT@70
 !s100 YaS_m8K5SeB=1=lOb5eXb1
 R8
 32
-R21
+R23
 !i10b 1
 R27
 R28
@@ -183,7 +183,7 @@ R29
 R13
 R14
 Eprocessor
-Z30 w1509013583
+Z30 w1509015236
 R1
 R2
 R3
@@ -197,7 +197,7 @@ VBehA7:N?hWN2hfU^b;QAP1
 !s100 7?Nol_hooLcTAU>J3YB6=3
 R8
 32
-R21
+R23
 !i10b 1
 R27
 Z33 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/processor.vhd|
@@ -213,11 +213,11 @@ R4
 DEx4 work 9 processor 0 22 BehA7:N?hWN2hfU^b;QAP1
 l189
 L28
-VWzMU8FIozL6hPdRX?PI?U0
-!s100 69oLXF6ROo8V:B;=B<H530
+VW3^HFFl`?dBFL6=0a`E7z1
+!s100 =V?M6[88F5IDN:6aYVUnZ3
 R8
 32
-R21
+R23
 !i10b 1
 R27
 R33
@@ -240,7 +240,7 @@ VFS:S<=BS=QLHS?YWLjYI11
 !s100 TP3]zWZd=AR;5i]B7@Jo^2
 R8
 32
-R21
+R23
 !i10b 1
 R27
 Z37 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/Nacho/Desktop/University/Tercero/ARCO/P2/P2e2/processor_tb.vhd|
@@ -260,7 +260,7 @@ VAc<kjj[Q`U<S75M??Z6C81
 !s100 4Y]CnD_T;Kj47b[VT>LIO0
 R8
 32
-R21
+R23
 !i10b 1
 R27
 R37
@@ -283,7 +283,7 @@ VAgYSgOQ4g_SX8SRD`8k8S2
 !s100 mcj_ZWF[]T]VE]XjFVS]T0
 R8
 32
-R21
+R23
 !i10b 1
 R27
 Z41 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:\Users\Nacho\Desktop\University\Tercero\ARCO\P2\P2e2\reg_bank.vhd|
@@ -303,7 +303,7 @@ Z44 Vn1oUTb4E0z[K8@0EKdZ4O1
 Z45 !s100 M1LeG8DJnR3MHaLYJ5KWI2
 R8
 32
-R21
+R23
 !i10b 1
 R27
 R41

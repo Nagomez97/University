@@ -23,6 +23,10 @@ main:
   lw $t5, 16($zero) # lw $r13, 16($r0) -> r13 = 16. Adelantamiento desde registro
   lw $t6, 20($zero) # lw $r14, 20($r0) -> r14 = 32. Se va a hacer adelantamiento desde memoria(con bubble)
   beq $t5, $t6, next # no deberia saltar
+  nop
+  nop
+  nop
+  nop
   # Load seguido de un beq que salta
   lw $t7, 0($zero) # r15 = 1. Se va a hacer adelantamiento desde memoria(con bubble)
   beq $t7, $t7, next # deberia saltar a next
