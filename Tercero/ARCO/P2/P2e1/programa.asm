@@ -21,9 +21,13 @@ main:
   lw $t4, 12($zero) # lw $r12, 12($r0) -> r12 = 8 
   lw $t5, 16($zero) # lw $r13, 16($r0) -> r13 = 16
   lw $t6, 20($zero) # lw $r14, 20($r0) -> r14 = 32
-  add $t1, $t2, $t2 # -> r9 = 4
-  beq $t2, $t2, jump # -> salta a jump
-  and $t6, $t5, $t5 # -> r13 = 16
-  and $t2, $t5, $t5 # -> r10 = 16
-jump:
-  and $t6, $t4, $t4 # -> r14 = 8
+  # probamos forwarding
+  add $t7, $t6, $t1 # r15 = 33
+  lw $t6, 20($zero) # lw $r14, 20($r0) -> r14 = 32
+  add $t7, $t2, $t6 # r15 = 34
+  add $s0, $t7, $t7 # r16 = 66
+  add $s1, $t7, $t7 # r17 = 66
+  add $s2, $t7, $t7 # r18 = 66
+  
+  
+
