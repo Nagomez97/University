@@ -78,8 +78,8 @@ begin
    end process;
 
    -- Lectura Asíncrona en el resto del tiempo.
-   --Rd1 <= regs(conv_integer(A1));
-   --Rd2 <= regs(conv_integer(A2));
+   Rd1 <= regs(conv_integer(A1));
+   Rd2 <= regs(conv_integer(A2));
 
 end architecture;
 

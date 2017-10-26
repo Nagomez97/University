@@ -151,7 +151,7 @@ begin
                ALUOp <= SLTI;
                MemWrite <= '0';
                ALUSrc <= '1';
-               RegWrite <= '1';
+               RegWrite <= '0';
    				LUICtrl <= '0';
    				Jump <= '0';
                

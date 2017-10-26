@@ -522,56 +522,24 @@ begin
    -- Forwarding Unit
    ------------------------------------------------------
 
-	process(reg4_A3_out, reg3_A3_out, reg1_IDataIn_out(25 downto 21), reg1_IDataIn_out(20 downto 16), reg3_RegWrite_out, reg4_RegWrite_out)
+	process(reg4_A3_out, reg3_A3_out, reg2_IDataIn_out(25 downto 21), reg2_IDataIn_out(20 downto 16), reg3_RegWrite_out, reg4_RegWrite_out)
 		begin
-		-- Forwarding desde MEM, se realiza antes para darle preferencia a EX por ser mas reciente
-
-		-- Forwarding de RS, se comprueba que se escriba en registro y que no se escriba en el 0
-		if (reg4_RegWrite_out = '1' AND reg4_A3_out /= "00000") then
-			if (reg4_A3_out = reg1_IDataIn_out(25 downto 21)) then
-				fwd_A <= "01";
-			else
-				fwd_A <= "00";
-			end if;
-		else
+		
+		if (reg3_A3_out /= "00000") and (reg3_RegWrite_Out = '1') and (reg3_A3_out = reg2_IDataIn_out(25 downto 21)) then
+			fwd_A <= "10";
+		elsif (reg4_A3_out /= "00000") and (reg4_RegWrite_Out = '1') and (reg4_A3_out = reg2_IDataIn_out(25 downto 21)) then
+			fwd_A <= "01";
+		else 
 			fwd_A <= "00";
-		end if ;
+		end if;
 
-		-- Forwarding de RT, se comprueba que se escriba en registro y que no se escriba en el 0
-		if (reg4_RegWrite_out = '1' AND reg4_A3_out /= "00000") then
-			if (reg4_A3_out = reg1_IDataIn_out(20 downto 16)) then
-				fwd_B <= "01";
-			else
-				fwd_B <= "00";
-			end if;
-		else
+		if (reg3_A3_out /= "00000") and (reg3_RegWrite_Out = '1') and (reg3_A3_out = reg2_IDataIn_out(20 downto 16)) then
+			fwd_B <= "10";
+		elsif (reg4_A3_out /= "00000") and (reg4_RegWrite_Out = '1') and (reg4_A3_out = reg2_IDataIn_out(20 downto 16)) then
+			fwd_B <= "01";
+		else 
 			fwd_B <= "00";
-		end if ;
-
-		-- Forwarding desde EX
-
-		-- Forwarding de RS, se comprueba que se escriba en registro y que no se escriba en el 0
-		if (reg3_RegWrite_out = '1' AND reg3_A3_out /= "00000") then
-			if (reg3_A3_out = reg1_IDataIn_out(25 downto 21)) then
-				fwd_A <= "10";
-			else
-				fwd_A <= "00";
-			end if;
-		else
-			fwd_A <= "00";
-		end if ;
-
-		-- Forwarding de RT, se comprueba que se escriba en registro y que no se escriba en el 0
-		if (reg3_RegWrite_out = '1' AND reg3_A3_out /= "00000") then
-			if (reg3_A3_out = reg1_IDataIn_out(20 downto 16)) then
-				fwd_B <= "10";
-			else
-				fwd_B <= "00";
-			end if;
-		else
-			fwd_B <= "00";
-		end if ;
-
+		end if;
 	end process;
 
 	------------------------------------------------------
@@ -583,14 +551,14 @@ begin
    -- En este caso hay que parar el pipeline un ciclo.
    ------------------------------------------------------
 
-	process(reg2_MemRead_out, reg2_RegDst_out, reg1_IDataIn_out)
+	process(reg2_MemRead_out, reg2_IDataIN_out, reg1_IDataIn_out)
 	begin
 		if reg2_MemRead_out = '1' then --Comprobación de que es un lw
-			if (reg2_RegDst_out = reg1_IDataIn_out(25 downto 21)) AND (reg2_RegDst_out /= "00000") then --Comprobación registro rs=rd
+			if (reg2_IDataIN_out(20 downto 16) = reg1_IDataIn_out(25 downto 21)) AND (reg2_IDataIN_out(20 downto 16) /= "00000") then --Comprobación registro rs=rd
 				PC_Stop <= '1';
 				reg1_Stop <= '1';
 				bubble <= '1';
-			elsif (reg2_RegDst_out = reg1_IDataIn_out(20 downto 16)) AND (reg2_RegDst_out /= "00000") then
+			elsif (reg2_IDataIN_out(20 downto 16) = reg1_IDataIn_out(20 downto 16)) AND (reg2_IDataIN_out(20 downto 16) /= "00000") then
 				PC_Stop <= '1';
 				reg1_Stop <= '1';
 				bubble <= '1';
