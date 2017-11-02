@@ -7,6 +7,20 @@
 # El primer argumento debe ser el nombre de la traza a analizar
 NOMBRE_TRAZA=$1
 
+# Comprobamos que se haya introducido un argumento
+if [ "$#" -ne 1 ] ; then 
+	echo "Es necesario introducir un parámetro:"
+	echo "$0 <Nombre de la traza>"
+	exit
+fi
+
+# Comprobamos que ese arguento es un fichero pcap
+if [[ $NOMBRE_TRAZA != *.pcap ]] ; then
+	echo "El archivo introducido como primer argumento debe ser de tipo pcap:"
+	echo "$0 <Nombre de la traza>"
+	exit
+fi
+
 ##########################################################################
 # Obtenemos los porcentajes de los paquetes de tipo IP, ya sean VLAN o no.
 ##########################################################################
