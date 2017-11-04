@@ -10,11 +10,14 @@ TEMPORAL="practica3.temp"
 TOTAL="total.temp"
 TOP=10
 RESULTADOS="practica3.res"
+SILENT=0
 
 # Comprobamos que se haya introducido un argumento
-if [ "$#" -ne 1 ] ; then 
+if [ "$#" -lt 1 ] ; then 
 	echo "Es necesario introducir un parámetro:"
 	echo "$0 <Nombre de la traza>"
+	echo "Si no se quiere mostrar nada por pantalla:"
+	echo "$0 <Nombre de la traza> -s"
 	exit
 fi
 
@@ -23,6 +26,10 @@ if [[ $NOMBRE_TRAZA != *.pcap ]] ; then
 	echo "El archivo introducido como primer argumento debe ser de tipo pcap:"
 	echo "$0 <Nombre de la traza>"
 	exit
+fi
+
+if [[ $2 == -s ]] ; then
+	SILENT=1
 fi
 
 ##########################################################################
@@ -34,11 +41,15 @@ echo "" >> $RESULTADOS
 echo "Porcentajes de paquetes IP y no IP" >> $RESULTADOS
 
 # Contamos los paquetes totales
-echo "Analizando todos los paquetes"
+if [[ $SILENT == 0 ]] ; then
+	echo "Analizando todos los paquetes"
+fi
 PAQ_TOTAL=`tshark -r $NOMBRE_TRAZA -T fields -e frame.len > $TOTAL | wc -l`
 
 # Contamos los paquetes que son IP 
-echo "Analizando paquetes IP"
+if [[ $SILENT == 0 ]] ; then
+	echo "Analizando paquetes IP"
+fi
 PAQ_IP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.dst -e ip.src -e udp.dstport -e udp.srcport -e tcp.dstport -e tcp.srcport -e frame.len -Y 'eth.type eq 0x00000800 or vlan.etype eq 0x00000800' > $TEMPORAL | wc -l`
 PAQ_IP=55114
 PAQ_TOTAL=55667
@@ -65,11 +76,15 @@ PAQ_TCP=49378
 PAQ_UDP=4970
 
 # Contamos los paquetes con protocolo TCP
-echo "Analizando paquetes TCP"
+if [[ $SILENT == 0 ]] ; then
+	echo "Analizando paquetes TCP"
+fi
 #PAQ_TCP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 6' | wc -l`
 
 # Contamos los paquetes con protocolo UDP
-echo "Analizando paquetes UDP"
+if [[ $SILENT == 0 ]] ; then
+	echo "Analizando paquetes UDP"
+fi
 #PAQ_UDP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 17' | wc -l`
 
 # Obtenemos el numero de paquetes no TCP ni UDP
@@ -173,7 +188,9 @@ echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
 
 #Mostramos los resultados
-cat $RESULTADOS
+if [[ $SILENT == 0 ]] ; then
+	cat $RESULTADOS
+fi
 
 #eliminamos el temporal
 rm $TEMPORAL $TOTAL
