@@ -7,10 +7,12 @@
 # El primer argumento debe ser el nombre de la traza a analizar
 NOMBRE_TRAZA=$1
 TEMPORAL="practica3.temp"
+TEMPORAL1="ECDFtemp.temp"
 TOTAL="total.temp"
 TOP=10
 RESULTADOS="practica3.res"
 SILENT=0
+MAC="00:11:88:cc:33:e5"
 
 # Comprobamos que se haya introducido un argumento
 if [ "$#" -lt 1 ] ; then 
@@ -157,35 +159,50 @@ echo "" >> $RESULTADOS
 # ip.dst
 echo "Top 10 IPs destino" >> $RESULTADOS
 echo "  pos    tamaño                              ip destino" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $7}' practica3.temp | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # ip.src
 echo "Top 10 IPs origen" >> $RESULTADOS
 echo "  pos    tamaño                               ip origen" >> $RESULTADOS
-awk -F '\t' '{print $2 "\t" $7}' practica3.temp | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.dst
 echo "Top 10 Puertos UDP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto udp destino" >> $RESULTADOS
-awk -F '\t' '{print $3 "\t" $7}' practica3.temp | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $3 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.src
 echo "Top 10 Puertos UDP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto udp origen" >> $RESULTADOS
-awk -F '\t' '{print $4 "\t" $7}' practica3.temp | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $4 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.dst
 echo "Top 10 Puertos TCP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto tcp destino" >> $RESULTADOS
-awk -F '\t' '{print $5 "\t" $7}' practica3.temp | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $5 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.src
 echo "Top 10 Puertos TCP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto tcp origen" >> $RESULTADOS
-awk -F '\t' '{print $6 "\t" $7}' practica3.temp | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $6 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
+
+########################################################################################################
+if [[ $SILENT == 0 ]] ; then
+	echo "Realizando graficas"
+fi
+# Obtenemos el tamaño de los paquetes que utilizan nuestra MAC
+tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e eth.src -e eth.dst -Y "eth.addr==$MAC" > $TEMPORAL
+
+# ECDF del tamaño de los paquetes de nivel 2 con origen en nuestra MAC
+awk -v mac=$MAC '$2 == mac {print $1}' $TEMPORAL > $TEMPORAL1
+./hacer_ECDF.sh $TEMPORAL1 "Tam_eth_src" "Tamanio" "Frecuencia"
+
+# ECDF del tamaño de los paquetes de nivel 2 con destino en nuestra MAC
+awk -v mac=$MAC '$3 == mac {print $1}' $TEMPORAL > $TEMPORAL1
+./hacer_ECDF.sh $TEMPORAL1 "Tam_eth_dst" "Tamanio" "Frecuencia"
 
 #Mostramos los resultados
 if [[ $SILENT == 0 ]] ; then
@@ -193,4 +210,4 @@ if [[ $SILENT == 0 ]] ; then
 fi
 
 #eliminamos el temporal
-rm $TEMPORAL $TOTAL
+rm $TEMPORAL $TOTAL $TEMPORAL1
