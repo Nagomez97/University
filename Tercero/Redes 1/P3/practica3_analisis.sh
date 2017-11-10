@@ -8,11 +8,13 @@
 NOMBRE_TRAZA=$1
 TEMPORAL="practica3.temp"
 TEMPORAL1="ECDFtemp.temp"
+TIME_TEMP="time.temp"
 TOTAL="total.temp"
 TOP=10
 RESULTADOS="practica3.res"
 SILENT=0
 MAC="00:11:88:cc:33:e5"
+IP="119.25.90.131"
 
 # Comprobamos que se haya introducido un argumento
 if [ "$#" -lt 1 ] ; then 
@@ -193,6 +195,9 @@ echo "" >> $RESULTADOS
 if [[ $SILENT == 0 ]] ; then
 	echo "Realizando graficas"
 fi
+
+# Graficas de tamaño de paquetes a nivel 2
+
 # Obtenemos el tamaño de los paquetes que utilizan nuestra MAC
 tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e eth.src -e eth.dst -Y "eth.addr==$MAC" > $TEMPORAL
 
@@ -203,6 +208,53 @@ awk -v mac=$MAC '$2 == mac {print $1}' $TEMPORAL > $TEMPORAL1
 # ECDF del tamaño de los paquetes de nivel 2 con destino en nuestra MAC
 awk -v mac=$MAC '$3 == mac {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam_eth_dst" "Tamanio" "Frecuencia"
+
+# Graficas de tamaño de HTTP y DNS
+
+# Obtenemos un archivo con todos los paquetes TCP
+tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e tcp.srcport -e tcp.dstport > $TEMPORAL
+
+# Paquetes HTTP: vamos a filtrar el archivo temporal en busca de
+# paquetes con origen/destino en el puerto 80 TCP
+
+# ECDF del tamanio de los paquetes HTTP de nivel 3 con origen en el puerto 80
+awk -v port=80 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
+./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP src:80" "Tamanio" "Frecuencia"
+
+# ECDF del tamanio de los paquetes HTTP de nivel 3 con destino en el puerto 80
+awk -v port=80 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
+./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP dst:80" "Tamanio" "Frecuencia"
+
+# Obtenemos un archivo con todos los paquetes UDP
+tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e udp.srcport -e udp.dstport > $TEMPORAL
+
+# Paquetes DNS: vamos a filtrar el archivo temporal en busca de
+# paquetes con origen/destino en el puerto 53 UDP
+
+# ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
+awk -v port=53 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
+./hacer_ECDF.sh $TEMPORAL1 "Tam DNS src:53" "Tamanio" "Frecuencia"
+
+# ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
+awk -v port=53 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
+./hacer_ECDF.sh $TEMPORAL1 "Tam DNS dst:53" "Tamanio" "Frecuencia"
+
+# Obtenemos archivo con los tiempo de los paquetes TCP, con las columnas de las ip destino y origen
+tshark -r $NOMBRE_TRAZA -T fields -e frame.time_relative -e ip.src -e ip.dst -e tcp.srcport > $TEMPORAL
+
+# Filtramos el anterior archivo buscando sólo las que tengan nuestra IP como origen
+awk -v ip=$IP '$2 == ip {print $1 "\t" $2 "\t" $3 "\t" $4}' $TEMPORAL > $TEMPORAL1
+
+# Calculamos el tiempo entre paquetes
+awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
+./hacer_ECDF_time.sh $TIME_TEMP "Delta Time TCP salida" "Tiempo" "Frecuencia"
+
+# Filtramos el anterior archivo buscando sólo las que tengan nuestra IP como destino
+awk -v ip=$IP '$3 == ip {print $1 "\t" $2 "\t" $3 "\t" $4}' $TEMPORAL > $TEMPORAL1
+
+# Calculamos el tiempo entre paquetes
+awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
+./hacer_ECDF_time.sh $TIME_TEMP "Delta Time TCP llegada" "Tiempo" "Frecuencia"
 
 #Mostramos los resultados
 if [[ $SILENT == 0 ]] ; then

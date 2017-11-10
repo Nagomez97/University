@@ -31,6 +31,9 @@ set ylabel "$4"
 # Rango variable y
 set yrange [0:1]
 
+# Rango variable x
+set xrange [0:0.001]
+
 # Dibujamos la grafica
 plot "$TEMPORALECDF" using 1:2 with steps title "$2"
 
