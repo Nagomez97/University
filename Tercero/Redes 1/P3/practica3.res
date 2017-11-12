@@ -177,13 +177,3 @@ Top 10 Puertos TCP origen
 
 --------------------------------------------------
 
-Grafica de tamanio de paquetes de nivel 2 de salida
-Grafica de tamanio de paquetes de nivel 2 entrantes
-Grafica de tamanio de paquetes HTTP de salida
-Grafica de tamanio de paquetes HTTP entrantes
-Grafica de tamanio de paquetes DNS de salida
-Grafica de tamanio de paquetes DNS entrantes
-Grafica de tiempo entre paquetes TCP de salida
-Grafica de tiempo entre paquetes TCP entrantes
-Grafica de tiempo entre paquetes UDP de salida
-Grafica de tiempo entre paquetes UDP entrantes

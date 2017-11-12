@@ -209,12 +209,10 @@ fi
 tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e eth.src -e eth.dst -Y "eth.addr==$MAC" > $TEMPORAL
 
 # ECDF del tamaño de los paquetes de nivel 2 con origen en nuestra MAC
-echo "Grafica de tamanio de paquetes de nivel 2 de salida" >> $RESULTADOS
 awk -v mac=$MAC '$2 == mac {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam eth salida" "Tamanio" "Frecuencia"
 
 # ECDF del tamaño de los paquetes de nivel 2 con destino en nuestra MAC
-echo "Grafica de tamanio de paquetes de nivel 2 entrantes" >> $RESULTADOS
 awk -v mac=$MAC '$3 == mac {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam eth entrantes" "Tamanio" "Frecuencia"
 
@@ -231,12 +229,10 @@ tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e tcp.srcport -e tcp.dstport > $
 # paquetes con origen/destino en el puerto 80 TCP
 
 # ECDF del tamanio de los paquetes HTTP de nivel 3 con origen en el puerto 80
-echo "Grafica de tamanio de paquetes HTTP de salida" >> $RESULTADOS
 awk -v port=80 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP src:80" "Tamanio" "Frecuencia"
 
 # ECDF del tamanio de los paquetes HTTP de nivel 3 con destino en el puerto 80
-echo "Grafica de tamanio de paquetes HTTP entrantes" >> $RESULTADOS
 awk -v port=80 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP dst:80" "Tamanio" "Frecuencia"
 
@@ -251,12 +247,10 @@ fi
 # paquetes con origen/destino en el puerto 53 UDP
 
 # ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
-echo "Grafica de tamanio de paquetes DNS de salida" >> $RESULTADOS
 awk -v port=53 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam DNS src:53" "Tamanio" "Frecuencia"
 
 # ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
-echo "Grafica de tamanio de paquetes DNS entrantes" >> $RESULTADOS
 awk -v port=53 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam DNS dst:53" "Tamanio" "Frecuencia"
 
@@ -271,7 +265,6 @@ tshark -r $NOMBRE_TRAZA -T fields -e frame.time_relative -e ip.src -e ip.dst -Y 
 awk -v ip=$IP '$2 == ip {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes
-echo "Grafica de tiempo entre paquetes TCP de salida" >> $RESULTADOS
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
 ./hacer_ECDF_tcp.sh $TIME_TEMP "Delta Time TCP salida" "Tiempo" "Frecuencia"
 
@@ -279,7 +272,6 @@ awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua =
 awk -v ip=$IP '$3 == ip {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes
-echo "Grafica de tiempo entre paquetes TCP entrantes" >> $RESULTADOS
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
 ./hacer_ECDF_tcp.sh $TIME_TEMP "Delta Time TCP llegada" "Tiempo" "Frecuencia"
 
@@ -294,7 +286,6 @@ tshark -r $NOMBRE_TRAZA -T fields -e frame.time_relative -e udp.srcport -e udp.d
 awk '$2 == 27884 {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes y hacemos la grafica
-echo "Grafica de tiempo entre paquetes UDP de salida" >> $RESULTADOS
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
 ./hacer_ECDF_udp.sh $TIME_TEMP "Delta Time UDP salida" "Tiempo" "Frecuencia"
 
@@ -302,7 +293,6 @@ awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua =
 awk '$3 == 27884 {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes
-echo "Grafica de tiempo entre paquetes UDP entrantes" >> $RESULTADOS
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
 ./hacer_ECDF_udp.sh $TIME_TEMP "Delta Time UDP llegada" "Tiempo" "Frecuencia"
 
@@ -327,6 +317,8 @@ awk -v mac=$MAC '$4 == mac {printf "%d\t%s\n", $2, $1}' $TEMPORAL > $TEMPORAL1
 
 #Mostramos los resultados
 if [[ $SILENT == 0 ]] ; then
+	echo ""
+	echo "RESULTADOS:"
 	cat $RESULTADOS
 fi
 
