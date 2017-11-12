@@ -15,6 +15,7 @@ RESULTADOS="practica3.res"
 SILENT=0
 MAC="00:11:88:cc:33:e5"
 IP="119.25.90.131"
+UDPPORT="27884"
 
 # Comprobamos que se haya introducido un argumento
 if [ "$#" -lt 1 ] ; then 
@@ -29,6 +30,8 @@ fi
 if [[ $NOMBRE_TRAZA != *.pcap ]] ; then
 	echo "El archivo introducido como primer argumento debe ser de tipo pcap:"
 	echo "$0 <Nombre de la traza>"
+	echo "Si no se quiere mostrar nada por pantalla:"
+	echo "$0 <Nombre de la traza> -s"
 	exit
 fi
 
@@ -48,16 +51,14 @@ echo "Porcentajes de paquetes IP y no IP" >> $RESULTADOS
 if [[ $SILENT == 0 ]] ; then
 	echo "Analizando todos los paquetes"
 fi
-PAQ_TOTAL=`tshark -r $NOMBRE_TRAZA -T fields -e frame.len > $TOTAL | wc -l`
-
+tshark -r $NOMBRE_TRAZA -T fields -e frame.len > $TOTAL
+PAQ_TOTAL=`cat $TOTAL | wc -l`
 # Contamos los paquetes que son IP 
 if [[ $SILENT == 0 ]] ; then
 	echo "Analizando paquetes IP"
 fi
-PAQ_IP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.dst -e ip.src -e udp.dstport -e udp.srcport -e tcp.dstport -e tcp.srcport -e frame.len -Y 'eth.type eq 0x00000800 or vlan.etype eq 0x00000800' > $TEMPORAL | wc -l`
-PAQ_IP=55114
-PAQ_TOTAL=55667
-
+tshark -r $NOMBRE_TRAZA -T fields -e ip.dst -e ip.src -e udp.dstport -e udp.srcport -e tcp.dstport -e tcp.srcport -e frame.len -Y 'eth.type eq 0x00000800 or vlan.etype eq 0x00000800' > $TEMPORAL
+PAQ_IP=`cat $TEMPORAL | wc -l`
 
 # Obtenemos los paquetes no IP
 PAQ_NOIP=$(($PAQ_TOTAL - $PAQ_IP))
@@ -76,20 +77,17 @@ echo "" >> $RESULTADOS
 
 echo "Porcentajes de paquetes UDP, TCP y OTROS respecto al total de paquetes IP" >> $RESULTADOS
 
-PAQ_TCP=49378
-PAQ_UDP=4970
-
 # Contamos los paquetes con protocolo TCP
 if [[ $SILENT == 0 ]] ; then
 	echo "Analizando paquetes TCP"
 fi
-#PAQ_TCP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 6' | wc -l`
+PAQ_TCP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 6' | wc -l`
 
 # Contamos los paquetes con protocolo UDP
 if [[ $SILENT == 0 ]] ; then
 	echo "Analizando paquetes UDP"
 fi
-#PAQ_UDP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 17' | wc -l`
+PAQ_UDP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 17' | wc -l`
 
 # Obtenemos el numero de paquetes no TCP ni UDP
 PAQ_OTROS=$(($PAQ_IP - $PAQ_TCP - $PAQ_UDP))
@@ -191,9 +189,18 @@ echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
 
-########################################################################################################
+##########################################################################
+# Realizamos las ECDF de la traza
+# - Tamaños a nivel 2
+# - Tamaños a nivel 3 de los paquetes HTTP
+# - Tamaños a nivel 3 de los paquetes DNS
+# - Tiempos de llegada de los TCP
+# - Tiempos de llegada de los UDP
+##########################################################################
+
 if [[ $SILENT == 0 ]] ; then
 	echo "Realizando graficas"
+	echo "Realizando ECDF de tamaños a nivel 2"
 fi
 
 # Graficas de tamaño de paquetes a nivel 2
@@ -210,6 +217,10 @@ awk -v mac=$MAC '$3 == mac {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam_eth_dst" "Tamanio" "Frecuencia"
 
 # Graficas de tamaño de HTTP y DNS
+
+if [[ $SILENT == 0 ]] ; then
+	echo "Realizando ECDF de tamaños HTTP"
+fi
 
 # Obtenemos un archivo con todos los paquetes TCP
 tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e tcp.srcport -e tcp.dstport > $TEMPORAL
@@ -228,6 +239,10 @@ awk -v port=80 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
 # Obtenemos un archivo con todos los paquetes UDP
 tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e udp.srcport -e udp.dstport > $TEMPORAL
 
+if [[ $SILENT == 0 ]] ; then
+	echo "Realizando ECDF de tamaños DNS"
+fi
+
 # Paquetes DNS: vamos a filtrar el archivo temporal en busca de
 # paquetes con origen/destino en el puerto 53 UDP
 
@@ -239,7 +254,11 @@ awk -v port=53 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
 awk -v port=53 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
 ./hacer_ECDF.sh $TEMPORAL1 "Tam DNS dst:53" "Tamanio" "Frecuencia"
 
-# Obtenemos archivo con los tiempo de los paquetes TCP, con las columnas de las ip destino y origen
+if [[ $SILENT == 0 ]] ; then
+	echo "Realizando ECDF de tiempos TCP"
+fi
+
+# Obtenemos archivo con los tiempos de los paquetes TCP, con las columnas de las ip destino y origen
 tshark -r $NOMBRE_TRAZA -T fields -e frame.time_relative -e ip.src -e ip.dst -e tcp.srcport > $TEMPORAL
 
 # Filtramos el anterior archivo buscando sólo las que tengan nuestra IP como origen
@@ -256,10 +275,46 @@ awk -v ip=$IP '$3 == ip {print $1 "\t" $2 "\t" $3 "\t" $4}' $TEMPORAL > $TEMPORA
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
 ./hacer_ECDF_time.sh $TIME_TEMP "Delta Time TCP llegada" "Tiempo" "Frecuencia"
 
+if [[ $SILENT == 0 ]] ; then
+	echo "Realizando ECDF de tiempos UDP"
+fi
+
+#Obtenemos archivos con los tiempos de los paquetes UDP, con las columnas puerto destino y origen
+tshark -r $NOMBRE_TRAZA -T fields -e frame.time_relative -e udp.srcport -e udp.dstport > $TEMPORAL
+
+# Filtramos el anterior archivo buscando sólo los paquetes con origen en el puerto UDP que nos indica el generador
+awk -v port=$UDPPORT '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
+
+# Calculamos el tiempo entre paquetes
+awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
+./hacer_ECDF_time.sh $TIME_TEMP "Delta Time UDP salida" "Tiempo" "Frecuencia"
+
+# Filtramos el anterior archivo buscando sólo los paquetes con destino en el puerto UDP que nos indica el generador
+awk -v port=$UDPPORT '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
+
+# Calculamos el tiempo entre paquetes
+awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
+./hacer_ECDF_time.sh $TIME_TEMP "Delta Time UDP llegada" "Tiempo" "Frecuencia"
+
+##########################################################################
+# Calculamos el ancho de banda a nivel 2 en b/s
+##########################################################################
+
+# Obtenemos los paquetes con nuestra dirección ethernet
+tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e frame.time_relative -e eth.src -e eth.dst -Y "eth.addr==$MAC" > $TEMPORAL
+
+# Truncamos el frame.time_relative a segundos y filtramos nuestra MAC como origen
+awk -v mac=$MAC '$3 == mac {printf "%d\t%s\n", $2, $1}' $TEMPORAL > $TEMPORAL1
+./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de salida" "Tiempo" "Bits/s"
+
+# Truncamos el frame.time_relative a segundos y filtramos nuestra MAC como destino
+awk -v mac=$MAC '$4 == mac {printf "%d\t%s\n", $2, $1}' $TEMPORAL > $TEMPORAL1
+./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de llegada" "Tiempo" "Bits/s"
+
 #Mostramos los resultados
 if [[ $SILENT == 0 ]] ; then
 	cat $RESULTADOS
 fi
 
 #eliminamos el temporal
-rm $TEMPORAL $TOTAL $TEMPORAL1
+rm $TEMPORAL $TOTAL $TEMPORAL1 $TIME_TEMP
