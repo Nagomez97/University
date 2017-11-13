@@ -121,32 +121,32 @@ echo "" >> $RESULTADOS
 # ip.dst
 echo "Top 10 IPs destino" >> $RESULTADOS
 echo "  pos  paquetes                              ip destino" >> $RESULTADOS
-awk -F '\t' '{print $1}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORAL | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # ip.src
 echo "Top 10 IPs origen" >> $RESULTADOS
 echo "  pos  paquetes                               ip origen" >> $RESULTADOS
-awk -F '\t' '{print $2}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORAL | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.dstport
 echo "Top 10 Puertos UDP destino" >> $RESULTADOS
 echo "  pos  paquetes                      puerto udp destino" >> $RESULTADOS
-awk -F '\t' '{print $1}' $TEMPORALUDP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORALUDP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.srcport
 echo "Top 10 Puertos UDP origen" >> $RESULTADOS
 echo "  pos  paquetes                       puerto udp origen" >> $RESULTADOS
-awk -F '\t' '{print $2}' $TEMPORALUDP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORALUDP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.dstport
 echo "Top 10 Puertos TCP destino" >> $RESULTADOS
 echo "  pos  paquetes                      puerto tcp destino" >> $RESULTADOS
-awk -F '\t' '{print $1}' $TEMPORALTCP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORALTCP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.srcport
 echo "Top 10 Puertos TCP origen" >> $RESULTADOS
 echo "  pos  paquetes                       puerto tcp origen" >> $RESULTADOS
-awk -F '\t' '{print $2}' $TEMPORALTCP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORALTCP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
@@ -161,32 +161,32 @@ echo "" >> $RESULTADOS
 # ip.dst
 echo "Top 10 IPs destino" >> $RESULTADOS
 echo "  pos    tamaño                              ip destino" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $7}' $TEMPORAL | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # ip.src
 echo "Top 10 IPs origen" >> $RESULTADOS
 echo "  pos    tamaño                               ip origen" >> $RESULTADOS
-awk -F '\t' '{print $2 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $7}' $TEMPORAL | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.dst
 echo "Top 10 Puertos UDP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto udp destino" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $3}' $TEMPORALUDP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $3}' $TEMPORALUDP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.src
 echo "Top 10 Puertos UDP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto udp origen" >> $RESULTADOS
-awk -F '\t' '{print $2 "\t" $3}' $TEMPORALUDP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $3}' $TEMPORALUDP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.dst
 echo "Top 10 Puertos TCP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto tcp destino" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.src
 echo "Top 10 Puertos TCP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto tcp origen" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $3}' $TEMPORALTCP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
@@ -212,11 +212,11 @@ tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e eth.src -e eth.dst -Y "eth.add
 
 # ECDF del tamaño de los paquetes de nivel 2 con origen en nuestra MAC
 awk -v mac=$MAC '$2 == mac {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam eth salida" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam eth salida" "Tamanio (bytes)" "Frecuencia"
 
 # ECDF del tamaño de los paquetes de nivel 2 con destino en nuestra MAC
 awk -v mac=$MAC '$3 == mac {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam eth entrantes" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam eth entrantes" "Tamanio (bytes)" "Frecuencia"
 
 # Graficas de tamaño de HTTP y DNS
 
@@ -232,11 +232,11 @@ tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e tcp.srcport -e tcp.dstport > $
 
 # ECDF del tamanio de los paquetes HTTP de nivel 3 con origen en el puerto 80
 awk -v port=80 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP src:80" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP src 80" "Tamanio (bytes)" "Frecuencia"
 
 # ECDF del tamanio de los paquetes HTTP de nivel 3 con destino en el puerto 80
 awk -v port=80 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP dst:80" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP dst 80" "Tamanio (bytes)" "Frecuencia"
 
 # Obtenemos un archivo con todos los paquetes UDP
 tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e udp.srcport -e udp.dstport > $TEMPORAL
@@ -250,11 +250,11 @@ fi
 
 # ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
 awk -v port=53 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam DNS src:53" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam DNS src 53" "Tamanio (bytes)" "Frecuencia"
 
 # ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
 awk -v port=53 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam DNS dst:53" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam DNS dst 53" "Tamanio (bytes)" "Frecuencia"
 
 if [[ $SILENT == 0 ]] ; then
 	echo "Realizando ECDF de tiempos TCP"
@@ -268,14 +268,14 @@ awk -v ip=$IP '$2 == ip {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
-./hacer_ECDF_tcp.sh $TIME_TEMP "Delta Time TCP salida" "Tiempo" "Frecuencia"
+./hacer_ECDF_tcp.sh $TIME_TEMP "Delta Time TCP salida" "Tiempo (s)" "Frecuencia"
 
 # Filtramos el anterior archivo buscando sólo las que tengan nuestra IP como destino
 awk -v ip=$IP '$3 == ip {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
-./hacer_ECDF_tcp.sh $TIME_TEMP "Delta Time TCP llegada" "Tiempo" "Frecuencia"
+./hacer_ECDF_tcp.sh $TIME_TEMP "Delta Time TCP llegada" "Tiempo (s)" "Frecuencia"
 
 if [[ $SILENT == 0 ]] ; then
 	echo "Realizando ECDF de tiempos UDP"
@@ -289,14 +289,14 @@ awk '$2 == 27884 {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes y hacemos la grafica
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
-./hacer_ECDF_udp.sh $TIME_TEMP "Delta Time UDP salida" "Tiempo" "Frecuencia"
+./hacer_ECDF_udp.sh $TIME_TEMP "Delta Time UDP salida" "Tiempo (s)" "Frecuencia"
 
 # Filtramos el anterior archivo buscando sólo las que tengan nuestro puerto UDP como destino
 awk '$3 == 27884 {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
 
 # Calculamos el tiempo entre paquetes
 awk 'BEGIN{antigua = $1} {delta = $1-antigua; printf("%.7f\n", delta); antigua = $1 }' $TEMPORAL1 > $TIME_TEMP
-./hacer_ECDF_udp.sh $TIME_TEMP "Delta Time UDP llegada" "Tiempo" "Frecuencia"
+./hacer_ECDF_udp.sh $TIME_TEMP "Delta Time UDP llegada" "Tiempo (s)" "Frecuencia"
 
 ##########################################################################
 # Calculamos el ancho de banda a nivel 2 en b/s
@@ -311,11 +311,11 @@ tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e frame.time_relative -e eth.src
 
 # Truncamos el frame.time_relative a segundos y filtramos nuestra MAC como origen
 awk -v mac=$MAC '$3 == mac {printf "%d\t%s\n", $2, $1*8}' $TEMPORAL > $TEMPORAL1
-./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de salida" "Tiempo" "Bits/s"
+./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de salida" "Tiempo (s)" "Bits/s"
 
 # Truncamos el frame.time_relative a segundos y filtramos nuestra MAC como destino
 awk -v mac=$MAC '$4 == mac {printf "%d\t%s\n", $2, $1*8}' $TEMPORAL > $TEMPORAL1
-./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de llegada" "Tiempo" "Bits/s"
+./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de llegada" "Tiempo (s)" "Bits/s"
 
 #Mostramos los resultados
 if [[ $SILENT == 0 ]] ; then
