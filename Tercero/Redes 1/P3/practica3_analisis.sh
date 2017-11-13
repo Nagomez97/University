@@ -232,11 +232,11 @@ tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e tcp.srcport -e tcp.dstport > $
 
 # ECDF del tamanio de los paquetes HTTP de nivel 3 con origen en el puerto 80
 awk -v port=80 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP src:80" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP src 80" "Tamanio" "Frecuencia"
 
 # ECDF del tamanio de los paquetes HTTP de nivel 3 con destino en el puerto 80
 awk -v port=80 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP dst:80" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam HTTP dst 80" "Tamanio" "Frecuencia"
 
 # Obtenemos un archivo con todos los paquetes UDP
 tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e udp.srcport -e udp.dstport > $TEMPORAL
@@ -250,11 +250,11 @@ fi
 
 # ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
 awk -v port=53 '$2 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam DNS src:53" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam DNS src 53" "Tamanio" "Frecuencia"
 
 # ECDF del tamanio de los paquetes DNS de nivel 3 con origen en el puerto 53
 awk -v port=53 '$3 == port {print $1}' $TEMPORAL > $TEMPORAL1
-./hacer_ECDF.sh $TEMPORAL1 "Tam DNS dst:53" "Tamanio" "Frecuencia"
+./hacer_ECDF.sh $TEMPORAL1 "Tam DNS dst 53" "Tamanio" "Frecuencia"
 
 if [[ $SILENT == 0 ]] ; then
 	echo "Realizando ECDF de tiempos TCP"
