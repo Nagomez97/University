@@ -556,7 +556,7 @@ begin
    -- En este caso hay que parar el pipeline un ciclo.
    ------------------------------------------------------
 
-	process(reg2_MemRead_out, reg2_IDataIN_out, reg1_IDataIn_out, reg2_Branch_out)
+	process(reg2_MemRead_out, reg2_IDataIN_out, reg1_IDataIn_out, reg2_Branch_out, reg3_Jump_out, reg2_Jump_out)
 	begin
 		if reg2_MemRead_out = '1' then --Comprobacion de que es un lw
 			if (reg2_IDataIN_out(20 downto 16) = reg1_IDataIn_out(25 downto 21)) AND (reg2_IDataIN_out(20 downto 16) /= "00000") then --Comprobación registro rs=rd
@@ -575,6 +575,10 @@ begin
 		elsif reg2_Branch_out = '1' then
 			PC_Stop <= '1';
 			reg1_Stop <= '1';
+			bubble <= '1';
+		elsif reg2_Jump_out = '1' or reg3_Jump_out = '1' then
+			PC_Stop <= '0';
+			reg1_Stop <= '0';
 			bubble <= '1';
 		else
 			PC_Stop <= '0';
