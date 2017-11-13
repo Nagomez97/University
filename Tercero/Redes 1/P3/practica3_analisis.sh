@@ -8,6 +8,8 @@
 NOMBRE_TRAZA=$1
 TEMPORAL="practica3.temp"
 TEMPORAL1="ECDFtemp.temp"
+TEMPORALTCP="tcp.temp"
+TEMPORALUDP="udp.temp"
 TIME_TEMP="time.temp"
 TOTAL="total.temp"
 TOP=10
@@ -81,14 +83,14 @@ echo "Porcentajes de paquetes UDP, TCP y OTROS respecto al total de paquetes IP"
 if [[ $SILENT == 0 ]] ; then
 	echo "Analizando paquetes TCP"
 fi
-PAQ_TCP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 6' | wc -l`
-
+tshark -r $NOMBRE_TRAZA -T fields -e tcp.dstport -e tcp.srcport -e frame.len -Y 'tcp' > $TEMPORALTCP
+PAQ_TCP=`cat $TEMPORALTCP | wc -l`
 # Contamos los paquetes con protocolo UDP
 if [[ $SILENT == 0 ]] ; then
 	echo "Analizando paquetes UDP"
 fi
-PAQ_UDP=`tshark -r $NOMBRE_TRAZA -T fields -e ip.proto -Y 'ip.proto eq 17' | wc -l`
-
+tshark -r $NOMBRE_TRAZA -T fields -e udp.dstport -e udp.srcport -e frame.len  -Y 'udp' > $TEMPORALUDP
+PAQ_UDP=`cat $TEMPORALUDP | wc -l`
 # Obtenemos el numero de paquetes no TCP ni UDP
 PAQ_OTROS=$(($PAQ_IP - $PAQ_TCP - $PAQ_UDP))
 
@@ -129,22 +131,22 @@ echo "" >> $RESULTADOS
 # udp.dstport
 echo "Top 10 Puertos UDP destino" >> $RESULTADOS
 echo "  pos  paquetes                      puerto udp destino" >> $RESULTADOS
-awk -F '\t' '{print $3}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORALUDP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.srcport
 echo "Top 10 Puertos UDP origen" >> $RESULTADOS
 echo "  pos  paquetes                       puerto udp origen" >> $RESULTADOS
-awk -F '\t' '{print $4}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORALUDP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.dstport
 echo "Top 10 Puertos TCP destino" >> $RESULTADOS
 echo "  pos  paquetes                      puerto tcp destino" >> $RESULTADOS
-awk -F '\t' '{print $5}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORALTCP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.srcport
 echo "Top 10 Puertos TCP origen" >> $RESULTADOS
 echo "  pos  paquetes                       puerto tcp origen" >> $RESULTADOS
-awk -F '\t' '{print $6}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORALTCP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
@@ -169,22 +171,22 @@ echo "" >> $RESULTADOS
 # udp.dst
 echo "Top 10 Puertos UDP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto udp destino" >> $RESULTADOS
-awk -F '\t' '{print $3 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $3}' $TEMPORALUDP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.src
 echo "Top 10 Puertos UDP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto udp origen" >> $RESULTADOS
-awk -F '\t' '{print $4 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $3}' $TEMPORALUDP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.dst
 echo "Top 10 Puertos TCP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto tcp destino" >> $RESULTADOS
-awk -F '\t' '{print $5 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.src
 echo "Top 10 Puertos TCP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto tcp origen" >> $RESULTADOS
-awk -F '\t' '{print $6 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
@@ -259,7 +261,7 @@ if [[ $SILENT == 0 ]] ; then
 fi
 
 # Obtenemos archivo con los tiempos de los paquetes TCP, con las columnas de las ip destino y origen
-tshark -r $NOMBRE_TRAZA -T fields -e frame.time_relative -e ip.src -e ip.dst -Y 'ip.proto == 6' > $TEMPORAL
+tshark -r $NOMBRE_TRAZA -T fields -e frame.time_relative -e ip.src -e ip.dst -Y 'tcp' > $TEMPORAL
 
 # Filtramos el anterior archivo buscando sólo las que tengan nuestra IP como origen
 awk -v ip=$IP '$2 == ip {print $1 "\t" $2 "\t" $3}' $TEMPORAL > $TEMPORAL1
@@ -308,11 +310,11 @@ fi
 tshark -r $NOMBRE_TRAZA -T fields -e frame.len -e frame.time_relative -e eth.src -e eth.dst -Y "eth.addr==$MAC" > $TEMPORAL
 
 # Truncamos el frame.time_relative a segundos y filtramos nuestra MAC como origen
-awk -v mac=$MAC '$3 == mac {printf "%d\t%s\n", $2, $1}' $TEMPORAL > $TEMPORAL1
+awk -v mac=$MAC '$3 == mac {printf "%d\t%s\n", $2, $1*8}' $TEMPORAL > $TEMPORAL1
 ./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de salida" "Tiempo" "Bits/s"
 
 # Truncamos el frame.time_relative a segundos y filtramos nuestra MAC como destino
-awk -v mac=$MAC '$4 == mac {printf "%d\t%s\n", $2, $1}' $TEMPORAL > $TEMPORAL1
+awk -v mac=$MAC '$4 == mac {printf "%d\t%s\n", $2, $1*8}' $TEMPORAL > $TEMPORAL1
 ./hacer_grafica_tasa.sh $TEMPORAL1 "Tasa de llegada" "Tiempo" "Bits/s"
 
 #Mostramos los resultados
@@ -323,4 +325,4 @@ if [[ $SILENT == 0 ]] ; then
 fi
 
 #eliminamos el temporal
-rm $TEMPORAL $TOTAL $TEMPORAL1 $TIME_TEMP
+rm $TEMPORAL $TOTAL $TEMPORAL1 $TIME_TEMP $TEMPORALTCP $TEMPORALUDP
