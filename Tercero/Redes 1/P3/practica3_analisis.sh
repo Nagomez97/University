@@ -121,32 +121,32 @@ echo "" >> $RESULTADOS
 # ip.dst
 echo "Top 10 IPs destino" >> $RESULTADOS
 echo "  pos  paquetes                              ip destino" >> $RESULTADOS
-awk -F '\t' '{print $1}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORAL | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # ip.src
 echo "Top 10 IPs origen" >> $RESULTADOS
 echo "  pos  paquetes                               ip origen" >> $RESULTADOS
-awk -F '\t' '{print $2}' $TEMPORAL | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORAL | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.dstport
 echo "Top 10 Puertos UDP destino" >> $RESULTADOS
 echo "  pos  paquetes                      puerto udp destino" >> $RESULTADOS
-awk -F '\t' '{print $1}' $TEMPORALUDP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORALUDP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' | head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.srcport
 echo "Top 10 Puertos UDP origen" >> $RESULTADOS
 echo "  pos  paquetes                       puerto udp origen" >> $RESULTADOS
-awk -F '\t' '{print $2}' $TEMPORALUDP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORALUDP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.dstport
 echo "Top 10 Puertos TCP destino" >> $RESULTADOS
 echo "  pos  paquetes                      puerto tcp destino" >> $RESULTADOS
-awk -F '\t' '{print $1}' $TEMPORALTCP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1}' $TEMPORALTCP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.srcport
 echo "Top 10 Puertos TCP origen" >> $RESULTADOS
 echo "  pos  paquetes                       puerto tcp origen" >> $RESULTADOS
-awk -F '\t' '{print $2}' $TEMPORALTCP | sed '/^\s*$/d' | sort | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2}' $TEMPORALTCP | sed '/^\s*$/d' | sort -n | uniq -c | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
@@ -161,32 +161,32 @@ echo "" >> $RESULTADOS
 # ip.dst
 echo "Top 10 IPs destino" >> $RESULTADOS
 echo "  pos    tamaño                              ip destino" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $7}' $TEMPORAL | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # ip.src
 echo "Top 10 IPs origen" >> $RESULTADOS
 echo "  pos    tamaño                               ip origen" >> $RESULTADOS
-awk -F '\t' '{print $2 "\t" $7}' $TEMPORAL | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $7}' $TEMPORAL | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.dst
 echo "Top 10 Puertos UDP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto udp destino" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $3}' $TEMPORALUDP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $3}' $TEMPORALUDP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # udp.src
 echo "Top 10 Puertos UDP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto udp origen" >> $RESULTADOS
-awk -F '\t' '{print $2 "\t" $3}' $TEMPORALUDP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $3}' $TEMPORALUDP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.dst
 echo "Top 10 Puertos TCP destino" >> $RESULTADOS
 echo "  pos    tamaño                      puerto tcp destino" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 # tcp.src
 echo "Top 10 Puertos TCP origen" >> $RESULTADOS
 echo "  pos    tamaño                       puerto tcp origen" >> $RESULTADOS
-awk -F '\t' '{print $1 "\t" $3}' $TEMPORALTCP | sort | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
+awk -F '\t' '{print $2 "\t" $3}' $TEMPORALTCP | sort -n | awk 'NR>1 && p!=$1 {printf "%10s%40s\n", s, p; s=0} {s+=$2} {p=$1} END{printf "%10s%40s\n", s, p}' | sort -nr | awk 'BEGIN{n=0}{printf "%5s%10s%40s\n", n+=1, $1, $2}' |head -n $TOP >> $RESULTADOS
 echo "" >> $RESULTADOS
 echo "--------------------------------------------------" >> $RESULTADOS
 echo "" >> $RESULTADOS
