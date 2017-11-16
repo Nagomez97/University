@@ -1,0 +1,9 @@
+Autores: 
+José Ignacio Gómez García
+Óscar Gómez Borzdynski
+
+Scripts:
+practica3_analisis.sh: Debe llamarse con mínimo un argumento, el nombre de la traza. En caso de que se quiera correr sin mostrar nada por pantalla introduzca un segundo argumento: -s.
+	Este script realiza todo el trabajo de esta práctica, guardará los resultados en gráficas y en un fichero llamado practica3.res.
+hacer_ECDF*: Estos scripts se utilizan para la realización de las gráficas mediante GNUPlot de las ECDFS.
+hacer_grafica_tasa.sh: Crea una gráfica de tasa de transferencia.
