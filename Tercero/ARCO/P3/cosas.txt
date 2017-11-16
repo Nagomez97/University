@@ -1,0 +1,27 @@
+Nuestro numero es el 6
+
+1)
+
+LSTOPO -> sacar datos cache grafico
+
+Cache 1:
+
+256 kB Asociativa de 8 vias
+Hay separación de datos e instrucciones.
+Creemos que es así porque el procesador tiene arquitectura Harvard.
+
+Cache 2:
+
+1024 kB Asociativa de 4 vias
+
+Cache 3:
+
+6144 kB Asociativa de 12 vias
+
+2.2) Realizamos varias tomas debido a la posibilidad de que nuestro ordenador esté ejecutando procesos en segundo plano que afecten al tiempo de ejecución del programa. De este modo reducimos el efecto de estas variaciones.
+
+2.5) Para obtener los datos hemos hecho un script con un bucle principal que va a realizar el número de medidas oportuno. Engloba dos bucles que realizan las mediciones 
+Para matrices pequeñas, el tiempo de ejecución es muy similar debido a que podemos guardar toda la matriz en la caché. En cuanto aumentamos el tamaño, el procesador va a tener que estar haciendo cargas desde memoria (o cachés de mayor nivel).  
+El programa fast es más rápido debido a que suma los elementos por filas, aprovechando los datos cargados en cache. Mientras que el programa slow lo hace por columnas, necesitando un bloque nuevo en cada operación.
+En memoria la matriz está guardado de la siguiente manera: matriz[fila][columna] de manera que todos los elementos de la misma fila son consecutivos en memoria.
+
