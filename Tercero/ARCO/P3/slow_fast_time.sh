@@ -10,7 +10,7 @@ fPNG=slow_fast_time.png
 Iterations=10
 
 # borrar el fichero DAT y el fichero PNG
-rm -f $fDAT $fPNG
+rm -f $fDAT $fPNG $temp
 
 # generar el fichero DAT vacío
 touch $fDAT
@@ -18,16 +18,7 @@ touch $temp
 
 for ((j = 1; j <= Iterations; j+=1)); do
 echo "Running slow and fast in iteration $j"
-	# bucle para N desde Ninicio hasta Nfinal con un paso de NPaso
-	# for ((N = Ninicio, i=0; N <= Nfinal ; N += Npaso, i+=1)); do
-	# 	echo "slow N: $N / $Nfinal..."
-		
-	# 	# Ejecutamos slow con N, filtramos la linea que contiene el tiempo y
-	# 	# seleccionamos la tercera columna (el valor del tiempo). Deja el valor
-	# 	# en un array de variables para poder imprimirlo posteriormente
-	# 	slowTime[$i]=$(./slow $N | grep 'time' | awk '{print $3}')
-	# done
-	# bucle para N desde Ninicio hasta Nfinal con un paso de NPaso
+
 	for ((N = Ninicio, i=0 ; N <= Nfinal ; N += Npaso, i+=1)); do
 		echo "matriz N: $N / $Nfinal..."
 
