@@ -4,14 +4,8 @@ FLAGS = -g -Wall -D_GNU_SOURCE
 
 .PHONY: clean all
 
-all: fast slow multiply transposed
-
-transposed: transposed.c arqo3.c
-	gcc $(FLAGS) $(LIB_DIR) -o $@ $^ $(LIBS)
-
-multiply: multiply.c arqo3.c
-	gcc $(FLAGS) $(LIB_DIR) -o $@ $^ $(LIBS)
-
+all: fast slow
+	
 fast: fast.c arqo3.c
 	gcc $(FLAGS) $(LIB_DIR) -o $@ $^ $(LIBS)
 

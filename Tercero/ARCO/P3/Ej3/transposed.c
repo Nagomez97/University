@@ -39,10 +39,11 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	transpose(m,mt,n);
+	
 
 	gettimeofday(&ini,NULL);
-
+	transpose(m,mt,n);
+	
 	/* Main computation */
 	compute(m, mt, res, n);
 	/* End of computation */

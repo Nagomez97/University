@@ -30,13 +30,17 @@ for ((cache = 1024; cache <= 8192; cache *= 2)); do
 
 		valgrind -q --tool=cachegrind --I1=$cache,1,64 --D1=$cache,1,64 --LL=8388608,1,64 --cachegrind-out-file=$temp ./slow $N
 
-		mr_slow=$(cat $temp | grep summary | awk '{print $3}')
-		mw_slow=$(cat $temp | grep summary | awk '{print $6}')
+		#mr_slow=$(cat $temp | grep summary | awk '{print $3}')
+		#mw_slow=$(cat $temp | grep summary | awk '{print $6}')
+		mr_slow=$(cat $temp | grep summary | awk '{print $6}')
+		mw_slow=$(cat $temp | grep summary | awk '{print $9}')
 
 		valgrind -q --tool=cachegrind --I1=$cache,1,64 --D1=$cache,1,64 --LL=8388608,1,64 --cachegrind-out-file=$temp ./fast $N
 
-		mr_fast=$(cat $temp | grep summary | awk '{print $3}')
-		mw_fast=$(cat $temp | grep summary | awk '{print $6}')
+		#mr_fast=$(cat $temp | grep summary | awk '{print $3}')
+		#mw_fast=$(cat $temp | grep summary | awk '{print $6}')
+		mr_fast=$(cat $temp | grep summary | awk '{print $6}')
+		mw_fast=$(cat $temp | grep summary | awk '{print $9}')
 
 		echo "$N 	$mr_slow 	$mw_slow 	$mr_fast 	$mw_fast" >> $cDAT
 	done
@@ -53,14 +57,14 @@ set key right bottom
 set grid
 set term png
 set output "$fPNGread"
-plot "cache_1024" using 1:2 with lines lw 2 title "slow 1024", \
-     "cache_1024" using 1:4 with lines lw 2 title "fast 1024", \
-     "cache_2048" using 1:2 with lines lw 2 title "slow 2048", \
-     "cache_2048" using 1:4 with lines lw 2 title "fast 2048", \
-     "cache_4096" using 1:2 with lines lw 2 title "slow 4096", \
-     "cache_4096" using 1:4 with lines lw 2 title "fast 4096", \
-     "cache_8192" using 1:2 with lines lw 2 title "slow 8192", \
-     "cache_8192" using 1:4 with lines lw 2 title "fast 8192"
+plot "cache_1024.dat" using 1:2 with lines lw 2 title "slow 1024", \
+     "cache_1024.dat" using 1:4 with lines lw 2 title "fast 1024", \
+     "cache_2048.dat" using 1:2 with lines lw 2 title "slow 2048", \
+     "cache_2048.dat" using 1:4 with lines lw 2 title "fast 2048", \
+     "cache_4096.dat" using 1:2 with lines lw 2 title "slow 4096", \
+     "cache_4096.dat" using 1:4 with lines lw 2 title "fast 4096", \
+     "cache_8192.dat" using 1:2 with lines lw 2 title "slow 8192", \
+     "cache_8192.dat" using 1:4 with lines lw 2 title "fast 8192"
 
 replot
 quit
@@ -77,14 +81,14 @@ set key right bottom
 set grid
 set term png
 set output "$fPNGwrite"
-plot "cache_1024" using 1:2 with lines lw 2 title "slow 1024", \
-     "cache_1024" using 1:4 with lines lw 2 title "fast 1024", \
-     "cache_2048" using 1:2 with lines lw 2 title "slow 2048", \
-     "cache_2048" using 1:4 with lines lw 2 title "fast 2048", \
-     "cache_4096" using 1:2 with lines lw 2 title "slow 4096", \
-     "cache_4096" using 1:4 with lines lw 2 title "fast 4096", \
-     "cache_8192" using 1:2 with lines lw 2 title "slow 8192", \
-     "cache_8192" using 1:4 with lines lw 2 title "fast 8192"
+plot "cache_1024.dat" using 1:3 with lines lw 2 title "slow 1024", \
+     "cache_1024.dat" using 1:5 with lines lw 2 title "fast 1024", \
+     "cache_2048.dat" using 1:3 with lines lw 2 title "slow 2048", \
+     "cache_2048.dat" using 1:5 with lines lw 2 title "fast 2048", \
+     "cache_4096.dat" using 1:3 with lines lw 2 title "slow 4096", \
+     "cache_4096.dat" using 1:5 with lines lw 2 title "fast 4096", \
+     "cache_8192.dat" using 1:3 with lines lw 2 title "slow 8192", \
+     "cache_8192.dat" using 1:5 with lines lw 2 title "fast 8192"
 
 replot
 quit
