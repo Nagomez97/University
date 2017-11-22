@@ -1,0 +1,6 @@
+Lo he ordenado en carpetas, pero a lo bestia. Falta editar los makefile de cada carpeta para que compilen y revisar que no faltan archivos.
+El ejercicio 2 ya hace graficas, pero no se si funciona bien (no me ha dado tiempo a probar). 
+El ejercicio 3 necesita las graficas.
+
+IMPORTANTE
+Con nuestros tiempos tarda UN HUEVO así que para ver que funciona, lo corremos con P=0, que es la de Cabana, y comprobamos. Luego ya se corre en la EPS con los grandes.
