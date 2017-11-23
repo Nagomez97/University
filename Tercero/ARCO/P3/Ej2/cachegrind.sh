@@ -51,7 +51,7 @@ echo "Generating reading errors plot..."
 # estándar el script que está entre "<< END_GNUPLOT" y "END_GNUPLOT"	
 gnuplot << END_GNUPLOT
 set title "Read Misses"
-set ylabel "Execution time (s)"
+set ylabel "Misses"
 set xlabel "Matrix Size"
 set key right bottom
 set grid
@@ -75,7 +75,7 @@ echo "Generating write errors plot..."
 # estándar el script que está entre "<< END_GNUPLOT" y "END_GNUPLOT"	
 gnuplot << END_GNUPLOT
 set title "Write Misses"
-set ylabel "Execution time (s)"
+set ylabel "Misses"
 set xlabel "Matrix Size"
 set key right bottom
 set grid
