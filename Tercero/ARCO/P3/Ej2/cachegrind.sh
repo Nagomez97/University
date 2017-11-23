@@ -2,9 +2,9 @@
 
 # inicialiar variables
 P=0
-Ninicio=$((4096+1024*P))
+Ninicio=$((10000+1024*P))
 Step=64
-Nfinal=$((Ninicio+2048))
+Nfinal=$((Ninicio+1024))
 temp=cache.temp
 fPNGread=cache_lectura.png
 fPNGwrite=cache_excritura.png
@@ -51,7 +51,7 @@ echo "Generating reading errors plot..."
 # estándar el script que está entre "<< END_GNUPLOT" y "END_GNUPLOT"	
 gnuplot << END_GNUPLOT
 set title "Read Misses"
-set ylabel "Execution time (s)"
+set ylabel "Misses"
 set xlabel "Matrix Size"
 set key right bottom
 set grid
@@ -75,7 +75,7 @@ echo "Generating write errors plot..."
 # estándar el script que está entre "<< END_GNUPLOT" y "END_GNUPLOT"	
 gnuplot << END_GNUPLOT
 set title "Write Misses"
-set ylabel "Execution time (s)"
+set ylabel "Misses"
 set xlabel "Matrix Size"
 set key right bottom
 set grid
