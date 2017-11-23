@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # inicializar variables
-P=0
+P=6
 Ninicio=$((10000 + 1024 * P))      #10000 + 1024*6
 Npaso=64
 Nfinal=$((Ninicio+1024))
