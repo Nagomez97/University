@@ -2,9 +2,9 @@
 
 # inicialiar variables
 P=0
-Ninicio=$((2000+1024*P))
+Ninicio=$((4096+1024*P))
 Step=64
-Nfinal=$((Ninicio+1024))
+Nfinal=$((Ninicio+2048))
 temp=cache.temp
 fPNGread=cache_lectura.png
 fPNGwrite=cache_excritura.png
