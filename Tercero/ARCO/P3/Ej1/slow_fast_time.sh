@@ -39,8 +39,7 @@ done
 
 #cat $fDAT | sort -n | awk 'BEGIN{slow=0; fast=0; n=0; N=0} {slow=slow+$2; fast=fast+$3; n=n+1;} NR>1 && N!=$1{print N "\t" slow/n "\t" fast/n; slow=0; fast=0; n=0} {N=$1} END{print N "\t" slow/n "\t" fast/n}'
 
-awk -v I=$Iterations '{media_slow[$1] = media_slow[$1] + $2; media_fast[$1] = media_fast[$1] + $3} END{for(j in media_slow) print j"	"media_slow[j]/I"	"media_fast[j]/I}' $temp > $fDAT
-
+awk -v I=$Iterations '{media_slow[$1] = media_slow[$1] + $2; media_fast[$1] = media_fast[$1] + $3} END{for(j in media_slow) print j"	"media_slow[j]/I"	"media_fast[j]/I}' $temp | sort > $fDAT
 echo "Generating plot..."
 # llamar a gnuplot para generar el gráfico y pasarle directamente por la entrada
 # estándar el script que está entre "<< END_GNUPLOT" y "END_GNUPLOT"	
