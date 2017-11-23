@@ -7,6 +7,8 @@ tempTimeOr=tiemposOr.dat
 tempErrorOr=erroresOr.dat
 final=mult.dat
 Iterations=10
+fPNGmisses="mult_cache.png"
+fPNGtime="mult_time.png"
 
 rm -f $tempTimeOr $tempErrorOr $final
 
@@ -22,3 +24,34 @@ awk -v I=$Iterations ' \
 echo "Joining"
 join -j 1 -o 1.1,1.2,2.2,2.3,1.3,2.4,2.5 $tempTimeOr $tempErrorOr > $final
 
+echo "Generating plot..."
+
+gnuplot << END_GNUPLOT
+set title "Cache misses"
+set ylabel "Misses"
+set xlabel "Matrix Size"
+set key right bottom
+set grid
+set term png
+set output "$fPNGmisses"
+plot "$final" using 1:3 with lines lw 2 title "D1mr_mult", \
+	 "$final" using 1:4 with lines lw 2 title "D1mw_mult", \
+	 "$final" using 1:6 with lines lw 2 title "D1mr_tran", \
+     "$final" using 1:7 with lines lw 2 title "D1mw_tran"
+replot
+quit
+END_GNUPLOT
+
+gnuplot << END_GNUPLOT
+set title "Mult Execution Time"
+set ylabel "Time (s)"
+set xlabel "Matrix Size"
+set key right bottom
+set grid
+set term png
+set output "$fPNGtime"
+plot "$final" using 1:2 with lines lw 2 title "time_mult", \
+     "$final" using 1:5 with lines lw 2 title "time_tran"
+replot
+quit
+END_GNUPLOT
