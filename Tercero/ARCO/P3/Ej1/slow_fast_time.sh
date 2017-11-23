@@ -2,7 +2,7 @@
 
 # inicializar variables
 P=0
-Ninicio=$((10000 + 1024 * P))      #10000 + 1024*6
+Ninicio=$((10000 + 1024 * P)) 
 Npaso=64
 Nfinal=$((Ninicio+1024))
 fDAT=slow_fast_time.dat
