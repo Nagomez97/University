@@ -155,7 +155,7 @@ int main(int argc, char **argv){
 		//Rellenamos los parametros necesario para enviar el paquete a su destinatario y proceso
 	Parametros parametros_udp; memcpy(parametros_udp.IP_destino,IP_destino_red,IP_ALEN); parametros_udp.puerto_destino=puerto_destino;
 		//Enviamos
-	if(enviar((uint8_t*)data,pila_protocolos,strlen(data),&parametros_udp)==ERROR ){
+	if(enviar((uint8_t*)data,strlen(data),pila_protocolos,&parametros_udp)==ERROR ){
 		printf("Error: enviar(): %s %s %d.\n",errbuf,__FILE__,__LINE__);
 		return ERROR;
 	}
@@ -164,9 +164,9 @@ int main(int argc, char **argv){
 	printf("Enviado mensaje %"PRIu64", almacenado en %s\n\n\n", cont,fichero_pcap_destino);
 
 		//Luego, un paquete ICMP en concreto un ping
-	pila_protocolos[0]=ICMP_PROTO; pila_protocolos[1]=IP_PROTO; pila_protocolos[2]=0;
+	pila_protocolos[0]=ICMP_PROTO; pila_protocolos[1]=IP_PROTO; pila_protocolos[2]=ETH_PROTO;
 	Parametros parametros_icmp; parametros_icmp.tipo=PING_TIPO; parametros_icmp.codigo=PING_CODE; memcpy(parametros_icmp.IP_destino,IP_destino_red,IP_ALEN);
-	if(enviar((uint8_t*)"Probando a hacer un ping",pila_protocolos,strlen("Probando a hacer un ping"),&parametros_icmp)==ERROR ){
+	if(enviar((uint8_t*)"Probando a hacer un ping",strlen("Probando a hacer un ping"),pila_protocolos,&parametros_icmp)==ERROR ){
 		printf("Error: enviar(): %s %s %d.\n",errbuf,__FILE__,__LINE__);
 		return ERROR;
 	}
@@ -194,7 +194,7 @@ int main(int argc, char **argv){
 
 uint8_t enviar(uint8_t* mensaje, uint64_t longitud,uint16_t* pila_protocolos,void *parametros){
 	uint16_t protocolo=pila_protocolos[0];
-printf("Enviar(%"PRIu16") %s %d.\n",protocolo,__FILE__,__LINE__);
+	printf("Enviar(%"PRIu16") %s %d.\n",protocolo,__FILE__,__LINE__);
 	if(protocolos_registrados[protocolo]==NULL){
 		printf("Protocolo %"PRIu16" desconocido\n",protocolo);
 		return ERROR;
@@ -221,11 +221,11 @@ printf("Enviar(%"PRIu16") %s %d.\n",protocolo,__FILE__,__LINE__);
 
 uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,void *parametros){
 	uint8_t segmento[UDP_SEG_MAX]={0};
-	uint16_t puerto_origen = 0,suma_control=0;
+	uint16_t puerto_origen = 0,suma_control=0,len=0;
 	uint16_t aux16;
 	uint32_t pos=0;
 	uint16_t protocolo_inferior=pila_protocolos[1];
-printf("modulo UDP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
+	printf("modulo UDP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
 	if (longitud>(pow(2,16)-UDP_HLEN)){
 		printf("Error: mensaje demasiado grande para UDP (%f).\n",(pow(2,16)-UDP_HLEN));
@@ -234,17 +234,27 @@ printf("modulo UDP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
 	Parametros udpdatos=*((Parametros*)parametros);
 	uint16_t puerto_destino=udpdatos.puerto_destino;
+	len=(uint16_t) longitud;
 
-//TODO
-//[...] 
-//obtenerPuertoOrigen(·)
+	if(obtenerPuertoOrigen(&puerto_origen) == ERROR){
+		printf("Error al obtener un puerto origen disponible.\n");
+		return ERROR;
+	}
 	aux16=htons(puerto_origen);
 	memcpy(segmento+pos,&aux16,sizeof(uint16_t));
 	pos+=sizeof(uint16_t);
-	
-//TODO Completar el segmento [...]
-//[...] 
-//Se llama al protocolo definido de nivel inferior a traves de los punteros registrados en la tabla de protocolos registrados
+
+	memcpy(segmento+pos,&puerto_destino,sizeof(uint16_t));
+	pos+=sizeof(uint16_t);
+
+	memcpy(segmento+pos,&len,sizeof(uint16_t));
+	pos+=sizeof(uint16_t);
+
+	memcpy(segmento+pos,&suma_control,sizeof(uint16_t));
+	pos+=sizeof(uint16_t);
+
+	memcpy(segmento+pos,mensaje,len);
+
 	return protocolos_registrados[protocolo_inferior](segmento,longitud+pos,pila_protocolos,parametros);
 }
 
@@ -274,11 +284,47 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	uint16_t protocolo_inferior=pila_protocolos[2];
 	pila_protocolos++;
 	uint8_t mascara[IP_ALEN],IP_rango_origen[IP_ALEN],IP_rango_destino[IP_ALEN];
+	uint8_t IP_gateway[IP_ALEN];
 
-printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
+	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
 	Parametros ipdatos=*((Parametros*)parametros);
 	uint8_t* IP_destino=ipdatos.IP_destino;
+
+	if(obtenerIPInterface(interface, IP_origen)==ERROR){
+		printf("Error al obtener la direccion IP origen\n");
+		return ERROR;
+	}
+
+	if(obtenerMascaraInterface(interface,mascara)=ERROR){
+		printf("Error al obtener la mascara de la interfaz.\n");
+		return ERROR;
+	}
+
+	aplicarMascara(IP_origen,mascara,IP_ALEN,IP_rango_origen);
+	aplicarMascara(IP_destino,mascara,IP_ALEN,IP_rango_destino);
+
+	/*Comprobamos si el destino esta en la misma red*/
+	if(memcmp(IP_rango_destino,IP_rango_origen,(IP_ALEN * sizeof(uint8_t))) == 0){
+		if(ARPrequest(interface,IP_destino,ipdatos.ETH_destino) == ERROR){
+			printf("Error en ARP request de la IP destino.\n");
+			return ERROR;
+		}
+	}
+	else{
+		if(obtenerGateway(interface,IP_gateway) == ERROR){
+			printf("Error al obtener la IP del gateway.\n");
+			return ERROR;
+		}
+		if(ARPrequest(interface,IP_gateway,ipdatos.ETH_destino) == ERROR){
+			printf("Error en ARP request del gateway.\n");
+			return ERROR;
+		}
+	}
+
+/***************************************************************************
+* FALTA RELLENAR EL PROTOCOLO IP 		*
+***************************************************************************/
 
 //TODO
 //Llamar a ARPrequest(·) adecuadamente y usar ETH_destino de la estructura parametros
