@@ -2,7 +2,7 @@
 
 # inicializar variables
 P=0
-Ninicio=$((256+256*P))
+Ninicio=$((512+256*P))
 Npaso=16
 Nfinal=$((Ninicio+256))
 tempTime=tiempos.dat

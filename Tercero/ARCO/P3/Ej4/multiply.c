@@ -4,14 +4,12 @@
 
 #include "arqo3.h"
 
-void compute(tipo **matrix, tipo **mt, tipo **res,int n);
-void transpose(tipo **matrix, tipo **mt, int n);
+void compute(tipo **matrix, tipo **res,int n);
 
 int main(int argc, char *argv[]) {
 
 	int n;
 	tipo **m=NULL;
-	tipo **mt=NULL;
 	tipo **res=NULL;
 	struct timeval fin, ini;
 
@@ -27,25 +25,16 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	mt=generateEmptyMatrix(n);
-	if( !m )
-	{
-		return -1;
-	}
-
 	res=generateEmptyMatrix(n);
 	if( !res )
 	{
 		return -1;
 	}
 
-	
-
 	gettimeofday(&ini,NULL);
-	transpose(m,mt,n);
-	
+
 	/* Main computation */
-	compute(m, mt, res, n);
+	compute(m, res, n);
 	/* End of computation */
 
 	gettimeofday(&fin,NULL);
@@ -61,16 +50,8 @@ int main(int argc, char *argv[]) {
 
 }
 
-void transpose(tipo **matrix, tipo **mt, int n){
-	int i, j;
-	for(i=0;i<n;i++){
-		for(j=0;j<n;j++){
-			mt[j][i]=matrix[i][j];
-		}
-	}
-}
 
-void compute(tipo **matrix, tipo **mt, tipo **res, int n)
+void compute(tipo **matrix, tipo **res, int n)
 {
 	int i,j,k,suma;
 	
@@ -80,7 +61,7 @@ void compute(tipo **matrix, tipo **mt, tipo **res, int n)
 		{
 			suma=0;
 			for(k=0; k<n; k++){
-				suma += matrix[i][k] * mt[j][k];
+				suma += matrix[i][k] * matrix[k][j];
 			}
 			res[i][j] = suma;
 		}
