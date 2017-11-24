@@ -9,6 +9,8 @@ tempError=errores.dat
 tempTime=tiempos.dat
 tempV=valgrind.temp
 Iterations=10
+fPNGmisses=errores.png
+fPNGtime=tiempos.png
 
 #borrar ficheros temporales
 rm -f $tempError $tempV $tempTime
@@ -78,7 +80,7 @@ set xlabel "Matrix Size"
 set key right bottom
 set grid
 set term png
-set output "$fPNGread"
+set output "$fPNGmisses"
 plot "$tempError" using 1:2 with lines lw 2 title "multiply 1 way", \
      "$tempError" using 1:3 with lines lw 2 title "transpose 1 way", \
      "$tempError" using 1:4 with lines lw 2 title "multiply 4 way", \
@@ -100,7 +102,7 @@ set xlabel "Matrix Size"
 set key right bottom
 set grid
 set term png
-set output "$fPNGwrite"
+set output "$fPNGtime"
 plot "$tempTime" using 1:2 with lines lw 2 title "multiply 1 way", \
      "$tempTime" using 1:3 with lines lw 2 title "transpose 1 way", \
      "$tempTime" using 1:4 with lines lw 2 title "multiply 4 way", \
