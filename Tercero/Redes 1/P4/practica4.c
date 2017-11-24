@@ -403,8 +403,15 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 ****************************************************************************************/
 
 uint8_t aplicarMascara(uint8_t* IP, uint8_t* mascara, uint32_t longitud, uint8_t* resultado){
-//TODO
-//[...]
+	int i = 0;
+	if(IP==NULL || mascara==NULL || longitud<=0 || resultado==NULL){
+		printf("Error aplicando la mascara.\n");
+		return ERROR;
+	}
+	for(i=0; i<longitud; i++){
+		resultado[i] = IP[i] & mascara[i];
+	}
+	return OK;
 }
 
 
