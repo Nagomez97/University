@@ -9,6 +9,8 @@ tempError=errores.dat
 tempV=valgrind.temp
 Iterations=10
 
+make
+
 #borrar ficheros temporales
 rm -f $tempError $tempV
 #generar ficheros vacios

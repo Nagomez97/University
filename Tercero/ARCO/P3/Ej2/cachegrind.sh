@@ -9,6 +9,8 @@ temp=cache.temp
 fPNGread=cache_lectura.png
 fPNGwrite=cache_escritura.png
 
+make
+
 # borrar el fichero temporal
 rm -f $temp $fDAT cache_1024.dat cache_2048.dat cache_4096.dat cache_8192.dat
 

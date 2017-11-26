@@ -10,6 +10,8 @@ temp=temporal.dat
 fPNG=slow_fast_time.png
 Iterations=10
 
+make
+
 # borrar el fichero DAT y el fichero PNG
 rm -f $fDAT $fPNG $temp
 

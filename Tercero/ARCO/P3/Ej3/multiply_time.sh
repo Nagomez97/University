@@ -8,6 +8,8 @@ Nfinal=$((Ninicio+256))
 tempTime=tiempos.dat
 Iterations=10
 
+make
+
 #borrar ficheros temporales
 rm -f $tempTime
 #generar ficheros vacios
