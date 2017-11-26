@@ -5,9 +5,9 @@ P=0
 Ninicio=$((10000 + 1024 * P)) 
 Npaso=64
 Nfinal=$((Ninicio+1024))
-fDAT=slow_fast_time.dat
+fDAT=time_slow_fast.dat
 temp=temporal.dat
-fPNG=slow_fast_time.png
+fPNG=time_slow_fast.png
 Iterations=10
 
 make
