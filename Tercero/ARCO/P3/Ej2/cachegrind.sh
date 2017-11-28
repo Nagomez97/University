@@ -32,15 +32,11 @@ for ((cache = 1024; cache <= 8192; cache *= 2)); do
 
 		valgrind -q --tool=cachegrind --I1=$cache,1,64 --D1=$cache,1,64 --LL=8388608,1,64 --cachegrind-out-file=$temp ./slow $N
 
-		#mr_slow=$(cat $temp | grep summary | awk '{print $3}')
-		#mw_slow=$(cat $temp | grep summary | awk '{print $6}')
 		mr_slow=$(cat $temp | grep summary | awk '{print $6}')
 		mw_slow=$(cat $temp | grep summary | awk '{print $9}')
 
 		valgrind -q --tool=cachegrind --I1=$cache,1,64 --D1=$cache,1,64 --LL=8388608,1,64 --cachegrind-out-file=$temp ./fast $N
 
-		#mr_fast=$(cat $temp | grep summary | awk '{print $3}')
-		#mw_fast=$(cat $temp | grep summary | awk '{print $6}')
 		mr_fast=$(cat $temp | grep summary | awk '{print $6}')
 		mw_fast=$(cat $temp | grep summary | awk '{print $9}')
 

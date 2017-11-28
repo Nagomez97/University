@@ -7,7 +7,6 @@ Npaso=16
 Nfinal=$((Ninicio+256))
 tempError=errores.dat
 tempV=valgrind.temp
-Iterations=10
 
 make
 
