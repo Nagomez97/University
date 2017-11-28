@@ -12,6 +12,8 @@ Iterations=10
 fPNGmisses=errores.png
 fPNGtime=tiempos.png
 
+make
+
 #borrar ficheros temporales
 rm -f $tempError $tempV $tempTime
 #generar ficheros vacios
