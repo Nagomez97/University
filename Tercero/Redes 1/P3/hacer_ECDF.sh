@@ -15,7 +15,7 @@ ARG=$1
 TOTALARG=`cat  $ARG | sed '/^\s*$/d' | wc -l`
 
 # Ordenamos para agrupar y poder obtener la frecuencia acumulada de los datos de la primera columna
-sort -n $ARG | sed '/^\s*$/d' | awk -v t=$TOTALARG 'BEGIN{s=0; printf "0\t0\n"} NR>1 && p!=$1 {printf "%s\t%s\n", p, (s/t)} {s+=1} {p=$1} END{printf "%s\t%s\n", p, (s/t)}' > $TEMPORALECDF
+#sort -n $ARG | sed '/^\s*$/d' | awk -v t=$TOTALARG 'BEGIN{s=0; printf "0\t0\n"} NR>1 && p!=$1 {printf "%s\t%s\n", p, (s/t)} {s+=1} {p=$1} END{printf "%s\t%s\n", p, (s/t)}' > $TEMPORALECDF
 
 # Comandos de GnuPlot
 gnuplot <<EOF
