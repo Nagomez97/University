@@ -1,0 +1,12 @@
+1.1 Sí se pueden lanzar más threads que cores, pero si no hay hyperthreading no tiene sentido, ya que sólo se va a poder procesar en paralelo un thread por core.
+1.2 En los laboratorios se pueden ejecutar 4 threads en paralelo. En nuestro ordenador, se pueden ejecutar 4 threads en 2 cores, por lo que sí admite un hyperthreading de dos threads por core
+
+Tras correr omp2:
+
+Podemos ver que las variables se inicializan a: a=1, b=2, c=3. Por tanto, van a tener direcciones de memoria contiguas, de 4B cada una. Al pasar al segmento en paralelo, definimos b como una variable compartida, a como una privada, y c como una firstprivate. Esto quiere decir que:
+- Por cada thread se le va a asignar una nueva dirección a a, que se va a inicializar con el valor que se encontrase en esa dirección previamente (esto es aleatorio). Al finalizar, la variable a con la que nos quedamos es la original, cuyo valor no ha sido modificado.
+- La dirección de b es la misma en cada thread (la dirección del b original) y por lo tanto mantiene los datos que se vayan modificando. Esto es: el primer thread que se cree va a contener el dato 2 y lo va a modificar, de forma que cada thread posterior va a tener un nuevo valor de b. Al finalizar, b mantiene el valor de la última modificación.
+- Como c es firstprivate, por cada thread se le asigna una nueva dirección de memoria (no se modifica la original), pero se inicializa con el valor del primer c (esto es 3). Al salir de la zona paralela, el c que se mantiene es el original, que no ha sido modificado, por lo que seguirá valiendo 3.
+
+En conclusión, podemos ver que las direcciones de las variables impresas al final son las mismas que las iniciales, y que los valores de a y c no han cambiado (se han modificado internamente en los threads, pero no se han tocado sus posiciones de memoria originales), mientras que la variable compartida b si que ha sido modificada.
+ 
