@@ -6,15 +6,22 @@
 #include <stdlib.h>
 #include "arqo4.h"
 
-int main(void)
+int main(int argc, char*argv[])
 {
 	float *A=NULL, *B=NULL;
-	long long k=0;
+	long long k=0, tam;
 	struct timeval fin,ini;
 	double sum=0;
+
+	if(argc != 2){
+		printf("Size is needed. \n");
+		return -1;
+	}
+
+	tam = atoll(argv[1]);
 	
-	A = generateVector(M);
-	B = generateVector(M);
+	A = generateVector(tam);
+	B = generateVector(tam);
 	if ( !A || !B )
 	{
 		printf("Error when allocationg matrix\n");
