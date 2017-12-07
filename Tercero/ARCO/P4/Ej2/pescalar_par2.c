@@ -5,15 +5,30 @@
 #include <stdlib.h>
 #include "arqo4.h"
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	float *A=NULL, *B=NULL;
-	long long k=0;
+	long long k=0, size;
 	struct timeval fin,ini;
 	float sum=0;
+	int thr;
+
+	/*El tamaño por defecto es el tamaño definido en la macro M y el numero de threads T*/
+	if(argc == 1){
+		size = M;
+		thr = T;
+	}
+	else if(argc != 3){
+		printf("Vector size and number of threads are needed.\n");
+		return -1;
+	}
+	else{
+		size = atoll(argv[1]);
+		thr = atoi(argv[2]);
+	}
 	
-	A = generateVector(M);
-	B = generateVector(M);
+	A = generateVector(size);
+	B = generateVector(size);
 	if ( !A || !B )
 	{
 		printf("Error when allocationg matrix\n");
@@ -25,9 +40,12 @@ int main(void)
 	gettimeofday(&ini,NULL);
 	/* Bloque de computo */
 	sum = 0;
+	omp_set_num_threads(thr);
 	#pragma omp parallel for reduction(+:sum)
-	for(k=0;k<M;k++)
-	{
+	for(k=0;k<size;k++)
+	{	
+		if(k==0)
+		printf("Numero de threads: %d\n", omp_get_num_threads());
 		sum = sum + A[k]*B[k];
 	}
 	/* Fin del computo */
