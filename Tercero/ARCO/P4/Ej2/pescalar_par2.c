@@ -5,24 +5,15 @@
 #include <stdlib.h>
 #include "arqo4.h"
 
-int main(int argc, char* argv[])
+int main(void)
 {
 	float *A=NULL, *B=NULL;
-	long long k=0, tam;
+	long long k=0;
 	struct timeval fin,ini;
-	double sum=0;
-	int threads;
-
-	if(argc != 3){
-		printf("Size and threads are needed. \n");
-		return -1;
-	}
-
-	tam = atoll(argv[1]);
-	threads = atoi(argv[2]);
+	float sum=0;
 	
-	A = generateVector(tam);
-	B = generateVector(tam);
+	A = generateVector(M);
+	B = generateVector(M);
 	if ( !A || !B )
 	{
 		printf("Error when allocationg matrix\n");

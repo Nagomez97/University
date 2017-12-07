@@ -10,7 +10,7 @@ int main(void)
 	float *A=NULL, *B=NULL;
 	long long k=0;
 	struct timeval fin,ini;
-	double sum=0;
+	float sum=0;
 	
 	A = generateVector(M);
 	B = generateVector(M);

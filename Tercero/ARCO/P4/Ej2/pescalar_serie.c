@@ -6,22 +6,24 @@
 #include <stdlib.h>
 #include "arqo4.h"
 
-int main(int argc, char*argv[])
+int main(int argc, char* argv[])
 {
 	float *A=NULL, *B=NULL;
-	long long k=0, tam;
+	long long k=0, size;
 	struct timeval fin,ini;
-	double sum=0;
+	float sum=0;
 
 	if(argc != 2){
-		printf("Size is needed. \n");
+		printf("Vector size is needed.\n");
 		return -1;
 	}
+	printf("%s\n", argv[1]);
+	size = atoll(argv[1]);
 
-	tam = atoll(argv[1]);
+	printf("El tamanio es %lld\n", size);
 	
-	A = generateVector(tam);
-	B = generateVector(tam);
+	A = generateVector(size);
+	B = generateVector(size);
 	if ( !A || !B )
 	{
 		printf("Error when allocationg matrix\n");
