@@ -1,3 +1,14 @@
 2.1 El resultado es correcto en par2, ya que es igual que el obtenido en el procesamiento en serie (que es el correcto). Esto se debe a que par1 emplea la variable sum de forma compartida entre los threads del bucle, por lo que se dan situaciones en la que dos threads cogen el mismo valor inicial de sum, y lo operan sobre el mismo sum, por lo que a la hora de escribir, uno de ellos va a sobreescribir el resultado del anterior. Nos encontramos ante un fallo del tipo WAW (Write After Write).
 
 2.2 Los resultados obtenidos con los ficheros originales no eran exactamente iguales entre los programas en serie y en paralelo(2). Esto se debía a que los datos los tratábamos con precisión float, y al cambiar el orden de cálculo mediante threading, aunque debería dar el mismo resultado, se truncaba de distinta forma. Por ello cambiamos el tipo de la variable sum para que almacenase doubles, evitando así los problemas derivados del truncamiento.
+
+2.3 Podemos apreciar que para vectores pequeños (Menores de 20000000) crear 4 hilos ralentiza el tiempo de ejecucion respecto a crear 2 hilos. Esto se puede debera que la creación de los hilos es más lenta que la ejecución en sí. Por tanto pensamos que si el trabajo a realizar es de un tiempo menor al que tardaríamos en lanzar los hilos no valdrá la pena.
+
+2.4 En caso de que la creación de hilos compensara siempre. Creemos que en caso de que tengas un procesador mononúcleo y sin hyperthreading, no compensaría ya que no todo el trabajo lo realizaría el mismo núcleo. Debido a que la creación de los hilos utiliza cierto tiempo, lo que haremos es ralentizarlo.
+
+2.5 Tal y como hemos dicho en los apartados anteriores, el rendimiento para vectores muy grandes sí mejora significativamente al aumentar el número de threads. Para tamaños menores creemos que el rendimiento es muy similar. Por ello, en caso de un proyecto real, estaremos gastando tiempo de producción para paralelizar el programa sin tener un rendimiento mayor. 
+
+2.6 Esto se debe a el tiempo tardado en crear los threads (y cerrarlos) o debido a la arquitectura del ordenador, donde con un solo núcleo no vamos a paralelizar de forma efectiva.
+
+2.7 Por las razones que hemos dado antes, pensamos que en vectores pequeños, la gráfica de la aceleración cambiará, pudiendo mostrar una aceleración menor que 1 para los paralelos.
+
