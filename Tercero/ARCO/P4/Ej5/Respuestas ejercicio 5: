@@ -1,0 +1,5 @@
+Respuestas ejercicio 5:
+
+5.1) Al ejecutar las dos versiones para el cálculo de pi apreciamos que el valor devuelto por pi_par5 no es el correcto. Pensamos que el problema viene de que la variable i se declara en el exterior de la zona paralelizada y toma carácter compartido. Esto provoca una situación de carrera donde varios threads intentan acceder a i simultaneamente, generando éste error en el cálculo. En cuanto al rendimiento cabe destacar que pi_par5 es considerablemente más lento que pi_par4. Pensamos que se debe a que al declarar una sección crítica, los threads que llegan allí tienen que comprobar si ya hay otro thread ejecutando esa instrucción y esperar, provocando un cuello de botella que ralentiza toda la ejecución.
+
+5.2) Ejecutando las versiones 6 y 7 observamos que 7 tarda aproximadamente la mitad de tiempo que 6. Esto se debe a que la directiva for reduction optimiza la suma entre los threads, creando un árbol binario inverso que suma los valores intermedios en threads diferentes.
