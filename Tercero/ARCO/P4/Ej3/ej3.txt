@@ -1,0 +1,2 @@
+3.1 El peor rendimiento se obtiene en el bucle externo (por qué?)
+3.2 El mejor rendimiento se obtiene en el bucle interno

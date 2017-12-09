@@ -45,7 +45,6 @@ int main(int argc, char* argv[])
 	for(k=0;k<size;k++)
 	{	
 		if(k==0)
-		printf("Numero de threads: %d\n", omp_get_num_threads());
 		sum = sum + A[k]*B[k];
 	}
 	/* Fin del computo */
