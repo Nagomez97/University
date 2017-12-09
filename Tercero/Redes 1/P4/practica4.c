@@ -275,6 +275,7 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 
 uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos,void *parametros){
 	uint8_t datagrama[IP_DATAGRAM_MAX]={0};
+	unit8_t cabecera[IHL*4]={0};
 	uint32_t aux32;
 	uint16_t aux16;
 	uint8_t aux8;
@@ -286,9 +287,12 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	uint8_t mascara[IP_ALEN],IP_rango_origen[IP_ALEN],IP_rango_destino[IP_ALEN];
 	uint8_t IP_gateway[IP_ALEN];
 	uint16_t len8, len16;
-
+	
+	uint16_t offset;
+	
 	len8 = sizeof(uint8_t);
 	len16 = sizeof(uint16_t);
+	len32 = sizeof(uint32_t);
 
 	/*Variables para el datagrama*/
 	uint8_t vers_ihl = 70; /* 70 es 0x46 en hex. Esto es porque los primeros
@@ -297,8 +301,13 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 							de tamanio 6*/
 	uint8_t servicio = 0; /*Dejamos el tipo de servicio a 0*/
 	uint16_t total_size;
+	uint8_t tiempo = 128;
+	unit16_t flags_pos;
+	uint16_t inichecksum = 0;
+	uint8_t protocol = (uint8_t) protocolo_superior;
 	uint16_t* identificador; /*Valor aleatorio para el identificador*/
 	random_identifier(identificador);
+	uint32_t opciones_relleno = 0;
 
 	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
@@ -341,30 +350,84 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		}
 	}
 
-	/*Control de tamanio*/
-	if(longitud > IP_DATAGRAM_MAX){
-		/*fragmentacion*/
-	}
-
-	/*Rellenamos el datagrama*/
+	/*Rellenamos la cabecera*/
 	/*Version IP y IHL*/
-	memcpy(datagrama+pos,vers_ihl,len8);
+	memcpy(cabecera+pos,vers_ihl,len8);
 	pos += len8;
 	
 	/*Tipo de servicio*/
-	memcpy(datagrama+pos,servicio,len8);
+	memcpy(cabecera+pos,servicio,len8);
 	pos += len8;
 	
-	/*Total size*/
-	memcpy(datagrama+pos,total_size,len16);
+	/*Salto debido a total size, se rellenara al fragmentar*/
 	pos += len16;
 
 	/*Identificacion*/
-	memcpy(datagrama+pos,identificador,len16);
+	memcpy(cabecera+pos,identificador,len16);
 	pos += len16;
 
+	/*Salto debido a las flags y a posicion, estos campos se rellenan tras calcular la fragmentacion*/
+	pos += len16;
 
+	/*Tiempo de vida*/
+	memcpy(cabecera+pos,tiempo,len8);
+	pos += len8;
+	
+	/*Protocolo*/
+	memcpy(cabecera+pos,protocol,len8);
+	pos += len8;
+	
+	/*Salto debido al checksum, se rellenará en la fragmentación*/
+	pos += len16;
 
+	/*Direccion ip origen*/
+	memcpy(cabecera+pos,IP_origen,IP_ALEN);
+	pos += IP_ALEN;
+	
+	/*Direccion ip destino*/
+	memcpy(cabecera+pos,IP_destino,IP_ALEN);
+	pos += IP_ALEN;
+	
+	/*Opciones y relleno*/
+	memcpy(cabecera+pos,opciones_relleno,len32);
+	
+
+	/*Bucle para fragmentacion*/
+	for(offset=0; offset<longitud; offset+=IP_DATAGRAM_MAX-(IHL*4)){
+		/*No es el ultimo paquete*/
+		if(offset + IP_DATAGRAM_MAX-(IHL*4) < longitud){
+			total_size = IP_DATAGRAM_MAX;
+			flags_pos = (offset & 0x1fff) | 0x2000;
+		}
+		/*Ultimo paquete*/
+		else{
+			total_size = longitud - offset + (IHL*4);
+			flags_pos = (offset & 0x1fff) | 0x0000;
+		}
+		
+		/*Rellenamos la cabecera con longitud total*/
+		memcpy(cabecera+IP_TO_LEN,total_size,len16);
+		
+		/*Rellenamos el campo de las flags y el offset*/
+		memcpy(cabecera+IP_TO_FLAGS,flags_pos,len16);
+		
+		/*Ponemos el checksum a 0*/
+		memcpy(cabecera+IP_TO_CHECKSUM,inichecksum,len16);
+		
+		/*Obtenemos el checksum y lo guardamos en la posición correspondiente*/
+		calcularChecksum((unit16_t)(IHL)*4,cabecera,cabecera+IP_TO_CHECKSUM);
+		
+		/*Rellenamos el datagrama para enviarlo*/
+		memcpy(datagrama,cabecera,(IHL*4));
+		
+		/*Rellenamos el datagrama con el fragmento del segmento*/
+		memcpy(datagrama+(IHL*4), segmento+offset, total_size-(IHL*4));
+		
+		/*Pasamos al siguiente nivel de protocolos*/
+		if(protocolos_registrados[protocolo_inferior](datagrama,total_size,pila_protocolos,parametros) == ERROR) return ERROR;
+	}
+		
+	return OK;
 
 
 

@@ -265,6 +265,13 @@ int rdtsc()
     __asm__ __volatile__("rdtsc");
 }
 
+/****************************************************************************************
+* Nombre: random_identifier								*
+* Descripcion: Devuelve un identificador IP aleatorio				*
+* Argumentos: 										*
+*  -retorno: Puntero donde se guardara el resultado obtenido						*
+* Retorno: OK==1/ERROR==0								*
+****************************************************************************************/
 int random_identifier(uint16_t* retorno){
 	time_t t;
 
