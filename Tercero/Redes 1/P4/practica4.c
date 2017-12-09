@@ -285,6 +285,20 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	pila_protocolos++;
 	uint8_t mascara[IP_ALEN],IP_rango_origen[IP_ALEN],IP_rango_destino[IP_ALEN];
 	uint8_t IP_gateway[IP_ALEN];
+	uint16_t len8, len16;
+
+	len8 = sizeof(uint8_t);
+	len16 = sizeof(uint16_t);
+
+	/*Variables para el datagrama*/
+	uint8_t vers_ihl = 70; /* 70 es 0x46 en hex. Esto es porque los primeros
+							4 bits de esta variable son del tipo de IP (4) mientras
+							que los 4 siguientes son del tamanio de cabecera, que sera
+							de tamanio 6*/
+	uint8_t servicio = 0; /*Dejamos el tipo de servicio a 0*/
+	uint16_t total_size;
+	uint16_t* identificador; /*Valor aleatorio para el identificador*/
+	random_identifier(identificador);
 
 	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
@@ -301,26 +315,58 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		return ERROR;
 	}
 
+	/*Aplicamos las mascaras para luego ver si estan en la misma subred*/
 	aplicarMascara(IP_origen,mascara,IP_ALEN,IP_rango_origen);
 	aplicarMascara(IP_destino,mascara,IP_ALEN,IP_rango_destino);
 
-	/*Comprobamos si el destino esta en la misma red*/
+	/*Comprobamos si el destino esta en la misma subred*/
 	if(memcmp(IP_rango_destino,IP_rango_origen,(IP_ALEN * sizeof(uint8_t))) == 0){
+		/*Se realiza un ARP request y guarda la MAC destino en la estructura de datos*/
 		if(ARPrequest(interface,IP_destino,ipdatos.ETH_destino) == ERROR){
 			printf("Error en ARP request de la IP destino.\n");
 			return ERROR;
 		}
 	}
+	/*En caso de que no se encuentren en la misma subred*/
 	else{
+		/*Obtenemos la puerta de enlace*/
 		if(obtenerGateway(interface,IP_gateway) == ERROR){
 			printf("Error al obtener la IP del gateway.\n");
 			return ERROR;
 		}
+		/*Realizamos un ARP request*/
 		if(ARPrequest(interface,IP_gateway,ipdatos.ETH_destino) == ERROR){
 			printf("Error en ARP request del gateway.\n");
 			return ERROR;
 		}
 	}
+
+	/*Control de tamanio*/
+	if(longitud > IP_DATAGRAM_MAX){
+		/*fragmentacion*/
+	}
+
+	/*Rellenamos el datagrama*/
+	/*Version IP y IHL*/
+	memcpy(datagrama+pos,vers_ihl,len8);
+	pos += len8;
+	
+	/*Tipo de servicio*/
+	memcpy(datagrama+pos,servicio,len8);
+	pos += len8;
+	
+	/*Total size*/
+	memcpy(datagrama+pos,total_size,len16);
+	pos += len16;
+
+	/*Identificacion*/
+	memcpy(datagrama+pos,identificador,len16);
+	pos += len16;
+
+
+
+
+
 
 /***************************************************************************
 * FALTA RELLENAR EL PROTOCOLO IP 		*

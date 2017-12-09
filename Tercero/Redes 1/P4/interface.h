@@ -40,5 +40,6 @@ uint8_t obtenerIPInterface(char* interface, uint8_t* retorno);
 uint8_t obtenerGateway(char* interface, uint8_t* retorno);
 uint8_t ARPrequest(char* interface, uint8_t* IP, uint8_t* retorno);
 uint8_t obtenerMTUInterface(char* interface, uint16_t* retorno);
+uint16_t random_identifier(uint16_t* retorno);
 
 #endif
