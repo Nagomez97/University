@@ -275,19 +275,16 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 
 uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos,void *parametros){
 	uint8_t datagrama[IP_DATAGRAM_MAX]={0};
-	unit8_t cabecera[IHL*4]={0};
-	uint32_t aux32;
-	uint16_t aux16;
+	uint8_t cabecera[IHL*4]={0};
 	uint16_t MTU;
-	uint8_t aux8;
-	uint32_t pos=0,pos_control=0;
+	uint32_t pos=0;
 	uint8_t IP_origen[IP_ALEN];
 	uint16_t protocolo_superior=pila_protocolos[0];
 	uint16_t protocolo_inferior=pila_protocolos[2];
 	pila_protocolos++;
 	uint8_t mascara[IP_ALEN],IP_rango_origen[IP_ALEN],IP_rango_destino[IP_ALEN];
 	uint8_t IP_gateway[IP_ALEN];
-	uint16_t len8, len16;
+	uint16_t len8, len16, len32;
 	
 	uint16_t offset;
 	
@@ -303,7 +300,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	uint8_t servicio = 0; /*Dejamos el tipo de servicio a 0*/
 	uint16_t total_size;
 	uint8_t tiempo = 128;
-	unit16_t flags_pos;
+	uint16_t flags_pos;
 	uint16_t inichecksum = 0;
 	uint8_t protocol = (uint8_t) protocolo_superior;
 	uint32_t opciones_relleno = 0;
@@ -323,7 +320,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		return ERROR;
 	}
 
-	if(obtenerMascaraInterface(interface,mascara)=ERROR){
+	if(obtenerMascaraInterface(interface,mascara)==ERROR){
 		printf("Error al obtener la mascara de la interfaz.\n");
 		return ERROR;
 	}
@@ -356,11 +353,11 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 
 	/*Rellenamos la cabecera*/
 	/*Version IP y IHL*/
-	memcpy(cabecera+pos,vers_ihl,len8);
+	memcpy(cabecera+pos,&vers_ihl,len8);
 	pos += len8;
 	
 	/*Tipo de servicio*/
-	memcpy(cabecera+pos,servicio,len8);
+	memcpy(cabecera+pos,&servicio,len8);
 	pos += len8;
 	
 	/*Salto debido a total size, se rellenara al fragmentar*/
@@ -374,11 +371,11 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	pos += len16;
 
 	/*Tiempo de vida*/
-	memcpy(cabecera+pos,tiempo,len8);
+	memcpy(cabecera+pos,&tiempo,len8);
 	pos += len8;
 	
 	/*Protocolo*/
-	memcpy(cabecera+pos,protocol,len8);
+	memcpy(cabecera+pos,&protocol,len8);
 	pos += len8;
 	
 	/*Salto debido al checksum, se rellenará en la fragmentación*/
@@ -393,7 +390,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	pos += IP_ALEN;
 	
 	/*Opciones y relleno*/
-	memcpy(cabecera+pos,opciones_relleno,len32);
+	memcpy(cabecera+pos,&opciones_relleno,len32);
 	
 
 	/*Bucle para fragmentacion*/
@@ -471,12 +468,16 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	pila_protocolos ++;
 	int len8 = sizeof(uint8_t);
 	int len16 = sizeof(uint16_t);
-	uint16_t ETH_type = 0x0800;
+	uint16_t ETH_type = protocolo_superior;
 	int size = longitud + ETH_HLEN;
 	struct pcap_pkthdr *cabeceras = NULL;
+	uint8_t ETH_origen[ETH_ALEN];
+	Parametros ethdatos=*((Parametros*)parametros);
 	
 	printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);
 	
+	obtenerMACdeInterface(interface, ETH_origen);
+
 	/*CONTROL DE TAMANIO*/
 	if(longitud > (ETH_FRAME_MAX-ETH_HLEN)){
 		printf("Error: datagrama demasiado grande para Ethernet.\n");
@@ -486,11 +487,11 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	/*CABECERA EHTERNET*/
 	
 	/*Rellenamos la MAC destino*/
-	memcpy(trama+pos,parametros.ETH_destino,len8*ETH_ALEN);
+	memcpy(trama+pos,ethdatos.ETH_destino,len8*ETH_ALEN);
 	pos+=len8*ETH_ALEN;
 	
 	/*Rellenamos la MAC origen*/
-	memcpy(trama+pos,parametros.ETH_origen,len8*ETH_ALEN);
+	memcpy(trama+pos,ETH_origen,len8*ETH_ALEN);
 	pos+=len8*ETH_ALEN;
 	
 	/*Rellenamos el tipo de Ethernet*/
@@ -501,13 +502,13 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	memcpy(trama+pos,datagrama,longitud);
 	
 	/*ENVIAR A CAPA FISICA*/
-	if(pcap_sendpacket(descr, buf, size) == -1){
+	if(pcap_sendpacket(descr, trama, size) == -1){
 		printf("Error al enviar el paquete.\n");
 		return ERROR;
 	}
 	
 	/*Volcamos los datos a un archivo pcap*/
-	pcap_dump((uint8_t *)pdumper, cabeceras, (const u_char *)data);
+	pcap_dump((uint8_t *)pdumper, cabeceras, (const u_char *)trama);
 	
 	
 	
@@ -552,11 +553,10 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 	printf("modulo ICMP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
 	if (longitud>(ICMP_DATAGRAM_MAX-ICMP_HLEN)){
-		printf("Error: mensaje demasiado grande para ICMP (%f).\n",(ICMP_DATAGRAM_MAX-ICMP_HLEN));
+		printf("Error: mensaje demasiado grande para ICMP (%d).\n",(ICMP_DATAGRAM_MAX-ICMP_HLEN));
 		return ERROR;
 	}
 
-	Parametros icmpdatos=*((Parametros*)parametros);
 	len=(uint16_t) longitud;
 	
 	/*Copiamos el tipo*/
@@ -583,7 +583,7 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 	memcpy(datagrama+pos,mensaje,len);
 
 	/*Enviamos a protocolo inferior*/
-	return protocolos_registrados[protocolo_inferior](segmento,longitud+pos,pila_protocolos,parametros);
+	return protocolos_registrados[protocolo_inferior](datagrama,longitud+pos,pila_protocolos,parametros);
 }
 
 
