@@ -465,6 +465,13 @@ uint8_t trama[ETH_FRAME_MAX]={0};
 
 printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);	
 
+if(longitud > (ETH_FRAME_MAX-ETH_HLEN)){
+	printf("Error: datagrama demasiado grande para ETH\n");
+	return ERROR;
+}
+
+
+
 //TODO
 //[...] Control de tamano
 
