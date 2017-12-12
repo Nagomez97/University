@@ -44,6 +44,7 @@ uint8_t ARPrequest(char* interface, uint8_t* IP, uint8_t* retorno){
 	if(linea==NULL)
 		return ERROR;
 	pclose(f);
+	printf("linea %s\n", linea);
 	if(sscanf(linea,"%*s %*s %*s %*s [%s %*s\n",ETH_destino_aux)<1){
 		printf("Error ejecutando el comando: %s\n",comando);
 		return ERROR;
