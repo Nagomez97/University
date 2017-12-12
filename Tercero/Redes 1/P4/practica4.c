@@ -315,6 +315,11 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	Parametros ipdatos=*((Parametros*)parametros);
 	uint8_t* IP_destino=ipdatos.IP_destino;
 
+	if(longitud > IP_DATAGRAM_MAX){
+		printf("Error, datagrama demasiado grande");
+		return ERROR;
+	}
+
 	if(obtenerIPInterface(interface, IP_origen)==ERROR){
 		printf("Error al obtener la direccion IP origen\n");
 		return ERROR;
@@ -501,6 +506,7 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	/*Rellenamos el datagrama*/
 	memcpy(trama+pos,datagrama,longitud);
 	
+	printf("trama %d\n", trama[1]);
 	/*ENVIAR A CAPA FISICA*/
 	if(pcap_sendpacket(descr, trama, size) == -1){
 		printf("Error al enviar el paquete.\n");
@@ -508,7 +514,7 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	}
 	
 	/*Volcamos los datos a un archivo pcap*/
-	pcap_dump((uint8_t *)pdumper, cabeceras, (const u_char *)trama);
+	//pcap_dump((uint8_t *)pdumper, cabeceras, (const u_char *)trama);
 	
 	
 	
