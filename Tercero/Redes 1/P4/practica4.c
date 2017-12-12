@@ -234,7 +234,7 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 
 	Parametros udpdatos=*((Parametros*)parametros);
 	uint16_t puerto_destino=udpdatos.puerto_destino;
-	len=(uint16_t) longitud;
+	len=(uint16_t) htons(longitud);
 
 	if(obtenerPuertoOrigen(&puerto_origen) == ERROR){
 		printf("Error al obtener un puerto origen disponible.\n");
@@ -253,9 +253,9 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 	memcpy(segmento+pos,&suma_control,sizeof(uint16_t));
 	pos+=sizeof(uint16_t);
 
-	memcpy(segmento+pos,mensaje,len);
+	memcpy(segmento+pos,mensaje,ntohs(len));
 
-	return protocolos_registrados[protocolo_inferior](segmento,longitud+pos,pila_protocolos,parametros);
+	return protocolos_registrados[protocolo_inferior](segmento,longitud+pos,pila_protocolos,&udpdatos);
 }
 
 
@@ -281,7 +281,6 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	uint8_t IP_origen[IP_ALEN];
 	uint16_t protocolo_superior=pila_protocolos[0];
 	uint16_t protocolo_inferior=pila_protocolos[2];
-	pila_protocolos++;
 	uint8_t mascara[IP_ALEN],IP_rango_origen[IP_ALEN],IP_rango_destino[IP_ALEN];
 	uint8_t IP_gateway[IP_ALEN];
 	uint16_t len8, len16, len32;
@@ -341,6 +340,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 			printf("Error en ARP request de la IP destino.\n");
 			return ERROR;
 		}
+
 	}
 	/*En caso de que no se encuentren en la misma subred*/
 	else{
@@ -402,12 +402,12 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	for(offset=0; offset<longitud; offset+=max_tam){
 		/*No es el ultimo paquete*/
 		if(offset + max_tam < longitud){
-			total_size = max_tam + (IHL*4);
+			total_size = htons(max_tam + (IHL*4));
 			flags_pos = (offset & 0x1fff) | 0x2000;
 		}
 		/*Ultimo paquete*/
 		else{
-			total_size = longitud - offset + (IHL*4);
+			total_size = htons(longitud - offset + (IHL*4));
 			flags_pos = (offset & 0x1fff) | 0x0000;
 		}
 		
@@ -427,10 +427,10 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		memcpy(datagrama,cabecera,(IHL*4));
 		
 		/*Rellenamos el datagrama con el fragmento del segmento*/
-		memcpy(datagrama+(IHL*4), segmento+offset, total_size-(IHL*4));
+		memcpy(datagrama+(IHL*4), segmento+offset, ntohs(total_size)-(IHL*4));
 		
 		/*Pasamos al siguiente nivel de protocolos*/
-		if(protocolos_registrados[protocolo_inferior](datagrama,total_size,pila_protocolos,parametros) == ERROR) return ERROR;
+		if(protocolos_registrados[protocolo_inferior](datagrama,ntohs(total_size),pila_protocolos,&ipdatos) == ERROR) return ERROR;
 	}
 		
 	return OK;
@@ -469,17 +469,16 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	//[...] Variables del modulo
 	uint8_t trama[ETH_FRAME_MAX]={0};
 	uint32_t pos = 0;
-	uint16_t protocolo_superior=pila_protocolos[1];
-	pila_protocolos ++;
+	uint16_t protocolo_superior=htons(pila_protocolos[1]);
 	int len8 = sizeof(uint8_t);
 	int len16 = sizeof(uint16_t);
-	uint16_t ETH_type = protocolo_superior;
 	int size = longitud + ETH_HLEN;
-	struct pcap_pkthdr *cabeceras = NULL;
 	uint8_t ETH_origen[ETH_ALEN];
 	Parametros ethdatos=*((Parametros*)parametros);
+	struct pcap_pkthdr h;
 	
 	printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);
+	printf("PROTOCOLO SUPERIOR %d\n", protocolo_superior);
 	
 	obtenerMACdeInterface(interface, ETH_origen);
 
@@ -490,23 +489,23 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	}
 	
 	/*CABECERA EHTERNET*/
-	
+
 	/*Rellenamos la MAC destino*/
-	memcpy(trama+pos,ethdatos.ETH_destino,len8*ETH_ALEN);
-	pos+=len8*ETH_ALEN;
+	memcpy(trama+pos,ethdatos.ETH_destino,ETH_ALEN);
+	pos+=ETH_ALEN;
 	
 	/*Rellenamos la MAC origen*/
-	memcpy(trama+pos,ETH_origen,len8*ETH_ALEN);
-	pos+=len8*ETH_ALEN;
+	memcpy(trama+pos,ETH_origen,ETH_ALEN);
+	pos+=ETH_ALEN;
 	
 	/*Rellenamos el tipo de Ethernet*/
-	memcpy(trama+pos,&ETH_type,len16);
+	memcpy(trama+pos,&protocolo_superior,len16);
 	pos+=len16;
 	
 	/*Rellenamos el datagrama*/
 	memcpy(trama+pos,datagrama,longitud);
 	
-	printf("trama %d\n", trama[1]);
+	mostrarPaquete(trama, size);
 	/*ENVIAR A CAPA FISICA*/
 	if(pcap_sendpacket(descr, trama, size) == -1){
 		printf("Error al enviar el paquete.\n");
@@ -514,7 +513,11 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	}
 	
 	/*Volcamos los datos a un archivo pcap*/
-	//pcap_dump((uint8_t *)pdumper, cabeceras, (const u_char *)trama);
+
+	gettimeofday(&(h.ts), NULL);
+	h.len = size;
+	h.caplen = size;
+	pcap_dump((uint8_t *)pdumper, &h, (const u_char *)trama);
 	
 	
 	
@@ -587,6 +590,9 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 
 	/*Copiamos los datos*/
 	memcpy(datagrama+pos,mensaje,len);
+
+	/*Hacemos el checksum*/
+	calcularChecksum(longitud+pos, datagrama, datagrama+2);
 
 	/*Enviamos a protocolo inferior*/
 	return protocolos_registrados[protocolo_inferior](datagrama,longitud+pos,pila_protocolos,parametros);
