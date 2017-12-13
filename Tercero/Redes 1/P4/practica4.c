@@ -511,7 +511,7 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 
 	/*CONTROL DE TAMANIO*/
 	if(longitud > (ETH_FRAME_MAX)){
-		printf("Error: datagrama demasiado grande para Ethernet. Longitud = %d\n", longitud);
+		printf("Error: datagrama demasiado grande para Ethernet. Longitud = %"PRIu64"\n", longitud);
 		return ERROR;
 	}
 	
