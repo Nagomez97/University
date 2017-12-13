@@ -127,7 +127,7 @@ int main(int argc, char **argv){
 	}
 
 	if (flag_file == 0) {
-		sprintf(data,"%s","Payload.12341234123412341234123412341234123412341234123412341234"); //Deben ser pares!
+		sprintf(data,"%s","Payload "); //Deben ser pares!
 		sprintf(fichero_pcap_destino,"%s%s","debugging",".pcap");
 	}
 
@@ -173,7 +173,7 @@ int main(int argc, char **argv){
 		//Luego, un paquete ICMP en concreto un ping
 	pila_protocolos[0]=ICMP_PROTO; pila_protocolos[1]=IP_PROTO; pila_protocolos[2]=ETH_PROTO;
 	Parametros parametros_icmp; parametros_icmp.tipo=PING_TIPO; parametros_icmp.codigo=PING_CODE; memcpy(parametros_icmp.IP_destino,IP_destino_red,IP_ALEN);
-	if(enviar((uint8_t*)"Probando a hacer un ping1234123412341234",strlen("Probando a hacer un ping"),pila_protocolos,&parametros_icmp)==ERROR ){
+	if(enviar((uint8_t*)"Probando a hacer un ping",strlen("Probando a hacer un ping"),pila_protocolos,&parametros_icmp)==ERROR ){
 		printf("Error: enviar(): %s %s %d.\n",errbuf,__FILE__,__LINE__);
 		return ERROR;
 	}
