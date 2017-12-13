@@ -315,7 +315,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 
 	obtenerMTUInterface(interface, &MTU);
 	uint16_t max_tam = MTU;
-	
+
 	//BORRARARARARARGJASDFHASFHBAF LZHEAIDNHAOIENHF IANHFAWELDFHKS JRDHFNADUBKGJNFHAMÑIDLNFJ BASDKFAKM 
 	//max_tam=max_tam-(max_tam%8);
 
@@ -509,7 +509,7 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	obtenerMACdeInterface(interface, ETH_origen);
 
 	/*CONTROL DE TAMANIO*/
-	if(longitud > (ETH_FRAME_MAX-ETH_HLEN)){
+	if(longitud > (ETH_FRAME_MAX)){
 		printf("Error: datagrama demasiado grande para Ethernet.\n");
 		return ERROR;
 	}
