@@ -259,3 +259,23 @@ printf("Retorno obtenerPuertoOrigen():\n");
 printf("\t%"PRIu16"\n",*puerto);
 	return OK;
 }
+
+int rdtsc()
+{
+    __asm__ __volatile__("rdtsc");
+    return 0;
+}
+
+/****************************************************************************************
+* Nombre: random_identifier								*
+* Descripcion: Devuelve un identificador IP aleatorio				*
+* Argumentos: 										*
+*  -retorno: Puntero donde se guardara el resultado obtenido						*
+* Retorno: OK==1/ERROR==0								*
+****************************************************************************************/
+uint16_t random_identifier(uint16_t* retorno){
+	srand(rdtsc());
+  	*retorno = rand() % MAX_PROTOCOL;
+
+	return OK;
+}

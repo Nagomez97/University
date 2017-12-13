@@ -1,0 +1,10 @@
+4.1 Usa 100000000 rectangulos
+
+4.2 El programa pi_par1 utilizar la variable sum (shared) para almacenar los datos de la suma, mientras que pi_par4 los almacena en una variable privada, y sólo actualiza sum cuando termina el cálculo. Sin embargo, como pi_par1 utiliza sum[tid], siendo tid una variable privada y única de cada thread (está ligada al thread id), no se va a producir false sharing, ya que no se va a acceder al mismo sector del array sum desde distintos hilos. Sin embargo, como cada hilo tiene que apoderarse del array múltiples veces para poder acceder a la posición correspondiente y actualizarla, va a ser más lento que pi_par4.
+
+4.3 Los resultados son los mismos, pero tarda menos pi_par4 (como ya hemos explicado)
+
+4.4 En este caso, pi_par2 emplea la variable sum como firstprivate, por lo que va a mantener el valor asignado antes del pragma, pero no se van a mantener los cambios realizados durante la región paralela. Sin embargo, sum es un puntero, por lo que al guardar datos en la región de memoria a la que apunta, esos datos sí que siguen ahí tras el pragama.
+En el caso de pi_par3, el programa le asigna a cada thread un tamaño de memoria equivalente al tamaño de una línea de caché. De este modo, cuando se cargue la región necesaria para escritura, se reducirán el número de accesos a memoria, ya que se cargará la línea entera de una sola vez.
+Por ello, el resultado esperado es el mismo en ambos casos, pero mucho más rápido para pi_par3
+En efecto, al ejecutar los programas vemos que pi_par3 es más rápido que pi_par2

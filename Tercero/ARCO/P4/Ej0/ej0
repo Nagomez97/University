@@ -1,0 +1,8 @@
+el comando cpuinfo nos da:
+4 cores
+3.4GHz max por core
+en el momento de ejecución del comando los cores corren a 800MHz
+corremos con el programa fast de la practica anterior para ver si aumenta la frecuencia del procesador
+no tiene hyperthreading porque tiene 4 threads (uno por core)
+siblings = 4
+

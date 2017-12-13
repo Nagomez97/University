@@ -38,6 +38,7 @@ int main(int argc, char **argv){
 	uint16_t puerto_destino;
 	char data[IP_DATAGRAM_MAX];
 	uint16_t pila_protocolos[CADENAS];
+	FILE *f = NULL;
 
 
 	int long_index=0;
@@ -92,9 +93,15 @@ int main(int argc, char **argv){
 					}
 					sprintf(fichero_pcap_destino,"%s%s","stdin",".pcap");
 				} else {
+					f=fopen(optarg, "r");
+					if(fgets(data, sizeof data, f)==NULL){
+						printf("Error leyendo desde fichero: %s %s %d.\n",errbuf,__FILE__,__LINE__);
+						return ERROR;
+					}	
 					sprintf(fichero_pcap_destino,"%s%s",optarg,".pcap");
 					//TODO Leer fichero en data [...]
 				}
+
 				flag_file = 1;
 
 				break;
@@ -166,7 +173,7 @@ int main(int argc, char **argv){
 		//Luego, un paquete ICMP en concreto un ping
 	pila_protocolos[0]=ICMP_PROTO; pila_protocolos[1]=IP_PROTO; pila_protocolos[2]=ETH_PROTO;
 	Parametros parametros_icmp; parametros_icmp.tipo=PING_TIPO; parametros_icmp.codigo=PING_CODE; memcpy(parametros_icmp.IP_destino,IP_destino_red,IP_ALEN);
-	if(enviar((uint8_t*)"Probando a hacer un ping",strlen("Probando a hacer un ping"),pila_protocolos,&parametros_icmp)==ERROR ){
+	if(enviar((uint8_t*)"Probando a hacer un ping1234123412341234",strlen("Probando a hacer un ping"),pila_protocolos,&parametros_icmp)==ERROR ){
 		printf("Error: enviar(): %s %s %d.\n",errbuf,__FILE__,__LINE__);
 		return ERROR;
 	}
@@ -233,8 +240,8 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 	}
 
 	Parametros udpdatos=*((Parametros*)parametros);
-	uint16_t puerto_destino=udpdatos.puerto_destino;
-	len=(uint16_t) longitud;
+	uint16_t puerto_destino=htons(udpdatos.puerto_destino);
+	len=(uint16_t) htons(longitud);
 
 	if(obtenerPuertoOrigen(&puerto_origen) == ERROR){
 		printf("Error al obtener un puerto origen disponible.\n");
@@ -253,9 +260,9 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 	memcpy(segmento+pos,&suma_control,sizeof(uint16_t));
 	pos+=sizeof(uint16_t);
 
-	memcpy(segmento+pos,mensaje,len);
+	memcpy(segmento+pos,mensaje,ntohs(len));
 
-	return protocolos_registrados[protocolo_inferior](segmento,longitud+pos,pila_protocolos,parametros);
+	return protocolos_registrados[protocolo_inferior](segmento,longitud+pos,pila_protocolos,&udpdatos);
 }
 
 
@@ -275,52 +282,184 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 
 uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos,void *parametros){
 	uint8_t datagrama[IP_DATAGRAM_MAX]={0};
-	uint32_t aux32;
-	uint16_t aux16;
-	uint8_t aux8;
-	uint32_t pos=0,pos_control=0;
+	uint8_t cabecera[IHL*4]={0};
+	uint16_t MTU;
+	uint32_t pos=0;
 	uint8_t IP_origen[IP_ALEN];
 	uint16_t protocolo_superior=pila_protocolos[0];
 	uint16_t protocolo_inferior=pila_protocolos[2];
-	pila_protocolos++;
 	uint8_t mascara[IP_ALEN],IP_rango_origen[IP_ALEN],IP_rango_destino[IP_ALEN];
 	uint8_t IP_gateway[IP_ALEN];
+	uint16_t len8, len16, len32;
+	
+	uint16_t offset;
+	
+	len8 = sizeof(uint8_t);
+	len16 = sizeof(uint16_t);
+	len32 = sizeof(uint32_t);
+
+	/*Variables para el datagrama*/
+	uint8_t vers_ihl = 0x46; /* 70 es 0x46 en hex. Esto es porque los primeros
+							4 bits de esta variable son del tipo de IP (4) mientras
+							que los 4 siguientes son del tamanio de cabecera, que sera
+							de tamanio 6*/
+	uint8_t servicio = 0; /*Dejamos el tipo de servicio a 0*/
+	uint16_t total_size;
+	uint8_t tiempo = 128;
+	uint16_t flags_pos;
+	uint16_t inichecksum = 0;
+	uint8_t protocol = (uint8_t) protocolo_superior;
+	uint32_t opciones_relleno = 0;
+	uint16_t identificador; /*Valor aleatorio para el identificador*/
+	random_identifier(&identificador);
+
+	obtenerMTUInterface(interface, &MTU);
+	uint16_t max_tam = MTU-(IHL*4);
+	max_tam=max_tam-(max_tam%8);
 
 	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
 	Parametros ipdatos=*((Parametros*)parametros);
 	uint8_t* IP_destino=ipdatos.IP_destino;
 
+	if(longitud > IP_DATAGRAM_MAX){
+		printf("Error, datagrama demasiado grande");
+		return ERROR;
+	}
+
+	if(protocol == ICMP_PROTO){
+		if(longitud > max_tam){
+			printf("Error, datagrama demasiado grande");
+			return ERROR;
+		}
+	}
+
 	if(obtenerIPInterface(interface, IP_origen)==ERROR){
 		printf("Error al obtener la direccion IP origen\n");
 		return ERROR;
 	}
 
-	if(obtenerMascaraInterface(interface,mascara)=ERROR){
+	if(obtenerMascaraInterface(interface,mascara)==ERROR){
 		printf("Error al obtener la mascara de la interfaz.\n");
 		return ERROR;
 	}
 
+	/*Aplicamos las mascaras para luego ver si estan en la misma subred*/
 	aplicarMascara(IP_origen,mascara,IP_ALEN,IP_rango_origen);
 	aplicarMascara(IP_destino,mascara,IP_ALEN,IP_rango_destino);
 
-	/*Comprobamos si el destino esta en la misma red*/
+	/*Comprobamos si el destino esta en la misma subred*/
 	if(memcmp(IP_rango_destino,IP_rango_origen,(IP_ALEN * sizeof(uint8_t))) == 0){
+		/*Se realiza un ARP request y guarda la MAC destino en la estructura de datos*/
 		if(ARPrequest(interface,IP_destino,ipdatos.ETH_destino) == ERROR){
 			printf("Error en ARP request de la IP destino.\n");
 			return ERROR;
 		}
+
 	}
+	/*En caso de que no se encuentren en la misma subred*/
 	else{
+		/*Obtenemos la puerta de enlace*/
 		if(obtenerGateway(interface,IP_gateway) == ERROR){
 			printf("Error al obtener la IP del gateway.\n");
 			return ERROR;
 		}
+		/*Realizamos un ARP request*/
 		if(ARPrequest(interface,IP_gateway,ipdatos.ETH_destino) == ERROR){
 			printf("Error en ARP request del gateway.\n");
 			return ERROR;
 		}
 	}
+
+	/*Rellenamos la cabecera*/
+	/*Version IP y IHL*/
+	memcpy(cabecera+pos,&vers_ihl,len8);
+	pos += len8;
+	
+	/*Tipo de servicio*/
+	memcpy(cabecera+pos,&servicio,len8);
+	pos += len8;
+	
+	/*Salto debido a total size, se rellenara al fragmentar*/
+	pos += len16;
+
+	/*Identificacion*/
+	memcpy(cabecera+pos,&identificador,len16);
+	pos += len16;
+
+	/*Salto debido a las flags y a posicion, estos campos se rellenan tras calcular la fragmentacion*/
+	pos += len16;
+
+	/*Tiempo de vida*/
+	memcpy(cabecera+pos,&tiempo,len8);
+	pos += len8;
+	
+	/*Protocolo*/
+	memcpy(cabecera+pos,&protocol,len8);
+	pos += len8;
+	
+	/*Salto debido al checksum, se rellenará en la fragmentación*/
+	pos += len16;
+
+	/*Direccion ip origen*/
+	memcpy(cabecera+pos,IP_origen,IP_ALEN);
+	pos += IP_ALEN;
+	
+	/*Direccion ip destino*/
+	memcpy(cabecera+pos,IP_destino,IP_ALEN);
+	pos += IP_ALEN;
+	
+	/*Opciones y relleno*/
+	memcpy(cabecera+pos,&opciones_relleno,len32);
+	
+
+	/*Bucle para fragmentacion*/
+	for(offset=0; offset<longitud; offset+=max_tam){
+		/*No es el ultimo paquete*/
+		if(offset + max_tam < longitud){
+			total_size = htons(max_tam + (IHL*4));
+			flags_pos = ((offset/8) & 0x1fff) | 0x2000;
+		}
+		/*Ultimo paquete*/
+		else{
+			if(protocolo_superior == ICMP_PROTO){
+				total_size = htons(longitud - offset + (IHL*4));
+				printf("SOY ICMP\n");
+				flags_pos = ((offset/8) & 0x1fff) | 0x4000;
+			}
+			else{
+				total_size = htons(longitud - offset + (IHL*4));
+				flags_pos = ((offset/8) & 0x1fff) | 0x0000;
+			}
+		}
+		printf("OFFSEEEEEEEEEEEEEEEEEEEt%d\n", offset);
+		flags_pos = htons(flags_pos);
+		
+		/*Rellenamos la cabecera con longitud total*/
+		memcpy(cabecera+IP_TO_LEN,&total_size,len16);
+		
+		/*Rellenamos el campo de las flags y el offset*/
+		memcpy(cabecera+IP_TO_FLAGS,&flags_pos,len16);
+		
+		/*Ponemos el checksum a 0*/
+		memcpy(cabecera+IP_TO_CHECKSUM,&inichecksum,len16);
+		
+		/*Obtenemos el checksum y lo guardamos en la posición correspondiente*/
+		calcularChecksum((uint16_t)(IHL)*4,cabecera,cabecera+IP_TO_CHECKSUM);
+		
+		/*Rellenamos el datagrama para enviarlo*/
+		memcpy(datagrama,cabecera,(IHL*4));
+		
+		/*Rellenamos el datagrama con el fragmento del segmento*/
+		memcpy(datagrama+(IHL*4), segmento+offset, ntohs(total_size)-(IHL*4));
+		
+		/*Pasamos al siguiente nivel de protocolos*/
+		if(protocolos_registrados[protocolo_inferior](datagrama,ntohs(total_size),pila_protocolos,&ipdatos) == ERROR) return ERROR;
+	}
+		
+	return OK;
+
+
 
 /***************************************************************************
 * FALTA RELLENAR EL PROTOCOLO IP 		*
@@ -349,23 +488,73 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 ****************************************************************************************/
 
 uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocolos,void *parametros){
-//TODO
-//[....]
-//[...] Variables del modulo
-uint8_t trama[ETH_FRAME_MAX]={0};
+	//TODO
+	//[....]
+	//[...] Variables del modulo
+	uint8_t trama[ETH_FRAME_MAX]={0};
+	uint32_t pos = 0;
+	uint16_t protocolo_superior=htons(pila_protocolos[1]);
+	int len8 = sizeof(uint8_t);
+	int len16 = sizeof(uint16_t);
+	int size = longitud + ETH_HLEN;
+	uint8_t ETH_origen[ETH_ALEN];
+	Parametros ethdatos=*((Parametros*)parametros);
+	struct pcap_pkthdr h;
+	
+	printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);
+	printf("PROTOCOLO SUPERIOR %d\n", protocolo_superior);
+	
+	obtenerMACdeInterface(interface, ETH_origen);
 
-printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);	
+	/*CONTROL DE TAMANIO*/
+	if(longitud > (ETH_FRAME_MAX-ETH_HLEN)){
+		printf("Error: datagrama demasiado grande para Ethernet.\n");
+		return ERROR;
+	}
+	
+	/*CABECERA EHTERNET*/
 
-//TODO
-//[...] Control de tamano
+	/*Rellenamos la MAC destino*/
+	memcpy(trama+pos,ethdatos.ETH_destino,ETH_ALEN);
+	pos+=ETH_ALEN;
+	
+	/*Rellenamos la MAC origen*/
+	memcpy(trama+pos,ETH_origen,ETH_ALEN);
+	pos+=ETH_ALEN;
+	
+	/*Rellenamos el tipo de Ethernet*/
+	memcpy(trama+pos,&protocolo_superior,len16);
+	pos+=len16;
+	
+	/*Rellenamos el datagrama*/
+	memcpy(trama+pos,datagrama,longitud);
+	
+	mostrarPaquete(trama, size);
+	/*ENVIAR A CAPA FISICA*/
+	if(pcap_sendpacket(descr, trama, size) == -1){
+		printf("Error al enviar el paquete.\n");
+		return ERROR;
+	}
+	
+	/*Volcamos los datos a un archivo pcap*/
 
-//TODO
-//[...] Cabecera del modulo
-
-//TODO
-//Enviar a capa fisica [...]  
-//TODO
-//Almacenamos la salida por cuestiones de debugging [...]
+	gettimeofday(&(h.ts), NULL);
+	h.len = size;
+	h.caplen = size;
+	pcap_dump((uint8_t *)pdumper, &h, (const u_char *)trama);
+	
+	
+	
+	//TODO
+	//[...] Control de tamano
+	
+	//TODO
+	//[...] Cabecera del modulo
+	
+	//TODO
+	//Enviar a capa fisica [...]  
+	//TODO
+	//Almacenamos la salida por cuestiones de debugging [...]
 	
 	return OK;
 }
@@ -383,9 +572,55 @@ printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);
 ****************************************************************************************/
 
 uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,void *parametros){
-//TODO
-//[....]
+	uint8_t datagrama[ICMP_DATAGRAM_MAX]={0};
+	uint16_t len=0;
+	uint16_t inichecksum = 0;
+	uint32_t pos=0;
+	uint16_t protocolo_inferior=pila_protocolos[1];
+	uint8_t tipo = PING_TIPO;
+	uint8_t code = PING_CODE;
+	int len8 = sizeof(uint8_t);
+	int len16 = sizeof(uint16_t);	
+	uint16_t identificador; /*Valor aleatorio para el identificador*/
+	random_identifier(&identificador);
+	uint16_t seq = htons(1);
+	printf("modulo ICMP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
+	if (longitud>(ICMP_DATAGRAM_MAX-ICMP_HLEN)){
+		printf("Error: mensaje demasiado grande para ICMP (%d).\n",(ICMP_DATAGRAM_MAX-ICMP_HLEN));
+		return ERROR;
+	}
+
+	len=(uint16_t) longitud;
+	
+	/*Copiamos el tipo*/
+	memcpy(datagrama+pos,&tipo,len8);
+	pos+=len8;
+	
+	/*Copiamos el codigo*/
+	memcpy(datagrama+pos,&code,len8);
+	pos+=len8;
+	
+	/*Inicializamos el checksum a 0*/
+	memcpy(datagrama+pos,&inichecksum,len16);
+	pos+=len16;
+	
+	/*Copiamos el identificador*/
+	memcpy(datagrama+pos,&identificador,len16);
+	pos+=len16;
+	
+	/*Copiamos numero de secuencia*/
+	memcpy(datagrama+pos,&seq,len16);
+	pos+=len16;
+
+	/*Copiamos los datos*/
+	memcpy(datagrama+pos,mensaje,len);
+
+	/*Hacemos el checksum*/
+	calcularChecksum(longitud+pos, datagrama, datagrama+2);
+
+	/*Enviamos a protocolo inferior*/
+	return protocolos_registrados[protocolo_inferior](datagrama,longitud+pos,pila_protocolos,parametros);
 }
 
 
@@ -483,10 +718,10 @@ uint8_t inicializarPilaEnviar() {
 		return ERROR;
 	if(registrarProtocolo(IP_PROTO, moduloIP, protocolos_registrados)==ERROR)
 		return ERROR;
-	
-//TODO
-//A registrar los modulos de UDP y ICMP [...] 
-
+	if(registrarProtocolo(ICMP_PROTO, moduloICMP, protocolos_registrados)==ERROR)
+		return ERROR;
+	if(registrarProtocolo(UDP_PROTO, moduloUDP, protocolos_registrados)==ERROR)
+		return ERROR;
 	return OK;
 }
 

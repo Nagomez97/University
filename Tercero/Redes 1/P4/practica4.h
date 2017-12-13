@@ -40,9 +40,12 @@
 
 #define IP_ALEN 4		// Tamano de direccion IP
 #define IP_DATAGRAM_MAX 65536 	// Tamano maximo datagrama IP 
-#define IP_PROTO 0x0800		// Identificador protocolo UDP	
+#define IP_PROTO 0x0800		// Identificador protocolo IP
+#define IP_TO_LEN 2         // Tamaño hasta longitud
+#define IP_TO_FLAGS 6       // Tamaño hasta flags
+#define IP_TO_CHECKSUM 10   // Tamaño hasta el checksum
 
-#define UDP_HLEN 8	      	// Tamano de cabecera UDP	
+#define UDP_HLEN 8	      	// Tamano de cabecera UDP
 #define UDP_SEG_MAX 65536  	// Tamano maximo segmento UDP
 #define UDP_PROTO 17		// Identificador protocolo UDP
 
@@ -54,6 +57,7 @@
 #define PING_CODE 0		//
 
 #define CADENAS 256
+#define IHL 6
 
 #define MAX_PROTOCOL 65536	//Numero maximo identificador protocolo IP
 
