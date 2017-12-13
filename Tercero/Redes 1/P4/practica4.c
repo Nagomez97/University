@@ -127,7 +127,7 @@ int main(int argc, char **argv){
 	}
 
 	if (flag_file == 0) {
-		sprintf(data,"%s","Payload "); //Deben ser pares!
+		sprintf(data,"%s","Payload."); //Deben ser pares!
 		sprintf(fichero_pcap_destino,"%s%s","debugging",".pcap");
 	}
 
