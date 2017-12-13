@@ -38,6 +38,7 @@ int main(int argc, char **argv){
 	uint16_t puerto_destino;
 	char data[IP_DATAGRAM_MAX];
 	uint16_t pila_protocolos[CADENAS];
+	FILE *f = NULL;
 
 
 	int long_index=0;
@@ -92,9 +93,15 @@ int main(int argc, char **argv){
 					}
 					sprintf(fichero_pcap_destino,"%s%s","stdin",".pcap");
 				} else {
+					f=fopen(optarg, "r");
+					if(fgets(data, sizeof data, f)==NULL){
+						printf("Error leyendo desde fichero: %s %s %d.\n",errbuf,__FILE__,__LINE__);
+						return ERROR;
+					}	
 					sprintf(fichero_pcap_destino,"%s%s",optarg,".pcap");
 					//TODO Leer fichero en data [...]
 				}
+
 				flag_file = 1;
 
 				break;
@@ -308,6 +315,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 
 	obtenerMTUInterface(interface, &MTU);
 	uint16_t max_tam = MTU-(IHL*4);
+	max_tam=max_tam-(max_tam%8);
 
 	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
@@ -410,21 +418,21 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		/*No es el ultimo paquete*/
 		if(offset + max_tam < longitud){
 			total_size = htons(max_tam + (IHL*4));
-			flags_pos = (offset & 0x1fff) | 0x2000;
+			flags_pos = ((offset/8) & 0x1fff) | 0x2000;
 		}
 		/*Ultimo paquete*/
 		else{
 			if(protocolo_superior == ICMP_PROTO){
 				total_size = htons(longitud - offset + (IHL*4));
 				printf("SOY ICMP\n");
-				flags_pos = (offset & 0x1fff) | 0x4000;
+				flags_pos = ((offset/8) & 0x1fff) | 0x4000;
 			}
 			else{
 				total_size = htons(longitud - offset + (IHL*4));
-				flags_pos = (offset & 0x1fff) | 0x0000;
+				flags_pos = ((offset/8) & 0x1fff) | 0x0000;
 			}
 		}
-
+		printf("OFFSEEEEEEEEEEEEEEEEEEEt%d\n", offset);
 		flags_pos = htons(flags_pos);
 		
 		/*Rellenamos la cabecera con longitud total*/
