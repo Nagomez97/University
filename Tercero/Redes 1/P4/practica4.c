@@ -166,7 +166,7 @@ int main(int argc, char **argv){
 		//Luego, un paquete ICMP en concreto un ping
 	pila_protocolos[0]=ICMP_PROTO; pila_protocolos[1]=IP_PROTO; pila_protocolos[2]=ETH_PROTO;
 	Parametros parametros_icmp; parametros_icmp.tipo=PING_TIPO; parametros_icmp.codigo=PING_CODE; memcpy(parametros_icmp.IP_destino,IP_destino_red,IP_ALEN);
-	if(enviar((uint8_t*)"Probando a hacer un ping",strlen("Probando a hacer un ping"),pila_protocolos,&parametros_icmp)==ERROR ){
+	if(enviar((uint8_t*)"Probando a hacer un ping1234123412341234",strlen("Probando a hacer un ping"),pila_protocolos,&parametros_icmp)==ERROR ){
 		printf("Error: enviar(): %s %s %d.\n",errbuf,__FILE__,__LINE__);
 		return ERROR;
 	}
@@ -319,6 +319,13 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		return ERROR;
 	}
 
+	if(protocol == ICMP_PROTO){
+		if(longitud > max_tam){
+			printf("Error, datagrama demasiado grande");
+			return ERROR;
+		}
+	}
+
 	if(obtenerIPInterface(interface, IP_origen)==ERROR){
 		printf("Error al obtener la direccion IP origen\n");
 		return ERROR;
@@ -407,9 +414,18 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		}
 		/*Ultimo paquete*/
 		else{
-			total_size = htons(longitud - offset + (IHL*4));
-			flags_pos = (offset & 0x1fff) | 0x0000;
+			if(protocolo_superior == ICMP_PROTO){
+				total_size = htons(longitud - offset + (IHL*4));
+				printf("SOY ICMP\n");
+				flags_pos = (offset & 0x1fff) | 0x4000;
+			}
+			else{
+				total_size = htons(longitud - offset + (IHL*4));
+				flags_pos = (offset & 0x1fff) | 0x0000;
+			}
 		}
+
+		flags_pos = htons(flags_pos);
 		
 		/*Rellenamos la cabecera con longitud total*/
 		memcpy(cabecera+IP_TO_LEN,&total_size,len16);
@@ -559,6 +575,7 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 	int len16 = sizeof(uint16_t);	
 	uint16_t identificador; /*Valor aleatorio para el identificador*/
 	random_identifier(&identificador);
+	uint16_t seq = htons(1);
 	printf("modulo ICMP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
 	if (longitud>(ICMP_DATAGRAM_MAX-ICMP_HLEN)){
@@ -584,8 +601,8 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 	memcpy(datagrama+pos,&identificador,len16);
 	pos+=len16;
 	
-	/*Para el numero de secuencia, utilizamos el identificador para que sea aleatorio*/
-	memcpy(datagrama+pos,&identificador,len16);
+	/*Copiamos numero de secuencia*/
+	memcpy(datagrama+pos,&seq,len16);
 	pos+=len16;
 
 	/*Copiamos los datos*/
