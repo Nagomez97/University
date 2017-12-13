@@ -417,7 +417,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	
 
 	/*Bucle para fragmentacion*/
-	for(offset=0; offset<longitud; offset+=max_tam){
+	for(offset=0; offset<longitud; offset+=(max_tam-IHL*4)){
 		/*No es el ultimo paquete*/
 		if(offset + (max_tam-IHL*4) < longitud){
 			total_size = htons(max_tam);
