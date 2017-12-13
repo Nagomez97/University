@@ -318,7 +318,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	uint16_t max_tam = MTU;
 
 	//BORRARARARARARGJASDFHASFHBAF LZHEAIDNHAOIENHF IANHFAWELDFHKS JRDHFNADUBKGJNFHAMÑIDLNFJ BASDKFAKM 
-	//max_tam=max_tam-(max_tam%8);
+	max_tam=max_tam-(max_tam%8);
 
 	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
