@@ -233,7 +233,7 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 	}
 
 	Parametros udpdatos=*((Parametros*)parametros);
-	uint16_t puerto_destino=udpdatos.puerto_destino;
+	uint16_t puerto_destino=htons(udpdatos.puerto_destino);
 	len=(uint16_t) htons(longitud);
 
 	if(obtenerPuertoOrigen(&puerto_origen) == ERROR){
