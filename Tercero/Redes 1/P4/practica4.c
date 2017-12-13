@@ -299,10 +299,10 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	len32 = sizeof(uint32_t);
 
 	/*Variables para el datagrama*/
-	uint8_t vers_ihl = 0x46; /* 70 es 0x46 en hex. Esto es porque los primeros
+	uint8_t vers_ihl = 0x45; /* Esto es porque los primeros
 							4 bits de esta variable son del tipo de IP (4) mientras
 							que los 4 siguientes son del tamanio de cabecera, que sera
-							de tamanio 6*/
+							de tamanio 5*/
 	uint8_t servicio = 0; /*Dejamos el tipo de servicio a 0*/
 	uint16_t total_size;
 	uint8_t tiempo = 128;
