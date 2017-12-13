@@ -314,11 +314,8 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	random_identifier(&identificador);
 
 	obtenerMTUInterface(interface, &MTU);
-	printf("MTUMTUMTUMTUMTUMTU: %d", MTU);
 	uint16_t max_tam = MTU;
 
-	//BORRARARARARARGJASDFHASFHBAF LZHEAIDNHAOIENHF IANHFAWELDFHKS JRDHFNADUBKGJNFHAMÑIDLNFJ BASDKFAKM 
-	//max_tam=max_tam-(max_tam%8);
 
 	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
@@ -415,7 +412,6 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 
 	/*Bucle para fragmentacion*/
 	for(offset=0; offset<longitud; offset+=(max_tam-IHL*4)){
-		printf("MAXTAAAAAAAAAAAAAAAAAAAAAAAAAAM: %"PRIu16"\n", max_tam);
 		/*No es el ultimo paquete*/
 		if(offset + (max_tam-IHL*4) < longitud){
 			total_size = htons(max_tam);
@@ -425,17 +421,13 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 		else{
 			if(protocolo_superior == ICMP_PROTO){
 				total_size = htons(longitud - offset + (IHL*4));
-				printf("SOY ICMP\n");
 				flags_pos = ((offset/8) & 0x1fff) | 0x4000;
 			}
 			else{
-				printf("LONGITUUUUUUUUUUD %"PRIu64"\n", longitud);
 				total_size = htons(longitud - offset + (IHL*4));
-				printf("TOTAL SIZEEEEEEEEE %"PRIu16"\n", ntohs(total_size));
 				flags_pos = ((offset/8) & 0x1fff) | 0x0000;
 			}
 		}
-		printf("OFFSEEEEEEEEEEEEEEEEEEEt%d\n", offset);
 		flags_pos = htons(flags_pos);
 		
 		/*Rellenamos la cabecera con longitud total*/
@@ -505,7 +497,6 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	struct pcap_pkthdr h;
 	
 	printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);
-	printf("PROTOCOLO SUPERIOR %d\n", protocolo_superior);
 	
 	obtenerMACdeInterface(interface, ETH_origen);
 
