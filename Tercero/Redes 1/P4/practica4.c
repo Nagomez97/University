@@ -420,7 +420,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	for(offset=0; offset<longitud; offset+=max_tam){
 		/*No es el ultimo paquete*/
 		if(offset + (max_tam-IHL*4) < longitud){
-			total_size = htons(max_tam + (IHL*4));
+			total_size = htons(max_tam);
 			flags_pos = ((offset/8) & 0x1fff) | 0x2000;
 		}
 		/*Ultimo paquete*/
