@@ -412,9 +412,6 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	memcpy(cabecera+pos,IP_destino,IP_ALEN);
 	pos += IP_ALEN;
 	
-	/*Opciones y relleno*/
-	memcpy(cabecera+pos,&opciones_relleno,len32);
-	
 
 	/*Bucle para fragmentacion*/
 	for(offset=0; offset<longitud; offset+=(max_tam-IHL*4)){
