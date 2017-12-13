@@ -431,7 +431,7 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 			else{
 				printf("LONGITUUUUUUUUUUD %"PRIu64"\n", longitud);
 				total_size = htons(longitud - offset + (IHL*4));
-				printf("TOTAL SIZEEEEEEEEE %"PRIu16"\n", total_size);
+				printf("TOTAL SIZEEEEEEEEE %"PRIu16"\n", ntohs(total_size));
 				flags_pos = ((offset/8) & 0x1fff) | 0x0000;
 			}
 		}
