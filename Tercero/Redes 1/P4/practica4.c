@@ -38,6 +38,7 @@ int main(int argc, char **argv){
 	uint16_t puerto_destino;
 	char data[IP_DATAGRAM_MAX];
 	uint16_t pila_protocolos[CADENAS];
+	FILE *f = NULL;
 
 
 	int long_index=0;
@@ -92,9 +93,15 @@ int main(int argc, char **argv){
 					}
 					sprintf(fichero_pcap_destino,"%s%s","stdin",".pcap");
 				} else {
+					f=fopen(optarg, "r");
+					if(fgets(data, sizeof data, f)==NULL){
+						printf("Error leyendo desde fichero: %s %s %d.\n",errbuf,__FILE__,__LINE__);
+						return ERROR;
+					}	
 					sprintf(fichero_pcap_destino,"%s%s",optarg,".pcap");
 					//TODO Leer fichero en data [...]
 				}
+
 				flag_file = 1;
 
 				break;
@@ -120,7 +127,7 @@ int main(int argc, char **argv){
 	}
 
 	if (flag_file == 0) {
-		sprintf(data,"%s","Payload "); //Deben ser pares!
+		sprintf(data,"%s","Payload."); //Deben ser pares!
 		sprintf(fichero_pcap_destino,"%s%s","debugging",".pcap");
 	}
 
@@ -233,8 +240,8 @@ uint8_t moduloUDP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos,
 	}
 
 	Parametros udpdatos=*((Parametros*)parametros);
-	uint16_t puerto_destino=udpdatos.puerto_destino;
-	len=(uint16_t) htons(longitud);
+	uint16_t puerto_destino=htons(udpdatos.puerto_destino);
+	len=(uint16_t) htons(longitud+UDP_HLEN);
 
 	if(obtenerPuertoOrigen(&puerto_origen) == ERROR){
 		printf("Error al obtener un puerto origen disponible.\n");
@@ -292,10 +299,10 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	len32 = sizeof(uint32_t);
 
 	/*Variables para el datagrama*/
-	uint8_t vers_ihl = 0x46; /* 70 es 0x46 en hex. Esto es porque los primeros
+	uint8_t vers_ihl = 0x45; /* Esto es porque los primeros
 							4 bits de esta variable son del tipo de IP (4) mientras
 							que los 4 siguientes son del tamanio de cabecera, que sera
-							de tamanio 6*/
+							de tamanio 5*/
 	uint8_t servicio = 0; /*Dejamos el tipo de servicio a 0*/
 	uint16_t total_size;
 	uint8_t tiempo = 128;
@@ -307,7 +314,8 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	random_identifier(&identificador);
 
 	obtenerMTUInterface(interface, &MTU);
-	uint16_t max_tam = MTU-(IHL*4);
+	uint16_t max_tam = MTU;
+
 
 	printf("modulo IP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
@@ -317,6 +325,13 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	if(longitud > IP_DATAGRAM_MAX){
 		printf("Error, datagrama demasiado grande");
 		return ERROR;
+	}
+
+	if(protocol == ICMP_PROTO){
+		if(longitud > max_tam){
+			printf("Error, datagrama demasiado grande");
+			return ERROR;
+		}
 	}
 
 	if(obtenerIPInterface(interface, IP_origen)==ERROR){
@@ -394,22 +409,26 @@ uint8_t moduloIP(uint8_t* segmento, uint64_t longitud, uint16_t* pila_protocolos
 	memcpy(cabecera+pos,IP_destino,IP_ALEN);
 	pos += IP_ALEN;
 	
-	/*Opciones y relleno*/
-	memcpy(cabecera+pos,&opciones_relleno,len32);
-	
 
 	/*Bucle para fragmentacion*/
-	for(offset=0; offset<longitud; offset+=max_tam){
+	for(offset=0; offset<longitud; offset+=(max_tam-IHL*4)){
 		/*No es el ultimo paquete*/
-		if(offset + max_tam < longitud){
-			total_size = htons(max_tam + (IHL*4));
-			flags_pos = (offset & 0x1fff) | 0x2000;
+		if(offset + (max_tam-IHL*4) < longitud){
+			total_size = htons(max_tam);
+			flags_pos = ((offset/8) & 0x1fff) | 0x2000;
 		}
 		/*Ultimo paquete*/
 		else{
-			total_size = htons(longitud - offset + (IHL*4));
-			flags_pos = (offset & 0x1fff) | 0x0000;
+			if(protocolo_superior == ICMP_PROTO){
+				total_size = htons(longitud - offset + (IHL*4));
+				flags_pos = ((offset/8) & 0x1fff) | 0x4000;
+			}
+			else{
+				total_size = htons(longitud - offset + (IHL*4));
+				flags_pos = ((offset/8) & 0x1fff) | 0x0000;
+			}
 		}
+		flags_pos = htons(flags_pos);
 		
 		/*Rellenamos la cabecera con longitud total*/
 		memcpy(cabecera+IP_TO_LEN,&total_size,len16);
@@ -478,13 +497,12 @@ uint8_t moduloETH(uint8_t* datagrama, uint64_t longitud, uint16_t* pila_protocol
 	struct pcap_pkthdr h;
 	
 	printf("modulo ETH(fisica) %s %d.\n",__FILE__,__LINE__);
-	printf("PROTOCOLO SUPERIOR %d\n", protocolo_superior);
 	
 	obtenerMACdeInterface(interface, ETH_origen);
 
 	/*CONTROL DE TAMANIO*/
-	if(longitud > (ETH_FRAME_MAX-ETH_HLEN)){
-		printf("Error: datagrama demasiado grande para Ethernet.\n");
+	if(longitud > (ETH_FRAME_MAX)){
+		printf("Error: datagrama demasiado grande para Ethernet. Longitud = %"PRIu64"\n", longitud);
 		return ERROR;
 	}
 	
@@ -559,6 +577,7 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 	int len16 = sizeof(uint16_t);	
 	uint16_t identificador; /*Valor aleatorio para el identificador*/
 	random_identifier(&identificador);
+	uint16_t seq = htons(1);
 	printf("modulo ICMP(%"PRIu16") %s %d.\n",protocolo_inferior,__FILE__,__LINE__);
 
 	if (longitud>(ICMP_DATAGRAM_MAX-ICMP_HLEN)){
@@ -584,8 +603,8 @@ uint8_t moduloICMP(uint8_t* mensaje,uint64_t longitud, uint16_t* pila_protocolos
 	memcpy(datagrama+pos,&identificador,len16);
 	pos+=len16;
 	
-	/*Para el numero de secuencia, utilizamos el identificador para que sea aleatorio*/
-	memcpy(datagrama+pos,&identificador,len16);
+	/*Copiamos numero de secuencia*/
+	memcpy(datagrama+pos,&seq,len16);
 	pos+=len16;
 
 	/*Copiamos los datos*/

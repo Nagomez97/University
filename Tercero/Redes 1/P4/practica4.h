@@ -57,7 +57,7 @@
 #define PING_CODE 0		//
 
 #define CADENAS 256
-#define IHL 6
+#define IHL 5
 
 #define MAX_PROTOCOL 65536	//Numero maximo identificador protocolo IP
 
