@@ -109,7 +109,7 @@
 (sc-mapcar '(0 1) '(1 0))
 (sc-mapcar '(0 1) '(0 1))
 
-;;; Ejercicio 1.1
+;;; Ejercicio 1.2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; sc-conf (x vs conf)
@@ -138,7 +138,34 @@
 (sc-conf '(1 0) '((0 1) (1 1) (1 0)) 0.5) ;; ((1 0) (1 1))
 (sc-conf '(1 2 3) '((1 2 3) (1 2) (0 3 1) (0 0 1) (12 0 1)) 0.7) ;; ((1 2 3) (0 0 1) (0 3 1))
 
-;; EJercicio 1.2
+;; EJercicio 1.3
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; calcular-cosenos (cats text func)
+;;; Funcion auxiliar para obtener todas las tuplas posibles
+;;;
+;;; INPUT: cats: vector de vectores, representado como una lista de listas
+;;; vs: vector 
+;;; func: referencia a función para evaluar la similitud coseno
+;;;
+;;; OUTPUT: Pares identificador de categoría con resultado de similitud coseno
+;;;
+(defun calcular-cosenos (cats text func)
+  (mapcar #'(lambda (x) 
+              (cons (first x)
+                    (funcall func (rest x) (rest text))))
+    cats))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; coger-mayor (valores)
+;;; Funcion auxiliar para obtener la mayor tupla
+;;;
+;;; INPUT: valores: lista de tuplas con los valores a analizar
+;;;
+;;; OUTPUT: tupla cuyo segundo elemento es el mayor de la lista
+;;;
+(defun coger-mayor (valores)
+   (first (sort valores #'> :key #'rest)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; sc-classifier (cats texts func)
@@ -150,7 +177,10 @@
 ;;; OUTPUT: Pares identificador de categoría con resultado de similitud coseno
 ;;;
 (defun sc-classifier (cats texts func)
-  (mapcan)
+  (mapcan #'(lambda (x)
+              (list 
+               (coger-mayor (calcular-cosenos cats x func))))                    
+    texts))
 
 
 
