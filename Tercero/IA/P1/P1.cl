@@ -165,3 +165,43 @@
 
 
 ;; Ejercicio 2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Returns true if the tolerance has been reached
+;;
+;; a: lower extremum of the interval in which we search for the root
+;; b: b>a upper extremum of the interval in which we search for the root
+;; tol: tolerance for the stopping criterion: if b-a < tol the function
+;; returns true if the tolerance has been reached.
+(defun test (a b tol)
+  (when (< (- b a) tol)
+    T))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Finds a root of f between the points a and b using bisection.
+;;
+;; If f(a)f(b)>0 there is no guarantee that there will be a root in the
+;; interval, and the function will return NIL.
+;;
+;; f: function of a single real parameter with real values whose root
+;; we want to find
+;; a: lower extremum of the interval in which we search for the root
+;; b: b>a upper extremum of the interval in which we search for the root
+;; tol: tolerance for the stopping criterion: if b-a < tol the function
+;; returns (a+b)/2 as a solution.
+;;
+(defun bisect (f a b tol)
+  (let ((med (/ (+ a b) 2)))
+    (cond ((= 0 (funcall f a)) 
+      a)
+    ((= 0 (funcall f b)) 
+      b)
+    ((test a b tol) 
+      med)
+    ((> (* (funcall f a) (funcall f b)) 0)
+      nil)
+    ((< (* (funcall f a) (funcall f med)) 0)
+      (bisec f a med tol))
+    ((< (* (funcall f med) (funcall f b)) 0)
+      (bisec f med b tol)))))
