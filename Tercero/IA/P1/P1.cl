@@ -4,25 +4,51 @@
 
 ;;; Recursion
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; sc-rec-aux (x y p nx ny)
-;;; Funcion auxiliar para calcular el valor de la similitud coseno
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; opera-con-error(x y op)
+;;; Funcion auxiliar que opera comprobando errores
 ;;;
 ;;; INPUT: x: vector, representado como una lista
 ;;; y: vector, representado como una lista
-;;; p: acumulacion del producto escalar
-;;; nx: acumulacion de la norma de x
-;;; ny: acumulacion de la norma de y
+;;; op: operacion a realizar
 ;;;
-;;; OUTPUT: similitud coseno entre x e y
+;;; OUTPUT: resultado de operacion o NIL en caso de error
 ;;;
-(defun sc-rec-aux (x y p nx ny)
-  (cond ((and (null x) (null y))(/ p (* (sqrt nx) (sqrt ny)))) ;; Caso base, devuelve el calculo completo en funcion de los acumuladores
-        ((or (null y) (null x)) NIL) ;; Caso de longitudes diferentes
-        ((< (first x) 0) NIL) ;; Caso un numero negativo en x
-        ((< (first y) 0) NIL) ;; Caso un numero negativo en y
-        (t (sc-rec-aux (rest x) (rest y) (+ p (* (first x) (first y)))
-                      (+ nx (* (first x) (first x))) (+ ny (* (first y) (first y))))))) ;; Recursion con actualizacion de acumuladores
+(defun opera-con-error (op x y)
+  (unless (or (null x) (null y))
+    (funcall op x y)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; caso-error(x y)
+;;; Funcion auxiliar que comprueba los casos de error
+;;;
+;;; INPUT: x: vector, representado como una lista
+;;; y: vector, representado como una lista
+;;;
+;;; OUTPUT: T (algo esta mal) o NIL (todo correcto)
+;;;
+(defun caso-error (x y)
+  (when (or (null x) 
+         (null y) 
+         (minusp (first x)) 
+         (minusp (first y)))
+           t)) ;; Caso de longitudes diferentes
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; pe-rec (x y)
+;;; Funcion auxiliar que calcula el producto escalar entre dos vectores
+;;;
+;;; INPUT: x: vector, representado como una lista
+;;; y: vector, representado como una lista
+;;;
+;;; OUTPUT: Producto escalar de ambos o NIL si hay algun error
+;;;
+(defun pe-rec (x y)
+  (cond ((and (null x) (null y)) 0)
+        ((caso-error x y) NIL)
+        (t (opera-con-error #'+ 
+                            (* (first x) (first y)) 
+                            (pe-rec (rest x) (rest y))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; sc-rec (x y)
@@ -34,10 +60,32 @@
 ;;; OUTPUT similitud coseno entre x e y
 ;;;
 (defun sc-rec (x y)
-  (unless (or (null x) (null y))
-  (sc-rec-aux x y 0 0 0))) ;; Llamada a la funcion auxiliar recursiva
+  (if (or (null x) (null y))
+      0
+    (opera-con-error #'/ 
+                     (pe-rec x y)
+                     (sqrt (* (pe-rec x x) 
+                              (pe-rec y y))))))
+
+;;; PRUEBAS
+(sc-rec '() '())
+(sc-rec '(0 1) '(1 1))
+(sc-rec '(0 1) '(1 0))
+(sc-rec '(0 1) '(0 1))
 
 ;; Mapcar
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; pe-mapcar (x y)
+;;; Calcula el producto escalar usando mapcar
+;;;
+;;; INPUT: x: vector, representado como una lista
+;;; y: vector, representado como una lista
+;;;
+;;; OUTPUT: similitud coseno entre x e y
+;;;
+(defun pe-mapcar (x y)
+  (apply #'+ (mapcar #'* x y)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; sc-mapcar (x y)
@@ -49,23 +97,15 @@
 ;;; OUTPUT: similitud coseno entre x e y
 ;;;
 (defun sc-mapcar (x y)
-  (unless (or (null x) (null y))
-  (/ (reduce #'+ (mapcar #'* x y)) (* (sqrt (reduce #'+ (mapcar #'* x x))) (sqrt (reduce #'+ (mapcar #'* y y)))))))
+  (if (or (null x)
+          (null y))
+      0
+    (/ (pe-mapcar x y)
+       (sqrt (* (pe-mapcar x x) 
+                (pe-mapcar y y))))))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+;;; PRUEBAS
+(sc-mapcar '() '())
+(sc-mapcar '(0 1) '(1 1))
+(sc-mapcar '(0 1) '(1 0))
+(sc-mapcar '(0 1) '(0 1))
