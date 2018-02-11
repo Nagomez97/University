@@ -223,6 +223,9 @@
 
 ;; Ejercicio 2
 
+
+;; Ejercicio 2.1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Returns true if the tolerance has been reached
 ;;
@@ -231,8 +234,8 @@
 ;; tol: tolerance for the stopping criterion: if b-a < tol the function
 ;; returns true if the tolerance has been reached.
 (defun test (a b tol)
-  (when (< (- b a) tol)
-    T))
+	(when (< (- b a) tol)
+		T))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -249,19 +252,69 @@
 ;; returns (a+b)/2 as a solution.
 ;;
 (defun bisect (f a b tol)
-  (let ((med (/ (+ a b) 2)))
-    (cond ((= 0 (funcall f a)) 
-      a)
-    ((= 0 (funcall f b)) 
-      b)
-    ((test a b tol) 
-      med)
-    ((> (* (funcall f a) (funcall f b)) 0)
-      nil)
-    ((< (* (funcall f a) (funcall f med)) 0)
-      (bisec f a med tol))
-    ((< (* (funcall f med) (funcall f b)) 0)
-     (bisec f med b tol)))))
+	(let ((med (/ (+ a b) 2)))
+		(cond ((<= b a) 
+			nil)
+		((= 0 (funcall f a)) 
+			a)
+		((= 0 (funcall f b)) 
+			b)
+		((test a b tol) 
+			med)
+		((>= (* (funcall f a) (funcall f b)) 0)
+			nil)
+		((<= (* (funcall f a) (funcall f med)) 0)
+			(bisect f a med tol))
+		((<= (* (funcall f med) (funcall f b)) 0)
+			(bisect f med b tol)))))
+
+
+
+;; Ejercicio 2.2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Finds all the roots of f between the elements of a list using bisection.
+;;
+;;
+;; f: function of a single real parameter with real values whose root
+;; we want to find
+;; lst: a list of the values we want to explore
+;; tol: tolerance for the stopping criterion: if b-a < tol the function
+;; returns a list with the found roots
+;;
+(defun allroot (f lst tol)
+	(unless (null (rest lst)) 
+		(remove nil 
+			(append 
+				(list 
+					(bisect f 
+						(first lst) 
+						(second lst) tol)) 
+				(allroot f (rest lst) tol)))))
+
+
+
+;; Ejercicio 2.3
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Divides the interval [a, b] into 2^n parts. Then searches for roots
+;; in every part.
+;;
+;; f: function of a single real parameter with real values whose root
+;; we want to find
+;; a: lower extremum of the interval in which we search for the root
+;; b: b>a upper extremum of the interval in which we search for the root
+;; n: number of parts
+;; tol: tolerance for the stopping criterion: if b-a < tol the function
+;; returns a list with the found roots
+;;
+(defun allind (f a b n tol)
+	(if (= n 0)
+		(remove nil (list (bisect f a b tol)))
+		(let ((half (/ (+ b a) 2)))
+			(append 
+				(allind f a half (- n 1) tol)
+				(allind f half b (- n 1) tol)))))
 
 
 
