@@ -68,10 +68,10 @@
                               (pe-rec y y))))))
 
 ;;; Pruebas
-(sc-rec '() '())
-(sc-rec '(0 1) '(1 1))
-(sc-rec '(0 1) '(1 0))
-(sc-rec '(0 1) '(0 1))
+(sc-rec '() '())  ;; 0
+(sc-rec '(0 1) '(1 1))   ;; 0.7071...
+(sc-rec '(0 1) '(1 0))   ;; 1
+(sc-rec '(0 1) '(0 1))   ;; 0
 
 ;; Mapcar
 
@@ -104,10 +104,10 @@
                 (pe-mapcar y y))))))
 
 ;;; Pruebas
-(sc-mapcar '() '())
-(sc-mapcar '(0 1) '(1 1))
-(sc-mapcar '(0 1) '(1 0))
-(sc-mapcar '(0 1) '(0 1))
+(sc-mapcar '() '())   ;; 0
+(sc-mapcar '(0 1) '(1 1))   ;; 0.7071...
+(sc-mapcar '(0 1) '(1 0))   ;; 0
+(sc-mapcar '(0 1) '(0 1))   ;; 1
 
 ;;; Ejercicio 1.2
 
@@ -346,7 +346,7 @@
 ;;; OUTPUT: lista de listas con todas las combinaciones
 ;;;
 (defun combine-list-of-lsts (lstolsts)
-  (unless (null lstolsts)
+  (if (null lstolsts) '(())
     (if (null (rest lstolsts))
         (mapcar #'list (first lstolsts))
       (combine-list-of-lsts-aux (cddr lstolsts)
@@ -354,6 +354,7 @@
                                                  (second lstolsts))))))
 
 ;; Pruebas
+(combine-list-of-lsts NIL)
 (combine-list-of-lsts '(() (+ -) (1 2 3 4))) ;; --> NIL
 (combine-list-of-lsts '((a b c) () (1 2 3 4))) ;; --> NIL
 (combine-list-of-lsts '((a b c) (1 2 3 4) ())) ;; --> NIL
