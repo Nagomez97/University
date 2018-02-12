@@ -224,6 +224,7 @@
 ;; Ejercicio 2
 
 
+
 ;; Ejercicio 2.1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -268,6 +269,15 @@
 		((<= (* (funcall f med) (funcall f b)) 0)
 			(bisect f med b tol)))))
 
+;; Use cases
+
+(bisect #'(lambda (x) (sin (* 6.26 x))) 0.1 0.7 0.0001) ;; -> 0.50184333
+
+(bisect #'(lambda (x) (sin (* 6.26 x))) 0.1 0.1 0.0001) ;; -> NIL
+
+(bisect #'(lambda (x) (sin (* 6.26 x))) 0.2 0.1 0.0001) ;; -> NIL
+
+(bisect #'(lambda (x) (sin (* 6.26 x))) 0.1 0.7 1) ;; -> 0.4
 
 
 ;; Ejercicio 2.2
@@ -293,6 +303,19 @@
 				(allroot f (rest lst) tol)))))
 
 
+;; Use cases
+
+(allroot #'(lambda(x) (sin (* 6.28 x))) '(0.25 0.75 1.25 1.75 2.25) 0.0001) 
+;; -> (0.50027466 1.0005188 1.5007629 2.001007)
+
+(allroot #'(lambda(x) (sin (* 6.28 x))) NIL 0.0001)
+;; -> NIL
+
+(allroot #'(lambda(x) (sin (* 6.28 x))) '(0.25 2 1.25 1.75 2.25) 0.0001)
+;; -> (1.5007629 2.001007)
+;; En el caso de que b <= a, se devuelve NIL y no se incluye en la lista
+
+
 
 ;; Ejercicio 2.3
 
@@ -316,7 +339,14 @@
 				(allind f a half (- n 1) tol)
 				(allind f half b (- n 1) tol)))))
 
+;; Use cases
 
+(allind #'(lambda (x) (sin (* 6.28 x))) 0.1 2.25 1 0.0001) ;; -> NIL
+
+(allind #'(lambda (x) (sin (* 6.28 x))) 0.1 2.25 2 0.0001)
+;; -> (0.50027084 1.0005027 1.5007347 2.0010324)
+
+(allind #'(lambda (x) (sin (* 6.28 x))) 0.1 0.1 2 0.0001) ;; -> NIL
 
 
 
