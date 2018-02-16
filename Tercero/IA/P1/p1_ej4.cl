@@ -164,15 +164,25 @@
      (or (literal-p x)          ;; Un literal es FBF en formato infijo
          (and (listp x)         ;; En caso de que no sea un literal debe ser una lista
               (cond
-               ((unary-connector-p (first x)) ;; Caso conector en primera posicion
-                (and (null (third x))         ;; deberia tener la estructura (<conector> FBF)
-                     (wff-infix-p (second x))))
+               ((connector-p (first x)) ;; Caso conector en primera posicion
+                (cond
+                 ((unary-connector-p (first x)) ;; si es conector unario
+                  (and (null (third x))         ;; deberia tener la estructura (<conector> FBF)
+                       (wff-infix-p (second x))))
+                 ((n-ary-connector-p (first x)) ;; si es conector n-ario
+                  (null (second x)))            ;; debería tener la estructura (<conector>)
+                 (t NIL)))
                ((binary-connector-p (second x))  ;; Caso conector binario
                 (and (null (fourth x))           ;; deberia tener estructura (FBF <conector> FBF)
                      (wff-infix-p (first x))
                      (wff-infix-p (third x))))
-               ((n-ary-connector-p (second x))   ;; Caso conector n-ario
-                NIL) ;;TODO
+               ((n-ary-connector-p (second x))   ;; Caso conector n-ario en segunda posicion
+                (if (null (fourth x))            ;; formato (FBF <conector> FBF)
+                    (and (wff-infix-p (first x))
+                         (wff-infix-p (third x)))
+                  (and (eql (second x) (fourth x)) ;; formaro (FBF <conector> FBF <conector igual> ...)
+                       (wff-infix-p (first x))
+                       (wff-infix-p (rest (rest x))))))
                (t NIL))))))
  
 
