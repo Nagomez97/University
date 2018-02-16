@@ -332,12 +332,13 @@
 ;; returns a list with the found roots
 ;;
 (defun allind (f a b n tol)
-	(if (= n 0)
-		(remove nil (list (bisect f a b tol)))
-		(let ((half (/ (+ b a) 2)))
-			(append 
-				(allind f a half (- n 1) tol)
-				(allind f half b (- n 1) tol)))))
+  (if (= n 0)
+      (let ((root (bisect f a b tol))) 
+        (when root (list root)))
+    (let ((half (/ (+ b a) 2)))
+      (append 
+       (allind f a half (- n 1) tol)
+       (allind f half b (- n 1) tol)))))
 
 ;; Use cases
 
