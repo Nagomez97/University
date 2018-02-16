@@ -153,17 +153,28 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 4.1.4
-;; Predicado para determinar si una expresion esta en formato prefijo 
+;; Predicado para determinar si una expresion esta en formato infijo 
 ;;
 ;; RECIBE   : expresion x 
-;; EVALUA A : T si x esta en formato prefijo, 
+;; EVALUA A : T si x esta en formato infijo, 
 ;;            NIL en caso contrario. 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun wff-infix-p (x)
-  ;;
-  ;; 4.1.4 Completa el codigo
-  ;;
-  ) 
+   (unless (null x)             ;; NIL no es FBF en formato infijo (por convencion)
+     (or (literal-p x)          ;; Un literal es FBF en formato infijo
+         (and (listp x)         ;; En caso de que no sea un literal debe ser una lista
+              (cond
+               ((unary-connector-p (first x)) ;; Caso conector en primera posicion
+                (and (null (third x))         ;; deberia tener la estructura (<conector> FBF)
+                     (wff-infix-p (second x))))
+               ((binary-connector-p (second x))  ;; Caso conector binario
+                (and (null (fourth x))           ;; deberia tener estructura (FBF <conector> FBF)
+                     (wff-infix-p (first x))
+                     (wff-infix-p (third x))))
+               ((n-ary-connector-p (second x))   ;; Caso conector n-ario
+                NIL) ;;TODO
+               (t NIL))))))
+ 
 
 ;;
 ;; EJEMPLOS:
