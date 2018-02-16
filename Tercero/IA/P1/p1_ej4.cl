@@ -40,7 +40,9 @@
 ;;            NIL en caso contrario. 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun positive-literal-p (x)
-  (and (atom x) (not (or (connector-p x) (truth-value-p x)))))
+  (and (atom x) 
+       (not (or (connector-p x) 
+                (truth-value-p x)))))
 
 ;; EJEMPLOS:
 (positive-literal-p 'p)
@@ -65,7 +67,9 @@
 ;;            NIL en caso contrario. 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun negative-literal-p (x)
-  (and (listp x) (eql (first x) +not+) (positive-literal-p (rest x))))
+  (and (listp x) 
+       (eql (first x) +not+) 
+       (positive-literal-p (second x))))
 
 ;; EJEMPLOS:
 (negative-literal-p '(~ p))        ; T
