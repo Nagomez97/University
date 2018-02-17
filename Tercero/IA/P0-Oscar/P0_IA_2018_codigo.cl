@@ -367,31 +367,3 @@ lista
 
 (first *dias-libres*)
 *dias-libres*
-
-(pop *dias-libres*)
-*dias-libres*
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;  Ordenación de una lista por el cadr (second) de 
-;;;  sus elementos (versión no destructiva)
-;;;
-
-(setf lst '((a -4) (b -3)  (c 1)  (d 9)))
-(sort (copy-list lst)   ; copia solo el esqueleto de la lista
-      #'(lambda(x y) (< (abs x) (abs y))) ; compara valor abs 
-      :key #'second)                        ; del cadr  
-lst
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;  Ordenación de una lista por el cadr de sus 
-;;;  elementos (versión destructiva)
-;;;
-
-(setf lst '((a -4) (b -3)  (c 1)  (d 9)))
-(sort lst
-      #'(lambda(x y) (< (abs x) (abs y))) ; compara valor abs 
-      :key #'second)                        ; del cadr  
-lst
-
