@@ -329,10 +329,16 @@
 ;; EVALUA A : T si FBF es una clausula, NIL en caso contrario. 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun clause-p (wff)
-  ;;
-  ;; 4.1.6 Completa el codigo
-  ;;
-  )
+  (when (and (wff-prefix-p wff) (listp wff))
+    (let ((connector (first wff)))
+      (when (eql connector +or+)
+        (let ((elements (rest wff)))
+        (cond ((null elements) ;;No hay más elementos, es clausula por convencion
+               t)
+              ((and (literal-p (first elements)) ;;Comprobamos el primer elemento
+                    (clause-p (cons connector (rest elements)))) ;;El resto tienen que seguir el mismo esquema
+               t)
+              (t NIL))))))) ;;Nunca deberia llegar aqui
 
 ;;
 ;; EJEMPLOS:
@@ -360,11 +366,16 @@
 ;;            NIL en caso contrario. 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun cnf-p (wff)
-  ;;
-  ;; 4.1.7 Completa el codigo
-  ;;
-  )
-
+  (when (and (wff-prefix-p wff) (listp wff))
+    (let ((connector (first wff)))
+      (when (eql connector +and+)
+        (let ((elements (rest wff)))
+        (cond ((null elements) ;;No hay más elementos, es cnf por convencion
+               t)
+              ((and (clause-p (first elements)) ;;Comprobamos el primer elemento
+                    (cnf-p (cons connector (rest elements)))) ;;El resto tienen que seguir el mismo esquema
+               t)
+              (t NIL)))))))
 ;;
 ;; EJEMPLOS:
 ;;
