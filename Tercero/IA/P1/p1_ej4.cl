@@ -270,10 +270,27 @@
 ;; EVALUA A : FBF en formato prefijo 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun infix-to-prefix (wff)
-  ;;
-  ;; 4.1.5 Completa el codigo
-  ;;
-  )
+  (when (wff-infix-p wff)
+    (if (literal-p wff)
+        wff
+      (let ((first (first wff))
+            (second (second wff)))
+        (cond
+         ((unary-connector-p first)
+          (list first (infix-to-prefix second)))
+         ((binary-connector-p second)
+          (list second
+                (infix-to-prefix first)
+                (infix-to-prefix (third wff))))
+         ((n-ary-connector-p second)
+          (if (null (fourth wff))
+              (list second 
+                    (infix-to-prefix first) 
+                    (infix-to-prefix (third wff)))
+              (cons second 
+                    (cons (infix-to-prefix first)
+                          (rest (infix-to-prefix (rest (rest wff))))))))
+         (t NIL))))))
 
 ;;
 ;; EJEMPLOS
