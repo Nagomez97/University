@@ -665,8 +665,8 @@
               (t NIL)))))) ;; Si no es ese tipo de conector, tendrá que ser una negación
                                                           ;; por lo que procesamos su elemento.
 
-(eliminate-connectors 'nil)
-(eliminate-connectors (cnf '(^ (v p  (~ q))  (v k  r  (^ m  n)))))
+(eliminate-connectors 'nil) ;; nil
+(eliminate-connectors (cnf '(^ (v p  (~ q))  (v k  r  (^ m  n))))) 
 (eliminate-connectors
  (cnf '(^ (v (~ a) b c) (~ e) (^ e f (~ g) h) (v m n) (^ r s q) (v u q) (^ x y))))
 
@@ -676,6 +676,24 @@
 (eliminate-connectors '(^))
 (eliminate-connectors '(^ (v p (~ q)) (v) (v k r)))
 (eliminate-connectors '(^ (v a b)))
+
+
+(defun eliminate-connectors (cnf)
+  (unless (null cnf) ;;Caso base. Si no hay elementos, devuelve nil
+    (if (literal-p cnf) ;;Si es un literal, no hay conectores
+      cnf
+      (let ((connector (first cnf))
+            (args (rest cnf)))
+        (cond ((and (n-ary-connector-p connector) ;;Si tiene un conector ^ o v
+                    (not (null args)))
+                (let ((rec1 (eliminate-connectors (first args))) ;;Recursion en el primer operando
+                      (rec2 (eliminate-connectors (cons connector (rest args))))) ;;Recursion en el resto
+                  (if (eql rec1 nil) ;;Si el primer operando devuelve nil, no queremos incluirlo en la lista
+                      rec2 ;; Asi evitamos que se "cuelen" nil
+                      (cons rec1 rec2)))) ;;En caso contrario, se aplica la recursion en ambas partes
+              ((unary-connector-p connector) ;; Si es unario, se trata de una negacion, asi que se procesa
+                (eliminate-connectors (first args))) ;;su contenido
+              (t nil))))))
 
 ;;   EJEMPLOS:
 ;;
