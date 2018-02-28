@@ -383,7 +383,7 @@
 ;;            NIL en caso contrario. 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun cnf-p (wff)
-  (when (and (wff-prefix-p wff) (listp wff))
+  (when (and (wff-prefix-p wff) (listp wff) (not (null wff)))
     (let ((connector (first wff)))
       (when (eql connector +and+)
         (let ((elements (rest wff)))
@@ -538,54 +538,60 @@
 ;; EVALUA A : FBF equivalente en formato prefijo FNC 
 ;;            con conectores ^, v
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Función que combina un elt con todos los elementos de una lista
 (defun combine-elt-lst (elt lst)
   (if (null lst)
-      (list (list elt))
-    (mapcar #'(lambda (x) (cons elt x)) lst)))
+      (list (list elt)) 
+    (mapcar #'(lambda (x) (cons elt x)) lst))) ;; Crea un cons con los elementos correspondientes
 
+;; Función que cambia entre formas normales
 (defun exchange-NF (nf)
-  (if (or (null nf) (literal-p nf)) 
-      nf
+  (if (or (null nf) (literal-p nf)) ;; Si es NIL o un solo literal:
+      nf                            ;; está en ambas formas normales
     (let ((connector (first nf)))
-      (cons (exchange-and-or connector)
-            (mapcar #'(lambda (x)
+      (cons (exchange-and-or connector) ;; Cambiar conector (para cambiar de FN)
+            (mapcar #'(lambda (x)       ;; Aplicar NF_AUX al resto y combinarlo con el conector
                           (cons connector x))
                 (exchange-NF-aux (rest nf)))))))
 
+;; Función auxiliar para exchange-NF-aux
 (defun exchange-NF-aux (nf)
-  (if (null nf) 
-      NIL
+  (if (null nf) ;; Si es NIL, no lo procesamos.
+      NIL       ;; COMENTARIO: pensamos que esto se podría simplificar con un unless
     (let ((lst (first nf)))
       (mapcan #'(lambda (x) 
-                  (combine-elt-lst 
-                   x 
+                  (combine-elt-lst  ;; Combinamos cada elemento con la expresión
+                   x                ;; obtenida de cambiar la FN del resto de elementos
                    (exchange-NF-aux (rest nf)))) 
         (if (literal-p lst) (list lst) (rest lst))))))
 
+;; Simplicar un FN
 (defun simplify (connector lst-wffs )
-  (if (literal-p lst-wffs)
+  (if (literal-p lst-wffs) ;; Si es un literal, no tenemos que simplificarlo
       lst-wffs                    
-    (mapcan #'(lambda (x) 
-                (cond 
-                 ((literal-p x) (list x))
-                 ((equal connector (first x))
-                  (mapcan 
-                      #'(lambda (y) (simplify connector (list y))) 
-                    (rest x))) 
-                 (t (list x))))               
+    (mapcan #'(lambda (x) ;; A todos los elementos
+                (cond
+                 ((literal-p x) (list x)) ;; Si es un literal, crear una lista con él
+                 ((equal connector (first x)) ;; Si es un conector:
+                  (mapcan ;; A todos los elementos aplicados al conector
+                      #'(lambda (y) (simplify connector (list y))) ;; Simplificamos el elemento
+                    (rest x))) ;; Por tanto devolvemos la lista sin el conector
+                 (t (list x))))
       lst-wffs)))
 
+;; Convierte una FBF a FNC 
 (defun cnf (wff)
   (cond
-   ((cnf-p wff) wff)
-   ((literal-p wff)
+   ((cnf-p wff) wff) ;; Si ya es cnf, no procesamos
+   ((literal-p wff)  ;; Si es un literal lo cambiamos a (^(v a))
     (list +and+ (list +or+ wff)))
    ((let ((connector (first wff))) 
       (cond
-       ((equal +and+ connector) 
-        (cons +and+ (simplify +and+ (mapcar #'cnf (rest wff)))))
-       ((equal +or+ connector) 
-        (cnf (exchange-NF (cons +or+ (simplify +or+ (rest wff)))))))))))
+       ((equal +and+ connector) ;; Si el conector es de tipo and
+        (cons +and+ (simplify +and+ (mapcar #'cnf (rest wff))))) ;; Simplificamos el resto de elementos
+       ((equal +or+ connector) ;; Si el conector es de tipo or
+        (cnf (exchange-NF (cons +or+ (simplify +or+ (rest wff))))))))))) ;; Transformamos a fnc con exchange NF
 
 
 (cnf 'a)
@@ -639,14 +645,25 @@
 ;; que representa una conjuncion de disyunciones de literales
 ;;
 ;; RECIBE   : FBF en FNC con conectores ^, v
-;; EVALUA A : FBF en FNC (con conectores ^, v eliminaos)
+;; EVALUA A : FBF en FNC (con conectores ^, v eliminados)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun eliminate-connectors (cnf)
-  ;;
-  ;; 4.2.5 Completa el codigo
-  ;;
-  )
+  (unless (null cnf) ;; Si no tiene elementos, devolvemos NIL
+    (if (literal-p cnf) ;; Si es un literal, no tiene conectores ^ o v
+        cnf
+      (let ((connector (first cnf))
+            (args (rest cnf)))
+        (cond ((and (n-ary-connector-p connector) ;; Si tiene un conector ^ o v
+                    (not (null args))) 
+               (mapcan #'(lambda (x) (let ((res (eliminate-connectors x)))
+                                       (unless (null res)
+                                         (list res))))
+                 args))
+              ((unary-connector-p connector)
+               (eliminate-connectors (first args)))
+              (t NIL)))))) ;; Si no es ese tipo de conector, tendrá que ser una negación
+                                                          ;; por lo que procesamos su elemento.
 
 (eliminate-connectors 'nil)
 (eliminate-connectors (cnf '(^ (v p  (~ q))  (v k  r  (^ m  n)))))
