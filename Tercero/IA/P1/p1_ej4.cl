@@ -428,18 +428,17 @@
 ;; EVALUA A : FBF equivalente en formato prefijo 
 ;;            sin connector <=>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (defun eliminate-biconditional (wff)
-  (if (or (null wff) (literal-p wff))
-      wff
+  (if (or (null wff) (literal-p wff)) ;;En caso de que sea una lista vacía o un literal:
+      wff                             ;; no tiene ningun bicondicional, por lo que no hace falta eliminar nada
     (let ((connector (first wff)))
-      (if (eq connector +bicond+)
-          (let ((wff1 (eliminate-biconditional (second wff)))
-                (wff2 (eliminate-biconditional (third  wff))))
-            (list +and+ 
+      (if (eq connector +bicond+) ;;Si el conector es una bicondicional:
+          (let ((wff1 (eliminate-biconditional (second wff)))  ;;Eliminamos la bicondicional de las dos 
+                (wff2 (eliminate-biconditional (third  wff)))) ;;FBF de la bicondicional
+            (list +and+ ;; Creamos una lista de la forma (^(w1 -> w2) (w2 -> w1))
                   (list +cond+ wff1 wff2)
                   (list +cond+ wff2 wff1)))
-        (cons connector 
+        (cons connector ;; Si no es una bicondicional tenemos que analizar el resto de FBF
               (mapcar #'eliminate-biconditional (rest wff)))))))
 
 ;;
@@ -461,10 +460,17 @@
 ;;            sin el connector =>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun eliminate-conditional (wff)  
-  ;;
-  ;; 4.2.2 Completa el codigo
-  ;;
-  )       
+ (if (or (null wff) (literal-p wff))  ;;En caso de que sea una lista vacía o un literal:
+      wff                             ;; no tiene ningun condicional, por lo que no hace falta eliminar nada
+    (let ((connector (first wff)))
+      (if (eq connector +cond+) ;;Si el conector es una condicional:
+          (let ((wff1 (eliminate-conditional (second wff)))  ;;Eliminamos la condicional de las dos 
+                (wff2 (eliminate-conditional (third  wff)))) ;;FBF de la condicional
+            (list +or+ ;; Creamos una lista de la forma (^(w1 -> w2) (w2 -> w1))
+                  (list +not+ wff1)
+                  wff2))
+        (cons connector ;; Si no es una condicional tenemos que analizar el resto de FBF
+              (mapcar #'eliminate-conditional (rest wff)))))))       
 
 ;;
 ;; EJEMPLOS:
@@ -472,6 +478,12 @@
 (eliminate-conditional '(=> p q))                      ;;; (V (~ P) Q)
 (eliminate-conditional '(=> p (v q s p)))              ;;; (V (~ P) (V Q S P))
 (eliminate-conditional '(=> (=> (~ p) q) (^ s (~ q)))) ;;; (V (~ (V (~ (~ P)) Q)) (^ S (~ Q)))
+
+(defun exchange-and-or (connector)
+  (cond
+   ((eq connector +and+) +or+)    
+   ((eq connector +or+) +and+)
+   (t connector)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 4.2.3
@@ -485,16 +497,25 @@
 ;;            negativos.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun reduce-scope-of-negation (wff)
-  ;;
-  ;; 4.2.3 Completa el codigo
-  ;;
-  )
-
-(defun exchange-and-or (connector)
-  (cond
-   ((eq connector +and+) +or+)    
-   ((eq connector +or+) +and+)
-   (t connector)))
+  (if (or (null wff) (literal-p wff))  ;; En caso de que sea una lista vacía o un literal:
+      wff                              ;; no tiene negaciones.
+    (let ((connector (first wff)))
+      (if (eq connector +not+) ;; Si el conector es una negación:
+          (let ((connector-2 (first (second wff)))
+                (args (rest (second wff))))
+            (cond
+             ((eq connector-2 +not+) ;; Doble negación
+              (reduce-scope-of-negation (first args)))
+             ((n-ary-connector-p connector-2) ;;De Morgan
+              (cons (exchange-and-or connector-2) ;; Cambiamos signo y creamos una nueva lista
+                     (mapcar #'(lambda (x)        ;; con todos los elementos con las negaciones reducidas
+                                 (reduce-scope-of-negation (list +not+
+                                                                 x)))
+                       args)))
+             (t (list +not+
+                      (reduce-scope-of-negation (rest wff)))))) ;; Ultimo caso, revisamos argumentos
+        (cons connector ;; Si no es una negacion tenemos que analizar el resto de FBF
+              (mapcar #'reduce-scope-of-negation (rest wff)))))))
 
 ;;
 ;;  EJEMPLOS:
@@ -716,7 +737,7 @@
 ;; Predicado que determina si una clausula subsume otra
 ;;
 ;; RECIBE   : K1, K2 clausulas
-;; EVALUA a : K1 si K1 subsume a K2
+;; EVALUA a : (list K1) si K1 subsume a K2
 ;;            NIL en caso contrario
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun subsume (K1 K2)
@@ -735,13 +756,13 @@
 (subsume '(a b (~ c)) '(a) )
 ;; NIL
 (subsume '( b (~ c)) '(a b (~ c)) )
-;; ( b (~ c))
+;; (( b (~ c)))
 (subsume '(a b (~ c)) '( b (~ c)))
 ;; NIL
 (subsume '(a b (~ c)) '(d  b (~ c)))
 ;; nil
 (subsume '(a b (~ c)) '((~ a) b (~ c) a))
-;; (A B (~ C))
+;; ((A B (~ C)))
 (subsume '((~ a) b (~ c) a) '(a b (~ c)) )
 ;; nil
 
@@ -749,7 +770,7 @@
 ;; EJERCICIO 4.3.4
 ;; eliminacion de clausulas subsumidas en una FNC 
 ;; 
-;; RECIBE   : K (clausula), cnf (FBF en FNC)
+;; RECIBE   : cnf (FBF en FNC)
 ;; EVALUA A : FBF en FNC equivalente a cnf sin clausulas subsumidas 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun eliminate-subsumed-clauses (cnf) 
