@@ -648,22 +648,16 @@
 ;; EVALUA A : FBF en FNC (con conectores ^, v eliminados)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun eliminate-rec(cnf)
+  (mapcar #'(lambda (x)
+            (if (literal-p x)
+              x
+              (eliminate-rec x)))
+    (rest cnf)))
+
 (defun eliminate-connectors (cnf)
-  (unless (null cnf) ;; Si no tiene elementos, devolvemos NIL
-    (if (literal-p cnf) ;; Si es un literal, no tiene conectores ^ o v
-        cnf
-      (let ((connector (first cnf))
-            (args (rest cnf)))
-        (cond ((and (n-ary-connector-p connector) ;; Si tiene un conector ^ o v
-                    (not (null args))) 
-               (mapcan #'(lambda (x) (let ((res (eliminate-connectors x)))
-                                       (unless (null res)
-                                         (list res))))
-                 args))
-              ((unary-connector-p connector)
-               (eliminate-connectors (first args)))
-              (t NIL)))))) ;; Si no es ese tipo de conector, tendrá que ser una negación
-                                                          ;; por lo que procesamos su elemento.
+  (when (cnf-p cnf))
+  (eliminate-rec cnf))
 
 (eliminate-connectors 'nil) ;; nil
 (eliminate-connectors (cnf '(^ (v p  (~ q))  (v k  r  (^ m  n))))) 
@@ -676,22 +670,6 @@
 (eliminate-connectors '(^))
 (eliminate-connectors '(^ (v p (~ q)) (v) (v k r)))
 (eliminate-connectors '(^ (v a b)))
-
-
-(defun eliminate-rec(cnf)
-  (mapcar #'(lambda (x)
-            (if (literal-p x)
-              x
-              (eliminate-rec x)))
-    (rest cnf)))
-
-(defun eliminate-connectors (cnf)
-  (when (cnf-p cnf))
-  (eliminate-rec cnf))
-
-
-
-
 
 ;;   EJEMPLOS:
 ;;
@@ -712,10 +690,12 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun wff-infix-to-cnf (wff)
-  ;;
-  ;; 4.2.6 Completa el codigo
-  ;;
-  )
+  (eliminate-connectors            ;; Eliminamos conectores
+   (cnf                            ;; De una cnf
+    (reduce-scope-of-negation      ;; A la que hemos reducido las negaciones
+     (eliminate-conditional        ;; Eliminado las condicionales
+      (eliminate-biconditional     ;; Y bicondicionales
+       (infix-to-prefix wff))))))) ;; De la fbf en formato prefijo
 
 ;;
 ;; EJEMPLOS:
@@ -733,12 +713,8 @@
 ;; RECIBE   : K - clausula (lista de literales, disyuncion implicita)
 ;; EVALUA A : clausula equivalente sin literales repetidos 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (defun eliminate-repeated-literals (k)
-  ;;
-  ;; 4.3.1 Completa el codigo
-  ;;
-  )
+  (remove-duplicates k :test #'equal))
 
 ;;
 ;; EJEMPLO:
@@ -753,11 +729,14 @@
 ;; RECIBE   : cnf - FBF en FNC (lista de clausulas, conjuncion implicita)
 ;; EVALUA A : FNC equivalente sin clausulas repetidas 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun equal-clauses (a b)
+  (null (set-exclusive-or a b :test #'equal)))
+
 (defun eliminate-repeated-clauses (cnf) 
-  ;;
-  ;; 4.3.2 Completa el codigo
-  ;;
-  )
+  (remove-duplicates 
+   (mapcar #'eliminate-repeated-literals 
+     cnf) 
+   :test #'equal-clauses))
 
 ;;
 ;; EJEMPLO:
@@ -774,10 +753,8 @@
 ;;            NIL en caso contrario
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun subsume (K1 K2)
-  ;;
-  ;; 4.3.3 Completa el codigo
-  ;;
-  )
+  (when (subsetp K1 K2 :test #'equal)
+    (list k1)))
   
 ;;
 ;;  EJEMPLOS:
@@ -806,11 +783,16 @@
 ;; RECIBE   : cnf (FBF en FNC)
 ;; EVALUA A : FBF en FNC equivalente a cnf sin clausulas subsumidas 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun check-subsumed (K1 cnf) ;; Comprueba si K1 es subsumida por algun elemento de la cnf (que no sea si mismo)
+  (when 
+      (null 
+       (mapcan #'(lambda (x) (subsume x K1))
+                   (set-exclusive-or (list K1) cnf)))
+    (list K1)))
+
 (defun eliminate-subsumed-clauses (cnf) 
-  ;;
-  ;; 4.3.4 Completa el codigo
-  ;;
-)
+  (mapcan #'(lambda (x) (check-subsumed x cnf))
+    cnf))
 
 ;;
 ;;  EJEMPLOS:
@@ -833,11 +815,15 @@
 ;; EVALUA a : T si K es tautologia
 ;;            NIL en caso contrario
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun tautology-p (K) 
-  ;;
-  ;; 4.3.5 Completa el codigo
-  ;;
-  )
+(defun tautology-p (K)
+  (unless (null K)
+    (let* ((el (first K))
+           (nel (if (positive-literal-p el) ;; Negación del primer elemento
+                    (list +not+ el)
+                  (rest el))))
+      (if (member nel K :test #'equal)
+          T
+        (tautology-p (rest K))))))
 
 ;;
 ;;  EJEMPLOS:
@@ -853,10 +839,7 @@
 ;; EVALUA A : FBF en FNC equivalente a cnf sin tautologias 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun eliminate-tautologies (cnf) 
-  ;;
-  ;; 4.3.6 Completa el codigo
-  ;;
-  )
+  (remove-if #'tautology-p cnf))
 
 ;;
 ;;  EJEMPLOS:
@@ -882,10 +865,10 @@
 ;;            y sin clausulas subsumidas
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun simplify-cnf (cnf) 
-  ;;
-  ;; 4.3.7 Completa el codigo
-  ;;
-  )
+  (eliminate-subsumed-clauses 
+   (eliminate-tautologies 
+    (eliminate-repeated-clauses 
+     (mapcar #'eliminate-repeated-literals cnf)))))
 
 ;;
 ;;  EJEMPLOS:
