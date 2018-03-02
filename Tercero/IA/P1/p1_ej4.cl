@@ -807,6 +807,29 @@
  '((a b c) (b c) (a (~ c) b) ((~ a))  ((~ a) b) (a b (~ a)) (c b a)))
 ;;; ((A (~ C) B) ((~ A)) (B C))
 
+(defun is-subsumed (elt lst)
+  (cond
+      ((null lst) ;; Caso base, no ha sido subsumido
+          NIL)
+      ((subsume (first lst) elt) ;; Si es subsumido, devuelve True
+          T)
+      (T
+          (is-subsumed elt (rest lst))))) ;; Recursion
+
+
+(defun eliminate-subsumed-clauses-rec (processed new)
+  (if (null new)
+      processed
+    (let ((f (first new)) (r (rest new)))
+      (if (or (is-subsumed f processed) ;; Si f es subsumido por alguna clausula, no se añade a processed
+              (is-subsumed f r))
+          (eliminate-subsumed-clauses-rec processed r)
+        (eliminate-subsumed-clauses-rec (cons f processed) r))))) ;; Si no ha sido subsumido, se añade a processed
+      
+
+(defun eliminate-subsumed-clauses (cnf)
+  (eliminate-subsumed-clauses-rec nil cnf))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 4.3.5
 ;; Predicado que determina si una clausula es tautologia
