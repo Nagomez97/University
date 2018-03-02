@@ -831,7 +831,7 @@
 (defun change-sign (K)
   (if (positive-literal-p K) ;; Negación del primer elemento
       (list +not+ K)
-    (rest K)))
+    (second K)))
 
 (defun tautology-p (K)
   (unless (null K)
@@ -1055,16 +1055,17 @@
 ;; EVALUA A : RES_lambda(cnf) con las clauses repetidas eliminadas
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun resolve-on-list (lambda K1 lst)
-  (mapcar #'(lambda (x) (resolve-on lambda K1 x))
+  (mapcar #'(lambda (x) (first (resolve-on lambda K1 x)))
     lst))
 
 (defun build-RES (lambda cnf)
   (let ((nc (extract-negative-clauses lambda cnf))
         (pc (extract-positive-clauses lambda cnf)))
-  (union (extract-neutral-clauses lambda cnf)
-         (mapcan #'(lambda (x) (first (resolve-on-list lambda x nc)))
-                     pc)
-         :test #'equal-clauses)))
+    (eliminate-repeated-clauses 
+     (union (extract-neutral-clauses lambda cnf)
+            (mapcan #'(lambda (x) (resolve-on-list lambda x nc))
+              pc)
+            :test #'equal-clauses))))
 ;;
 ;;  EJEMPLOS:
 ;;
@@ -1094,12 +1095,37 @@
 ;; EVALUA A :	T  si cnf es SAT
 ;;                NIL  si cnf es UNSAT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun  RES-SAT-p (cnf) 
-  ;;
-  ;; 4.5 Completa el codigo
-  ;;
-  )
+(defun get-literals-aux (K1 els) ;;Devuelve una lista con los literales no repetidos de una clausula
+  (if (null K1)
+      els
+    (if (or (member (first K1) ;;Si esta en positivo
+                    els 
+                    :test #'equal)
+            (member (change-sign (first K1)) ;;Si esta en negativo
+                    els
+                    :test #'equal))
+        (get-literals-aux (rest K1) ;;No introducir el literal
+                          els)
+      (get-literals-aux (rest K1) ;;Introducir el literal
+                        (cons (first K1) els)))))
 
+(defun get-literals (cnf els) ;;Devuelve una lista con los literales no repetidos de una fnc
+  (if (null cnf) 
+      els
+    (get-literals (rest cnf) (get-literals-aux (first cnf) els))))
+
+(defun  RES-SAT-p-aux (cnf literals) 
+  (cond ((null cnf) t) ;;Tautología
+        ((null (first cnf)) NIL) ;;Contradicción
+        (t (RES-SAT-p-aux (simplify-cnf 
+                           (build-RES 
+                            (first literals) cnf))
+                          (rest literals))))) ;;Continuar recursion
+
+(defun RES-SAT-p (cnf)
+  (RES-SAT-p-aux cnf (get-literals cnf nil)))
+         
+         
 ;;
 ;;  EJEMPLOS:
 ;;
@@ -1132,10 +1158,8 @@
 ;;            NIL en caso de que no sea consecuencia logica.  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun logical-consequence-RES-SAT-p (wff w)
-  ;;
-  ;; 4.6 Completa el codigo
-  ;;
-  )
+  (not (RES-SAT-p (union (wff-infix-to-cnf wff) 
+         (wff-infix-to-cnf (change-sign w))))))
 
 ;;
 ;;  EJEMPLOS:
