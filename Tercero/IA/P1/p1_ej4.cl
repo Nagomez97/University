@@ -784,34 +784,6 @@
 ;; RECIBE   : cnf (FBF en FNC)
 ;; EVALUA A : FBF en FNC equivalente a cnf sin clausulas subsumidas 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun subsume-ne (K1 K2)
-  (unless (equal-clauses K1 K2)
-    (subsume K1 K2)))
-
-(defun check-subsumed (K1 cnf) ;; Comprueba si K1 es subsumida por algun elemento de la cnf (que no sea si mismo)
-  (when 
-      (null 
-       (mapcan #'(lambda (x) (subsume-ne x K1))
-                   cnf))
-    (list K1)))
-
-(defun eliminate-subsumed-clauses (cnf) 
-  (mapcan #'(lambda (x) (check-subsumed x cnf))
-    cnf))
-
-;;
-;;  EJEMPLOS:
-;;
-(eliminate-subsumed-clauses 
- '((a b c) (b c) (a (~ c) b) ((~ a) b) (a b (~ a)) (c b a)))
-;;; ((A (~ C) B) ((~ A) B) (B C)) ;; el orden no es importante
-(eliminate-subsumed-clauses
- '((a b c) (b c) (a b c) (a (~ c) b) (b)  ((~ a) b) (a b (~ a)) (c b a)))
-;;; ((B))
-(eliminate-subsumed-clauses
- '((a b c) (b c) (a (~ c) b) ((~ a))  ((~ a) b) (a b (~ a)) (c b a)))
-;;; ((A (~ C) B) ((~ A)) (B C))
-
 (defun is-subsumed (elt lst)
   (cond
       ((null lst) ;; Caso base, no ha sido subsumido
@@ -834,6 +806,19 @@
 
 (defun eliminate-subsumed-clauses (cnf)
   (eliminate-subsumed-clauses-rec nil cnf))
+
+;;
+;;  EJEMPLOS:
+;;
+(eliminate-subsumed-clauses 
+ '((a b c) (b c) (a (~ c) b) ((~ a) b) (a b (~ a)) (c b a)))
+;;; ((A (~ C) B) ((~ A) B) (B C)) ;; el orden no es importante
+(eliminate-subsumed-clauses
+ '((a b c) (b c) (a b c) (a (~ c) b) (b)  ((~ a) b) (a b (~ a)) (c b a)))
+;;; ((B))
+(eliminate-subsumed-clauses
+ '((a b c) (b c) (a (~ c) b) ((~ a))  ((~ a) b) (a b (~ a)) (c b a)))
+;;; ((A (~ C) B) ((~ A)) (B C))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 4.3.5
