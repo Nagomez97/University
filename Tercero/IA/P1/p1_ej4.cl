@@ -656,8 +656,8 @@
     (rest cnf)))
 
 (defun eliminate-connectors (cnf)
-  (when (cnf-p cnf))
-  (eliminate-rec cnf))
+  (when (cnf-p cnf)
+    (eliminate-rec cnf)))
 
 (eliminate-connectors 'nil) ;; nil
 (eliminate-connectors (cnf '(^ (v p  (~ q))  (v k  r  (^ m  n))))) 
@@ -729,8 +729,9 @@
 ;; RECIBE   : cnf - FBF en FNC (lista de clausulas, conjuncion implicita)
 ;; EVALUA A : FNC equivalente sin clausulas repetidas 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun equal-clauses (a b)
-  (null (set-exclusive-or a b :test #'equal)))
+(defun equal-clauses (a b) ;; Comprueba si dos clausulas son iguales
+  (and (subsetp a b :test #'equal)   ;; a contenido en b
+       (subsetp b a :test #'equal))) ;; b contenido en a
 
 (defun eliminate-repeated-clauses (cnf) 
   (remove-duplicates 
@@ -783,11 +784,15 @@
 ;; RECIBE   : cnf (FBF en FNC)
 ;; EVALUA A : FBF en FNC equivalente a cnf sin clausulas subsumidas 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun subsume-ne (K1 K2)
+  (unless (equal-clauses K1 K2)
+    (subsume K1 K2)))
+
 (defun check-subsumed (K1 cnf) ;; Comprueba si K1 es subsumida por algun elemento de la cnf (que no sea si mismo)
   (when 
       (null 
-       (mapcan #'(lambda (x) (subsume x K1))
-                   (set-exclusive-or (list K1) cnf)))
+       (mapcan #'(lambda (x) (subsume-ne x K1))
+                   cnf))
     (list K1)))
 
 (defun eliminate-subsumed-clauses (cnf) 
@@ -798,10 +803,10 @@
 ;;  EJEMPLOS:
 ;;
 (eliminate-subsumed-clauses 
- '((a b c) (b c) (a (~ c) b)  ((~ a) b) (a b (~ a)) (c b a)))
+ '((a b c) (b c) (a (~ c) b) ((~ a) b) (a b (~ a)) (c b a)))
 ;;; ((A (~ C) B) ((~ A) B) (B C)) ;; el orden no es importante
 (eliminate-subsumed-clauses
- '((a b c) (b c) (a (~ c) b) (b)  ((~ a) b) (a b (~ a)) (c b a)))
+ '((a b c) (b c) (a b c) (a (~ c) b) (b)  ((~ a) b) (a b (~ a)) (c b a)))
 ;;; ((B))
 (eliminate-subsumed-clauses
  '((a b c) (b c) (a (~ c) b) ((~ a))  ((~ a) b) (a b (~ a)) (c b a)))
@@ -815,12 +820,15 @@
 ;; EVALUA a : T si K es tautologia
 ;;            NIL en caso contrario
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun change-sign (K)
+  (if (positive-literal-p K) ;; Negación del primer elemento
+      (list +not+ K)
+    (rest K)))
+
 (defun tautology-p (K)
   (unless (null K)
     (let* ((el (first K))
-           (nel (if (positive-literal-p el) ;; Negación del primer elemento
-                    (list +not+ el)
-                  (rest el))))
+           (nel (change-sign el)))
       (if (member nel K :test #'equal)
           T
         (tautology-p (rest K))))))
@@ -887,10 +895,10 @@
 ;;            que no contienen el literal lambda ni ~lambda   
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun extract-neutral-clauses (lambda cnf) 
-  ;;
-  ;; 4.4.1 Completa el codigo
-  ;;
-  )
+  (let ((nlambda (change-sign lambda)))
+    (remove-if #'(lambda (x) (or (member lambda x :test #'equal) 
+                                 (member nlambda x :test #'equal)))
+               cnf))) ;;Si lambda y nlambda estan en una clausla, la quitamos
 
 ;;
 ;;  EJEMPLOS:
@@ -924,11 +932,8 @@
 ;;            que contienen el literal lambda  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun extract-positive-clauses (lambda cnf) 
-  ;;
-  ;; 4.4.2 Completa el codigo
-  ;;
-  )
-
+    (remove-if #'(lambda (x) (not (member lambda x :test #'equal)))
+               cnf)) ;;Si lambda no esta en una clausla, la quitamos
 ;;
 ;;  EJEMPLOS:
 ;;
@@ -959,10 +964,9 @@
 ;;            que contienen el literal ~lambda  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun extract-negative-clauses (lambda cnf) 
-  ;;
-  ;; 4.4.3 Completa el codigo
-  ;;
-  )
+  (let ((nlambda (change-sign lambda)))
+    (remove-if #'(lambda (x) (not (member nlambda x :test #'equal)))
+               cnf))) ;;Si nlambda no esta en una clausla, la quitamos
 
 ;;
 ;;  EJEMPLOS:
@@ -995,10 +999,18 @@
 ;;                          eliminados
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun resolve-on (lambda K1 K2) 
-  ;;
-  ;; 4.4.4 Completa el codigo
-  ;;
-  )
+  (let ((nlambda (change-sign lambda)))
+  (cond ((member lambda K1 :test #'equal)
+         (when (member nlambda K2 :test #'equal) 
+           (list (union (remove lambda K1 :test #'equal)
+                  (remove nlambda K2 :test #'equal)
+                  :test #'equal))))
+        ((member nlambda K1 :test #'equal)
+         (when (member lambda K2 :test #'equal)
+           (list (union (remove nlambda K1 :test #'equal) 
+                  (remove lambda K2 :test #'equal)
+                  :test #'equal))))
+        (t NIL))))
 
 ;;
 ;;  EJEMPLOS:
@@ -1034,12 +1046,17 @@
 ;;            
 ;; EVALUA A : RES_lambda(cnf) con las clauses repetidas eliminadas
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun build-RES (lambda cnf)
-  ;;
-  ;; 4.4.5 Completa el codigo
-  ;;
-)
+(defun resolve-on-list (lambda K1 lst)
+  (mapcar #'(lambda (x) (resolve-on lambda K1 x))
+    lst))
 
+(defun build-RES (lambda cnf)
+  (let ((nc (extract-negative-clauses lambda cnf))
+        (pc (extract-positive-clauses lambda cnf)))
+  (union (extract-neutral-clauses lambda cnf)
+         (mapcan #'(lambda (x) (first (resolve-on-list lambda x nc)))
+                     pc)
+         :test #'equal-clauses)))
 ;;
 ;;  EJEMPLOS:
 ;;
