@@ -447,7 +447,7 @@
 
 ;; Ejercicio 4
 
-﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Definicion de simbolos que representan valores de verdad,
 ;; conectores y predicados para evaluar si una expresion LISP
 ;; es un valor de verdad o un conector
@@ -1858,10 +1858,8 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; La siguiente llamada va a hacer que bfs entre en un bucle infinito
-(setf infinite '((a b c) (b a c) (c a b)))
-(shortest-path-improved 'a 'e infinite)
-
+(defun shortest-path-improved (start end net)
+  (bfs-improved end (list (list start)) net))
 
 (defun bfs-improved (end queue net)
   (if (null queue) '() ;; Si la cola esta vacia, se ha terminado
@@ -1881,9 +1879,9 @@
               (cons n path)) ;; en los caminos
     (rest (assoc node net)))) 
 
-(defun shortest-path-improved (start end net)
-  (bfs-improved end (list (list start)) net))
-
+;; La siguiente llamada va a hacer que bfs entre en un bucle infinito
+(setf infinite '((a b c) (b a c) (c a b)))
+(shortest-path-improved 'a 'e infinite)
 
 ;; Usando la misma llamada que antes, podemos ver que se devuelve nil
 ;; El unico cambio que hemos hecho ha sido el de comprobar si el nodo a 
