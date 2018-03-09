@@ -139,18 +139,32 @@
 ;;
 ;; BEGIN: Exercise 2 -- Navigation operators
 ;;
+;; Returns a list of all posible actions from a state
+;;
+;;  Input:
+;;    state: the current state (vis. the planet we are on)
+;;    [white/worm]-holes: Links in our galaxy of a certain type
+;;    (planets-forbidden): Only if worm holes. Planets that are not allowed to be visited
+;;                         allowed to be visited via worm-holes
+;;
+;;  Returns:
+;;    A list with all possible actions from the original state
+;;    avoiding the links that go to a forbidden planet.
+;;
 
+;; Function that evaluates a link
 (defun check-hole (hole state forbidden name)
   (let ((origin (first hole))
         (destination (second hole))
         (cost (third hole)))
-    (when (and (eql origin state) ;; Si el estado en el que estamos es el origen
-               (null (member destination forbidden))) ;; Y el destino no esta prohibido
-      (list (make-action :name name
+    (when (and (eql origin state) ;;If the origin of the link is the state we are on
+               (null (member destination forbidden))) ;; And the destination is not forbidden
+      (list (make-action :name name ;; Create an action within a list
                    :origin state
                    :final destination
                    :cost cost)))))
 
+;; Generical function for evaluating links
 (defun navigate (state holes planets-forbidden name)
   (mapcan #'(lambda (x) (check-hole x 
                                     state 
@@ -158,12 +172,14 @@
                                     name))
     holes))
 
+;; Function for evaluating white holes
 (defun navigate-white-hole (state white-holes)
   (navigate state
             white-holes
             NIL
             'NAVIGATE-WHITE-HOLE))
 
+;; Function for evaluating worm holes
 (defun navigate-worm-hole (state worm-holes planets-forbidden)
   (navigate state 
             worm-holes 
@@ -200,9 +216,33 @@
 ;;
 ;; BEGIN: Exercise 3 -- Goal test
 ;;
+;; Returns a list of all posible actions from a state
+;;
+;;  Input:
+;;    node: the current node (vis. the planet we are on)
+;;    planets-destination: List of planets we need to reach (one of them)
+;;    planets-mandatory: List of planets we need to visit.
+;;
+;;  Returns:
+;;    T if we reached the goal, NIL otherwise
+;;
 
+;; Checks if the path followed includes the mandatory planets
+(defun check-path (node planets)
+  (let ((new-planets (remove (node-state node) 
+                             planets)))
+    (if (null new-planets) ;; No more mandatory planets to visit
+        T
+      (let ((parent (node-parent node)))
+        (unless (null parent) ;; No more path to analyze
+          (check-path parent ;; Check next step of the path
+                      new-planets))))))
+
+;; Checks if we fullfilled the requirements
 (defun f-goal-test-galaxy (node planets-destination planets-mandatory) 
-  ...)
+  (and (member (node-state node) 
+               planets-destination) ;; Check if the node is a destination
+       (check-path node planets-mandatory))) ;; Check if we visited the mandatory planets
 
 
 (defparameter node-01
