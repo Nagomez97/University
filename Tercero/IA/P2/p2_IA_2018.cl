@@ -388,22 +388,24 @@
                                                    (< (node-g x) 
                                                     (node-g y)))))) ;; Compare path cost to node
 
+;; Insert a node in the corresponding position accord to the strategy
 (defun insert-sort-node (node lst-nodes strategy)
   (let ((first (first lst-nodes)))
     (if (funcall (strategy-node-compare-p strategy) 
                  node 
-                 first)
-        (cons node lst-nodes)
+                 first) ;; Check strategy
+        (cons node lst-nodes) ;; Place the node
       (cons first 
-            (insert-sort-node node 
+            (insert-sort-node node ;; Recursive call
                               (rest lst-nodes) 
                               strategy)))))
 
+;; Insert nodes in lst-nodes according to strategy
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
   (if (null nodes)
-      lst-nodes
-    (insert-nodes-strategy (rest nodes) 
-                         (insert-sort-node (first nodes) 
+      lst-nodes ;; No more nodes to insert
+    (insert-nodes-strategy (rest nodes) ;; Recursive call
+                         (insert-sort-node (first nodes) ;; Inserting one node
                                            lst-nodes 
                                            strategy) 
                          strategy)))
@@ -469,7 +471,7 @@
 
 
 ;;
-;;    END: Exercize 6 -- Node list management
+;;    END: Exercise 6 -- Node list management
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -484,7 +486,11 @@
 ;;
 
 (defparameter *A-star*
-  (make-strategy ...))
+  (make-strategy :name 'A-star
+                 :node-compare-p #'(lambda (x y) (if (null y)
+                                                     t
+                                                   (< (node-f x) 
+                                                    (node-f y)))))) ;; Compare cost + heuristic
 
 ;;
 ;; END: Exercise 7 -- Definition of the A* strategy
@@ -497,17 +503,33 @@
 ;;; 
 ;;;    BEGIN Exercise 8: Search algorithm
 ;;;
+(defun recursive-graph-search (open problem strategy)
+  (unless (null open)
+    (let ((first (first open)))
+      (if (funcall (problem-f-goal-test problem)
+                   first)
+          first
+        (recursive-graph-search (insert-nodes-strategy (expand-node first 
+                                                                    problem) 
+                                                       (rest open) 
+                                                       strategy)
+                                problem
+                                strategy)))))
+
 (defun graph-search (problem strategy)
-  ...)
+  (recursive-graph-search (list (make-node :state (problem-initial-state problem))) 
+                          problem 
+                          strategy))
 
 
 ;
 ;  Solve a problem using the A* strategy
 ;
-(defun a-star-search (problem)...)
+(defun a-star-search (problem)
+  (graph-search problem *A-star*))
 
 
-(graph-search *galaxy-M35* *A-star*);->
+(print (graph-search *galaxy-M35* *A-star*));->
 ;;;#S(NODE :STATE ...
 ;;;        :PARENT #S(NODE :STATE ...
 ;;;                        :PARENT #S(NODE :STATE ...)) 
@@ -530,8 +552,19 @@
 ;;; 
 ;;;    BEGIN Exercise 9: Solution path / action sequence
 ;;;
+
+;; Función recursiva para obtener el path
+(defun rec-solution-path (node path)
+  (let ((parent (node-parent node))
+        (state (node-state node)))
+    (if (null parent) ;; Nodo raiz
+        (cons state path) ;; Poner el primero de la lista
+      (rec-solution-path parent ;; Resto de nodos
+                         (cons state path))))) ;; Ponerlos al principio de la lista y seguir
+
 (defun solution-path (node)
-  ...)
+  (unless (null node) ;; Comprobar si es NIL
+    (rec-solution-path node NIL)))
 
 (solution-path nil) ;;; -> NIL 
 (solution-path (a-star-search *galaxy-M35*))  ;;;-> (MALLORY ...)
