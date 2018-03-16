@@ -276,8 +276,15 @@
    :f-goal-test       #'(lambda (node) 
                           (f-goal-test-galaxy node *planets-destination*
                                                    *planets-mandatory*))
-   :f-h               ...
-   :operators         (list ...))) 
+   :f-h               #'(lambda (state) 
+                          (f-h-galaxy state *sensors*)) 
+   :operators         (list #'(lambda (state) 
+                                (navigate-worm-hole state
+                                                    *worm-holes*
+                                                    *planets-forbidden*))
+                            #'(lambda (state)
+                                (navigate-white-hole state
+                                                     *white-holes*)))))
 
 ;;
 ;;  END: Exercise 4 -- Define the galaxy structure
@@ -289,8 +296,26 @@
 ;;
 ;; BEGIN Exercise 5: Expand node
 ;;
+
+;; Function to get all the posible actions from a node
+(defun get-all-actions (node problem)
+  (mapcan #'(lambda (x) (funcall x (node-state node)))
+    (problem-operators problem)))
+
+;; Function to expand a node
 (defun expand-node (node problem)
-  ...)
+  (mapcar #'(lambda (x) ;; Iterating through all actions
+              (let* ((final (action-final x))
+                    (g (+ (node-g node) (action-cost x)))
+                    (h (funcall (problem-f-h problem) final)))
+                (make-node :state final ;; Create a new node structure
+                           :parent node
+                           :action x
+                           :depth (+ (node-depth node) 1)
+                           :g g
+                           :h h
+                           :f (+ g h))))
+      (get-all-actions node problem)))
 
 (expand-node (make-node :state 'Kentares :depth 0 :g 0 :f 0) *galaxy-M35*)
 ;;;(#S(NODE :STATE AVALON
@@ -354,18 +379,51 @@
 ;;;
 ;;;  BEGIN Exercise 6 -- Node list management
 ;;;  
+
+;; Parameter for the unifirm-cost strategy
+(defparameter *uniform-cost* 
+  (make-strategy :name 'uniform-cost
+                 :node-compare-p #'(lambda (x y) (if (null y)
+                                                     t
+                                                   (< (node-g x) 
+                                                    (node-g y)))))) ;; Compare path cost to node
+
+(defun insert-sort-node (node lst-nodes strategy)
+  (let ((first (first lst-nodes)))
+    (if (funcall (strategy-node-compare-p strategy) 
+                 node 
+                 first)
+        (cons node lst-nodes)
+      (cons first 
+            (insert-sort-node node 
+                              (rest lst-nodes) 
+                              strategy)))))
+
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-  ...)
+  (if (null nodes)
+      lst-nodes
+    (insert-nodes-strategy (rest nodes) 
+                         (insert-sort-node (first nodes) 
+                                           lst-nodes 
+                                           strategy) 
+                         strategy)))
 
-
+(defparameter node-00
+  (make-node :state 'Proserpina :depth 8 :g 4 :f 0) )
 (defparameter node-01
    (make-node :state 'Avalon :depth 0 :g 0 :f 0) )
 (defparameter node-02
-   (make-node :state 'Kentares :depth 2 :g 50 :f 50) )
+  (make-node :state 'Kentares :depth 2 :g 50 :f 50) )
+(defparameter node-03
+   (make-node :state 'Davion :depth 0 :g 6 :f 0) )
+(defparameter node-04
+  (make-node :state 'Katril :depth 2 :g 0 :f 50) )
+(defparameter lst-nodes-00
+             (list node-04 node-03))
 
 (print (insert-nodes-strategy (list node-00 node-01 node-02) 
-                        lst-nodes-00 
-                        *uniform-cost*));->
+                              lst-nodes-00 
+                              *uniform-cost*));->
 ;;;
 ;;;(#S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H 0 :F 0)
 ;;; #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H 0 :F 20)
