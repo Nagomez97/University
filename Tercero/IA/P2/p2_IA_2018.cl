@@ -503,6 +503,20 @@
 ;;; 
 ;;;    BEGIN Exercise 8: Search algorithm
 ;;;
+
+
+;;; Function to check if a node is closed
+;;; It will return T if the node is already explored and
+;;; has a bigger g
+(defun check-closed (node closed)
+  (unless (null closed)
+      (if (and (eql (node-state node)           ; If the node is in the list and
+                   (node-state (first closed))) ; it has a bigger g, we don't
+               (> ((node-g node)                ; want to explore it
+                   (node-g (first closed))))
+          T
+        (check-closed (node (rest closed))))))
+
 (defun recursive-graph-search (open closed problem strategy)
   (unless (null open)
     (let ((first (first open)))
