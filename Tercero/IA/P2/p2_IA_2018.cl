@@ -503,7 +503,21 @@
 ;;; 
 ;;;    BEGIN Exercise 8: Search algorithm
 ;;;
-(defun recursive-graph-search (open problem strategy)
+
+
+;;; Function to check if a node is closed
+;;; It will return T if the node is already explored and
+;;; has a bigger g
+(defun check-closed (node closed)
+  (unless (null closed)
+      (if (and (eql (node-state node)           ; If the node is in the list and
+                   (node-state (first closed))) ; it has a bigger g, we don't
+               (> ((node-g node)                ; want to explore it
+                   (node-g (first closed))))
+          T
+        (check-closed (node (rest closed))))))
+
+(defun recursive-graph-search (open closed problem strategy)
   (unless (null open)
     (let ((first (first open)))
       (if (funcall (problem-f-goal-test problem)
@@ -513,11 +527,13 @@
                                                                     problem) 
                                                        (rest open) 
                                                        strategy)
+                                NIL
                                 problem
                                 strategy)))))
 
 (defun graph-search (problem strategy)
-  (recursive-graph-search (list (make-node :state (problem-initial-state problem))) 
+  (recursive-graph-search (list (make-node :state (problem-initial-state problem)))
+                          NIL
                           problem 
                           strategy))
 
@@ -562,6 +578,7 @@
       (rec-solution-path parent ;; Resto de nodos
                          (cons state path))))) ;; Ponerlos al principio de la lista y seguir
 
+;; Función que devuelve el path hasta node
 (defun solution-path (node)
   (unless (null node) ;; Comprobar si es NIL
     (rec-solution-path node NIL)))
@@ -569,8 +586,19 @@
 (solution-path nil) ;;; -> NIL 
 (solution-path (a-star-search *galaxy-M35*))  ;;;-> (MALLORY ...)
 
-(defun action-sequence-aux (node)
-  ...)
+;; Función recursiva que devuelve la lista de acciones para llegar al nodo
+(defun rec-action-sequence (node actions)
+  (let ((parent (node-parent node))
+        (action (node-action node)))
+    (if (null parent) ;; Nodo raiz
+        actions ;; Devolver la lista
+      (rec-action-sequence parent ;; Resto de nodos
+                         (cons action actions))))) ;; Ponerlos al principio de la lista y seguir
+
+;; Función que devuelve la lista de acciones necesarias para llegar al nodo
+(defun action-sequence (node)
+  (unless (null node) ;; Comprobar si es NIL 
+    (rec-action-sequence node NIL)))
 
 (action-sequence (a-star-search *galaxy-M35*))
 ;;; ->
@@ -587,24 +615,24 @@
 ;;;    BEGIN Exercise 10: depth-first / breadth-first
 ;;;
 
+(defun depth-first-node-compare-p (node-1 node-2)
+  T) ;; Last explored node gets in the first position of open-nodes
+
 (defparameter *depth-first*
   (make-strategy
    :name 'depth-first
    :node-compare-p #'depth-first-node-compare-p))
 
-(defun depth-first-node-compare-p (node-1 node-2)
-  ...)
-
 (solution-path (graph-search *galaxy-M35* *depth-first*))
 ;;; -> (MALLORY ... )
+
+(defun breadth-first-node-compare-p (node-1 node-2)
+  (null node-2)) ;; Last explored node gets in the last position of open-nodes
 
 (defparameter *breadth-first*
   (make-strategy
    :name 'breadth-first
    :node-compare-p #'breadth-first-node-compare-p))
-
-(defun breadth-first-node-compare-p (node-1 node-2)
-  ...)
 
 (solution-path (graph-search *galaxy-M35* *breadth-first*))
 ;; -> (MALLORY ... )
