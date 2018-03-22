@@ -14,13 +14,15 @@
 ;;    Problem definition
 ;;
 (defstruct problem
-  states              ; List of states
-  initial-state       ; Initial state
-  f-goal-test         ; reference to a function that determines whether 
-                      ; a state fulfills the goal 
-  f-h                 ; reference to a function that evaluates to the 
-                      ; value of the heuristic of a state
-  operators)          ; list of operators (references to functions) to generate succesors
+  states               ; List of states
+  initial-state        ; Initial state
+  f-goal-test          ; reference to a function that determines whether 
+                       ; a state fulfills the goal 
+  f-h                  ; reference to a function that evaluates to the 
+                       ; value of the heuristic of a state
+  f-search-state-equal ; reference to a predicate that determines whether
+                       ; two nodes are equal, in terms of their search state 
+  operators)           ; list of operators (references to functions) to generate succesors
 ;;
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -266,25 +268,81 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+;; BEGIN: Exercise  -- Equal predicate for search states
+;;
+
+;; comprueba si dos listas tienen los mismos elementos
+(defun equal-lists (list1 list2)
+  (and (subsetp list1 list2 :test #'equal) 
+       (subsetp list2 list1 :test #'equal)))
+
+;; Devuelve los nodos obligatorios que han sido visitados para llegar al nodo
+(defun get-mandatory-path (node planets-mandatory path)
+  (if (equal-lists planets-mandatory path)
+      path
+    (let ((parent (node-parent node))
+          (state (node-state node)))
+      (if (null parent) ;; Nodo raiz
+          (if (member state planets-mandatory) ;; Si es obligatorio
+              (cons state path) ;; Poner el primero de la lista
+            path);; No lo añadimos
+        (if (member state planets-mandatory) ;; Si es obligatorio
+            (get-mandatory-path parent ;; Resto de nodos
+                                planets-mandatory
+                                (cons state path)) ;; Lo añadimos
+          (get-mandatory-path parent ;; Resto de nodos
+                              planets-mandatory
+                              path)))))) ;; No lo añadimos  
+
+;; Función para valorar si dos nodos son iguales
+(defun f-search-state-equal-galaxy (node-1 node-2 &optional planets-mandatory)
+  (when (equal (node-state node-1) (node-state node-2))
+    (and (equal-lists (get-mandatory-path node-1 planets-mandatory NIL)
+                      (get-mandatory-path node-2 planets-mandatory NIL)))))    
+       
+(f-search-state-equal-galaxy node-01 node-01) ;-> T
+(f-search-state-equal-galaxy node-01 node-02) ;-> NIL
+(f-search-state-equal-galaxy node-02 node-04) ;-> T
+
+(f-search-state-equal-galaxy node-01 node-01 '(Avalon)) ;-> T
+(f-search-state-equal-galaxy node-01 node-02 '(Avalon)) ;-> NIL
+(f-search-state-equal-galaxy node-02 node-04 '(Avalon)) ;-> T
+
+(f-search-state-equal-galaxy node-01 node-01 '(Avalon Katril)) ;-> T
+(f-search-state-equal-galaxy node-01 node-02 '(Avalon Katril)) ;-> NIL
+(f-search-state-equal-galaxy node-02 node-04 '(Avalon Katril)) ;-> NIL
+
+
+;;
+;; END: Exercise  -- Equal predicate for search states
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 ;;  BEGIN: Exercise 4 -- Define the galaxy structure
 ;;
 ;;
 (defparameter *galaxy-M35* 
   (make-problem 
-   :states            *planets*          
-   :initial-state     *planet-origin*
-   :f-goal-test       #'(lambda (node) 
-                          (f-goal-test-galaxy node *planets-destination*
-                                                   *planets-mandatory*))
-   :f-h               #'(lambda (state) 
-                          (f-h-galaxy state *sensors*)) 
-   :operators         (list #'(lambda (state) 
-                                (navigate-worm-hole state
-                                                    *worm-holes*
-                                                    *planets-forbidden*))
-                            #'(lambda (state)
-                                (navigate-white-hole state
-                                                     *white-holes*)))))
+   :states               *planets*          
+   :initial-state        *planet-origin*
+   :f-goal-test          #'(lambda (node) 
+                             (f-goal-test-galaxy node *planets-destination*
+                                                 *planets-mandatory*))
+   :f-h                  #'(lambda (state) 
+                             (f-h-galaxy state *sensors*)) 
+   :f-search-state-equal #'(lambda (node-1 node-2) 
+                             (f-search-state-equal-galaxy node-1
+                                                          node-2
+                                                          *planets-mandatory*))
+   :operators            (list #'(lambda (state) 
+                                   (navigate-worm-hole state
+                                                       *worm-holes*
+                                                       *planets-forbidden*))
+                               #'(lambda (state)
+                                   (navigate-white-hole state
+                                                        *white-holes*)))))
 
 ;;
 ;;  END: Exercise 4 -- Define the galaxy structure
@@ -508,35 +566,43 @@
 ;;; Function to check if a node is closed
 ;;; It will return T if the node is already explored and
 ;;; has a bigger g
-(defun check-closed (node closed)
+(defun check-closed (node closed problem)
   (unless (null closed)
-      (if (and (eql (node-state node)           ; If the node is in the list and
-                   (node-state (first closed))) ; it has a bigger g, we don't
-               (> ((node-g node)                ; want to explore it
-                   (node-g (first closed))))
-          T
-        (check-closed (node (rest closed))))))
+    (let ((test (member node    ;; Check if the node is in the close list
+                        closed  ;; If the node is in it, it returns the cons of closed.
+                        :test #'(lambda (x y) 
+                                  (funcall (problem-f-search-state-equal problem) 
+                                           x 
+                                           y)))))
+      (and test (> (node-g node) 
+                   (node-g (first test))))))) ;; If the test checks and the g is bigger,
+                                              ;; we dont want to explore it
+          
 
 (defun recursive-graph-search (open closed problem strategy)
   (unless (null open)
     (let ((first (first open)))
-      (if (funcall (problem-f-goal-test problem)
+      (if (funcall (problem-f-goal-test problem) ;; Si es la meta
                    first)
           first
-        (recursive-graph-search (insert-nodes-strategy (expand-node first 
+        (if (check-closed first closed problem)
+            (recursive-graph-search (rest open)
+                                    closed
+                                    problem
+                                    strategy) ;; No expandimos ese nodo
+          (recursive-graph-search (insert-nodes-strategy (expand-node first 
                                                                     problem) 
                                                        (rest open) 
-                                                       strategy)
-                                NIL
+                                                       strategy) ;; Expandimos y añadmos a abiertos
+                                (cons first closed) ;; Lo añadimos a cerrados
                                 problem
-                                strategy)))))
+                                strategy))))))
 
 (defun graph-search (problem strategy)
   (recursive-graph-search (list (make-node :state (problem-initial-state problem)))
                           NIL
                           problem 
                           strategy))
-
 
 ;
 ;  Solve a problem using the A* strategy
