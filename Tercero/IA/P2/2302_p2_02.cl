@@ -568,14 +568,14 @@
 ;;; has a bigger g
 (defun check-closed (node closed problem)
   (unless (null closed)
-    (let ((test (member node    ;; Check if the node is in the close list
-                        closed  ;; If the node is in it, it returns the cons of closed.
-                        :test #'(lambda (x y) 
-                                  (funcall (problem-f-search-state-equal problem) 
-                                           x 
-                                           y)))))
+    (let ((test (find node    ;; Check if the node is in the close list
+                      closed  ;; If the node is in it, it returns the cons of closed.
+                      :test #'(lambda (x y) 
+                                (funcall (problem-f-search-state-equal problem) 
+                                         x 
+                                         y)))))
       (and test (> (node-g node) 
-                   (node-g (first test))))))) ;; If the test checks and the g is bigger,
+                   (node-g test)))))) ;; If the test checks and the g is bigger,
                                               ;; we dont want to explore it
           
 
