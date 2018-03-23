@@ -336,12 +336,12 @@
                              (f-search-state-equal-galaxy node-1
                                                           node-2
                                                           *planets-mandatory*))
-   :operators            (list #'(lambda (state) 
-                                   (navigate-worm-hole state
+   :operators            (list #'(lambda (node) 
+                                   (navigate-worm-hole (node-state node)
                                                        *worm-holes*
                                                        *planets-forbidden*))
-                               #'(lambda (state)
-                                   (navigate-white-hole state
+                               #'(lambda (node)
+                                   (navigate-white-hole (node-state node)
                                                         *white-holes*)))))
 
 ;;
@@ -357,7 +357,7 @@
 
 ;; Function to get all the posible actions from a node
 (defun get-all-actions (node problem)
-  (mapcan #'(lambda (x) (funcall x (node-state node)))
+  (mapcan #'(lambda (x) (funcall x node))
     (problem-operators problem)))
 
 ;; Function to expand a node
