@@ -590,13 +590,14 @@
                                     closed
                                     problem
                                     strategy) ;; No expandimos ese nodo
-          (recursive-graph-search (insert-nodes-strategy (expand-node first 
-                                                                    problem) 
-                                                       (rest open) 
-                                                       strategy) ;; Expandimos y añadmos a abiertos
-                                (cons first closed) ;; Lo añadimos a cerrados
-                                problem
-                                strategy))))))
+          (recursive-graph-search (insert-nodes-strategy 
+                                   (expand-node first 
+                                                problem) 
+                                   (rest open) 
+                                   strategy) ;; Expandimos y añadmos a abiertos
+                                  (cons first closed) ;; Lo añadimos a cerrados
+                                  problem
+                                  strategy))))))
 
 (defun graph-search (problem strategy)
   (recursive-graph-search (list (make-node :state (problem-initial-state problem)))
