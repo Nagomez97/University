@@ -14,13 +14,15 @@
 ;;    Problem definition
 ;;
 (defstruct problem
-  states              ; List of states
-  initial-state       ; Initial state
-  f-goal-test         ; reference to a function that determines whether 
-                      ; a state fulfills the goal 
-  f-h                 ; reference to a function that evaluates to the 
-                      ; value of the heuristic of a state
-  operators)          ; list of operators (references to functions) to generate succesors
+  states               ; List of states
+  initial-state        ; Initial state
+  f-goal-test          ; reference to a function that determines whether 
+                       ; a state fulfills the goal 
+  f-h                  ; reference to a function that evaluates to the 
+                       ; value of the heuristic of a state
+  f-search-state-equal ; reference to a predicate that determines whether
+                       ; two nodes are equal, in terms of their search state 
+  operators)           ; list of operators (references to functions) to generate succesors
 ;;
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -266,18 +268,81 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+;; BEGIN: Exercise  -- Equal predicate for search states
+;;
+
+;; comprueba si dos listas tienen los mismos elementos
+(defun equal-lists (list1 list2)
+  (and (subsetp list1 list2 :test #'equal) 
+       (subsetp list2 list1 :test #'equal)))
+
+;; Devuelve los nodos obligatorios que han sido visitados para llegar al nodo
+(defun get-mandatory-path (node planets-mandatory path)
+  (if (equal-lists planets-mandatory path)
+      path
+    (let ((parent (node-parent node))
+          (state (node-state node)))
+      (if (null parent) ;; Nodo raiz
+          (if (member state planets-mandatory) ;; Si es obligatorio
+              (cons state path) ;; Poner el primero de la lista
+            path);; No lo añadimos
+        (if (member state planets-mandatory) ;; Si es obligatorio
+            (get-mandatory-path parent ;; Resto de nodos
+                                planets-mandatory
+                                (cons state path)) ;; Lo añadimos
+          (get-mandatory-path parent ;; Resto de nodos
+                              planets-mandatory
+                              path)))))) ;; No lo añadimos  
+
+;; Función para valorar si dos nodos son iguales
+(defun f-search-state-equal-galaxy (node-1 node-2 &optional planets-mandatory)
+  (when (equal (node-state node-1) (node-state node-2))
+    (and (equal-lists (get-mandatory-path node-1 planets-mandatory NIL)
+                      (get-mandatory-path node-2 planets-mandatory NIL)))))    
+       
+(f-search-state-equal-galaxy node-01 node-01) ;-> T
+(f-search-state-equal-galaxy node-01 node-02) ;-> NIL
+(f-search-state-equal-galaxy node-02 node-04) ;-> T
+
+(f-search-state-equal-galaxy node-01 node-01 '(Avalon)) ;-> T
+(f-search-state-equal-galaxy node-01 node-02 '(Avalon)) ;-> NIL
+(f-search-state-equal-galaxy node-02 node-04 '(Avalon)) ;-> T
+
+(f-search-state-equal-galaxy node-01 node-01 '(Avalon Katril)) ;-> T
+(f-search-state-equal-galaxy node-01 node-02 '(Avalon Katril)) ;-> NIL
+(f-search-state-equal-galaxy node-02 node-04 '(Avalon Katril)) ;-> NIL
+
+
+;;
+;; END: Exercise  -- Equal predicate for search states
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 ;;  BEGIN: Exercise 4 -- Define the galaxy structure
 ;;
 ;;
 (defparameter *galaxy-M35* 
   (make-problem 
-   :states            *planets*          
-   :initial-state     *planet-origin*
-   :f-goal-test       #'(lambda (node) 
-                          (f-goal-test-galaxy node *planets-destination*
-                                                   *planets-mandatory*))
-   :f-h               ...
-   :operators         (list ...))) 
+   :states               *planets*          
+   :initial-state        *planet-origin*
+   :f-goal-test          #'(lambda (node) 
+                             (f-goal-test-galaxy node *planets-destination*
+                                                 *planets-mandatory*))
+   :f-h                  #'(lambda (state) 
+                             (f-h-galaxy state *sensors*)) 
+   :f-search-state-equal #'(lambda (node-1 node-2) 
+                             (f-search-state-equal-galaxy node-1
+                                                          node-2
+                                                          *planets-mandatory*))
+   :operators            (list #'(lambda (node) 
+                                   (navigate-worm-hole (node-state node)
+                                                       *worm-holes*
+                                                       *planets-forbidden*))
+                               #'(lambda (node)
+                                   (navigate-white-hole (node-state node)
+                                                        *white-holes*)))))
 
 ;;
 ;;  END: Exercise 4 -- Define the galaxy structure
@@ -289,8 +354,26 @@
 ;;
 ;; BEGIN Exercise 5: Expand node
 ;;
+
+;; Function to get all the posible actions from a node
+(defun get-all-actions (node problem)
+  (mapcan #'(lambda (x) (funcall x node))
+    (problem-operators problem)))
+
+;; Function to expand a node
 (defun expand-node (node problem)
-  ...)
+  (mapcar #'(lambda (x) ;; Iterating through all actions
+              (let* ((final (action-final x))
+                    (g (+ (node-g node) (action-cost x)))
+                    (h (funcall (problem-f-h problem) final)))
+                (make-node :state final ;; Create a new node structure
+                           :parent node
+                           :action x
+                           :depth (+ (node-depth node) 1)
+                           :g g
+                           :h h
+                           :f (+ g h))))
+      (get-all-actions node problem)))
 
 (expand-node (make-node :state 'Kentares :depth 0 :g 0 :f 0) *galaxy-M35*)
 ;;;(#S(NODE :STATE AVALON
@@ -354,18 +437,53 @@
 ;;;
 ;;;  BEGIN Exercise 6 -- Node list management
 ;;;  
+
+;; Parameter for the unifirm-cost strategy
+(defparameter *uniform-cost* 
+  (make-strategy :name 'uniform-cost
+                 :node-compare-p #'(lambda (x y) (if (null y)
+                                                     t
+                                                   (< (node-g x) 
+                                                    (node-g y)))))) ;; Compare path cost to node
+
+;; Insert a node in the corresponding position accord to the strategy
+(defun insert-sort-node (node lst-nodes strategy)
+  (let ((first (first lst-nodes)))
+    (if (funcall (strategy-node-compare-p strategy) 
+                 node 
+                 first) ;; Check strategy
+        (cons node lst-nodes) ;; Place the node
+      (cons first 
+            (insert-sort-node node ;; Recursive call
+                              (rest lst-nodes) 
+                              strategy)))))
+
+;; Insert nodes in lst-nodes according to strategy
 (defun insert-nodes-strategy (nodes lst-nodes strategy)
-  ...)
+  (if (null nodes)
+      lst-nodes ;; No more nodes to insert
+    (insert-nodes-strategy (rest nodes) ;; Recursive call
+                         (insert-sort-node (first nodes) ;; Inserting one node
+                                           lst-nodes 
+                                           strategy) 
+                         strategy)))
 
-
+(defparameter node-00
+  (make-node :state 'Proserpina :depth 8 :g 4 :f 0) )
 (defparameter node-01
    (make-node :state 'Avalon :depth 0 :g 0 :f 0) )
 (defparameter node-02
-   (make-node :state 'Kentares :depth 2 :g 50 :f 50) )
+  (make-node :state 'Kentares :depth 2 :g 50 :f 50) )
+(defparameter node-03
+   (make-node :state 'Davion :depth 0 :g 6 :f 0) )
+(defparameter node-04
+  (make-node :state 'Katril :depth 2 :g 0 :f 50) )
+(defparameter lst-nodes-00
+             (list node-04 node-03))
 
 (print (insert-nodes-strategy (list node-00 node-01 node-02) 
-                        lst-nodes-00 
-                        *uniform-cost*));->
+                              lst-nodes-00 
+                              *uniform-cost*));->
 ;;;
 ;;;(#S(NODE :STATE AVALON :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H 0 :F 0)
 ;;; #S(NODE :STATE PROSERPINA :PARENT NIL :ACTION NIL :DEPTH 12 :G 10 :H 0 :F 20)
@@ -411,7 +529,7 @@
 
 
 ;;
-;;    END: Exercize 6 -- Node list management
+;;    END: Exercise 6 -- Node list management
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -426,7 +544,11 @@
 ;;
 
 (defparameter *A-star*
-  (make-strategy ...))
+  (make-strategy :name 'A-star
+                 :node-compare-p #'(lambda (x y) (if (null y)
+                                                     t
+                                                   (< (node-f x) 
+                                                    (node-f y)))))) ;; Compare cost + heuristic
 
 ;;
 ;; END: Exercise 7 -- Definition of the A* strategy
@@ -439,17 +561,58 @@
 ;;; 
 ;;;    BEGIN Exercise 8: Search algorithm
 ;;;
-(defun graph-search (problem strategy)
-  ...)
 
+
+;;; Function to check if a node is closed
+;;; It will return T if the node is already explored and
+;;; has a bigger g
+(defun check-closed (node closed problem)
+  (unless (null closed)
+    (let ((test (find node    ;; Check if the node is in the close list
+                      closed  ;; If the node is in it, it returns the cons of closed.
+                      :test #'(lambda (x y) 
+                                (funcall (problem-f-search-state-equal problem) 
+                                         x 
+                                         y)))))
+      (and test (> (node-g node) 
+                   (node-g test)))))) ;; If the test checks and the g is bigger,
+                                              ;; we dont want to explore it
+          
+
+(defun recursive-graph-search (open closed problem strategy)
+  (unless (null open)
+    (let ((first (first open)))
+      (if (funcall (problem-f-goal-test problem) ;; Si es la meta
+                   first)
+          first
+        (if (check-closed first closed problem)
+            (recursive-graph-search (rest open)
+                                    closed
+                                    problem
+                                    strategy) ;; No expandimos ese nodo
+          (recursive-graph-search (insert-nodes-strategy 
+                                   (expand-node first 
+                                                problem) 
+                                   (rest open) 
+                                   strategy) ;; Expandimos y añadmos a abiertos
+                                  (cons first closed) ;; Lo añadimos a cerrados
+                                  problem
+                                  strategy))))))
+
+(defun graph-search (problem strategy)
+  (recursive-graph-search (list (make-node :state (problem-initial-state problem)))
+                          NIL
+                          problem 
+                          strategy))
 
 ;
 ;  Solve a problem using the A* strategy
 ;
-(defun a-star-search (problem)...)
+(defun a-star-search (problem)
+  (graph-search problem *A-star*))
 
 
-(graph-search *galaxy-M35* *A-star*);->
+(print (graph-search *galaxy-M35* *A-star*));->
 ;;;#S(NODE :STATE ...
 ;;;        :PARENT #S(NODE :STATE ...
 ;;;                        :PARENT #S(NODE :STATE ...)) 
@@ -472,14 +635,37 @@
 ;;; 
 ;;;    BEGIN Exercise 9: Solution path / action sequence
 ;;;
+
+;; Función recursiva para obtener el path
+(defun rec-solution-path (node path)
+  (let ((parent (node-parent node))
+        (state (node-state node)))
+    (if (null parent) ;; Nodo raiz
+        (cons state path) ;; Poner el primero de la lista
+      (rec-solution-path parent ;; Resto de nodos
+                         (cons state path))))) ;; Ponerlos al principio de la lista y seguir
+
+;; Función que devuelve el path hasta node
 (defun solution-path (node)
-  ...)
+  (unless (null node) ;; Comprobar si es NIL
+    (rec-solution-path node NIL)))
 
 (solution-path nil) ;;; -> NIL 
 (solution-path (a-star-search *galaxy-M35*))  ;;;-> (MALLORY ...)
 
-(defun action-sequence-aux (node)
-  ...)
+;; Función recursiva que devuelve la lista de acciones para llegar al nodo
+(defun rec-action-sequence (node actions)
+  (let ((parent (node-parent node))
+        (action (node-action node)))
+    (if (null parent) ;; Nodo raiz
+        actions ;; Devolver la lista
+      (rec-action-sequence parent ;; Resto de nodos
+                         (cons action actions))))) ;; Ponerlos al principio de la lista y seguir
+
+;; Función que devuelve la lista de acciones necesarias para llegar al nodo
+(defun action-sequence (node)
+  (unless (null node) ;; Comprobar si es NIL 
+    (rec-action-sequence node NIL)))
 
 (action-sequence (a-star-search *galaxy-M35*))
 ;;; ->
@@ -496,24 +682,24 @@
 ;;;    BEGIN Exercise 10: depth-first / breadth-first
 ;;;
 
+(defun depth-first-node-compare-p (node-1 node-2)
+  T) ;; Last explored node gets in the first position of open-nodes
+
 (defparameter *depth-first*
   (make-strategy
    :name 'depth-first
    :node-compare-p #'depth-first-node-compare-p))
 
-(defun depth-first-node-compare-p (node-1 node-2)
-  ...)
-
 (solution-path (graph-search *galaxy-M35* *depth-first*))
 ;;; -> (MALLORY ... )
+
+(defun breadth-first-node-compare-p (node-1 node-2)
+  (null node-2)) ;; Last explored node gets in the last position of open-nodes
 
 (defparameter *breadth-first*
   (make-strategy
    :name 'breadth-first
    :node-compare-p #'breadth-first-node-compare-p))
-
-(defun breadth-first-node-compare-p (node-1 node-2)
-  ...)
 
 (solution-path (graph-search *galaxy-M35* *breadth-first*))
 ;; -> (MALLORY ... )
