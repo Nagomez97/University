@@ -37,3 +37,47 @@ insert([X-P], [A-P1|Rs], [B-P2|Ls]) :-
     P2 = P1,
     A = B,
     insert([X-P], Rs, Ls). 
+
+% EJERCICIO 4.1 %
+
+elem_count(_,[],0). %caso base
+
+elem_count(X,[X|Rs], M) :- 
+    elem_count(X, Rs, N), 
+    M is N+1.
+
+elem_count(X, [Y|Rs], M) :- 
+    X \= Y, 
+    elem_count(X, Rs, M).
+
+/** <examples>
+?- elem_count(1, [2,3], 1).
+
+?- elem_count(1, [], 1).
+   
+?- elem_count(1, [1,2,3], 1).
+   
+?- elem_count(1, [1,2,3], 2).
+   
+?- elem_count(1, [1,2,3,1], X).
+   
+*/
+
+
+% EJERCICIO 4.2 %
+
+list_count([], A,  []) :- is_list(A).
+
+list_count([X|Rs], L2, [A-C|Ls]) :- 
+    X = A, 
+    elem_count(X,L2,C), 
+    list_count(Rs,L2,Ls).
+
+/** <examples>
+?- list_count([b],[b,a,b,a,b],Xn). 
+?- list_count([b,a],[b,a,b,a,b],Xn). 
+?- list_count([b,a,c],[b,a,b,a,b],Xn). 
+?- list_count([],[b,a,b,a,b],Xn). 
+?- list_count([a],[],Xn). 
+
+*/
