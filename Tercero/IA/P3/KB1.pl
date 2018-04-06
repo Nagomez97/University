@@ -17,8 +17,23 @@ pertenece_m(X, [_|Rs]) :- pertenece_m(X, Rs).
 concatena([], L, L).
 concatena([X|L1], L2, [X|L3]) :- concatena(L1, L2, L3).
 
-% INVIERTE: %
-invierte([],[]).
-invierte([X],[X]).
+% INIVIERTE: %
+invierte(L1, L2) :- invierte_aux(L1, L2, []).
+invierte_aux([], L2, L3) :- L3 = L2.
+invierte_aux([X|L1], L2, L3) :- 
+    concatena([X], L3, A), 
+    invierte_aux(L1, L2, A).
 
-same_last(X, [_,Y]) :- Y \= [_|_], X = Y.
+% EJERCICIO 3 %
+
+% INSERTAR: %
+insert([X-P], [], [X-P]).
+insert([X-P], [A-P1|Rs], R) :- 
+    P < P1, 
+    concatena([X-P], [A-P1|Rs], C),
+    C = R.
+insert([X-P], [A-P1|Rs], [B-P2|Ls]) :-
+    P > P1,
+    P2 = P1,
+    A = B,
+    insert([X-P], Rs, Ls). 
