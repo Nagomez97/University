@@ -1,5 +1,8 @@
 ;******************************************************************************* 
 ; CALCULA LA CODIFICACION HAMMING EDAC
+; Autores: José Ignacio Gómez García
+;          Óscar Gómez Borzdynski
+; Pareja 14
 ;*******************************************************************************
 
 ; DEFINICION DEL SEGMENTO DE DATOS 
