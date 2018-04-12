@@ -11,6 +11,10 @@ pertenece_m(X, [X|_]) :- X \= [_|_].
 pertenece_m(X, [Y|_]) :- pertenece_m(X,Y).
 pertenece_m(X, [_|Rs]) :- pertenece_m(X, Rs).
 
+/** <examples>
+?- pertenece_m(X, [2,[1,3],[1,[4,5]]])
+*/
+
 % EJERCICIO 2 %
 
 % CONCATENA: %
@@ -23,6 +27,12 @@ invierte_aux([], L2, L3) :- L3 = L2.
 invierte_aux([X|L1], L2, L3) :- 
     concatena([X], L3, A), 
     invierte_aux(L1, L2, A).
+
+/** <examples>
+?- invierte([1, 2], L).
+?- invierte([], L).
+?- invierte([1, 2, 5, 4], L).
+*/
 
 % EJERCICIO 3 %
 
@@ -37,6 +47,13 @@ insert([X-P], [A-P1|Rs], [B-P2|Ls]) :-
     P2 = P1,
     A = B,
     insert([X-P], Rs, Ls). 
+
+/** <examples>
+?- insert([a-6],[], X).
+?- insert([a-6],[p-0], X).
+?- insert([a-6],[p-0, g-7], X).
+?- insert([a-6],[p-0, g-7, t-2], X).
+*/
 
 % EJERCICIO 4.1 %
 
@@ -63,8 +80,7 @@ elem_count(X, [Y|Rs], M) :-
 
 list_count([], A,  []) :- is_list(A).
 
-list_count([X|Rs], L2, [A-C|Ls]) :- 
-    X = A, 
+list_count([X|Rs], L2, [X-C|Ls]) :- 
     elem_count(X,L2,C), 
     list_count(Rs,L2,Ls).
 
