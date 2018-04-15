@@ -7,8 +7,8 @@
 
 unsigned int comprobarNumeroSecreto(unsigned char* numero);
 void rellenarIntento(unsigned int intento, unsigned char* intentoDigitos);
-// unsigned int calcularAciertos(unsigned char* numSecreto, unsigned char* intentoDigitos);
-// unsigned int calcularSemiaciertos(unsigned char* numSecreto, unsigned char* intentoDigitos);
+unsigned int calcularAciertos(unsigned char* numSecreto, unsigned char* intentoDigitos);
+unsigned int calcularSemiaciertos(unsigned char* numSecreto, unsigned char* intentoDigitos);
 
 //////////////////////////////////////////////////////////////////////////
 ///// -------------------------- MAIN ------------------------------ /////
@@ -28,11 +28,6 @@ int main( void )
 		repetido = comprobarNumeroSecreto(numSecreto);
 	} while (repetido == TRUE);
 
-	printf("Numero secreto: ");
-	for (i=0; i<4; i++)
-			printf("%c", i, numSecreto[i]+48);
-	printf("\n");
-
 	numIntentos = 0;
 	
 	do {
@@ -46,9 +41,9 @@ int main( void )
 
 		rellenarIntento( intento, intentoDigitos );
 		aciertos = calcularAciertos(numSecreto, intentoDigitos);
-		// semiaciertos = calcularSemiaciertos(numSecreto, intentoDigitos);
+		semiaciertos = calcularSemiaciertos(numSecreto, intentoDigitos);
 		printf("Numero de Aciertos: %u\t", aciertos);
-		// printf("Numero de Semiaciertos: %u\n", semiaciertos );
+		printf("Numero de Semiaciertos: %u\n", semiaciertos );
 	} while ((aciertos != 4) && (numIntentos != NUMEROINTENTOS));
 
 	if (aciertos == 4)

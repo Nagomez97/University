@@ -1,3 +1,8 @@
+;******************************************************************************* 
+; Autores: José Ignacio Gómez García
+;          Óscar Gómez Borzdynski
+; Pareja 14
+;*******************************************************************************
 
 PRAC3A SEGMENT BYTE PUBLIC 'CODE'
 PUBLIC _comprobarNumeroSecreto, _rellenarIntento
