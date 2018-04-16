@@ -21,6 +21,9 @@
 *.la
 *.lo
 
+# Temporal files
+~$*
+
 # Shared objects (inc. Windows DLLs)
 *.so
 *.so.*
