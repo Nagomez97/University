@@ -19,13 +19,86 @@ interfaz proc
 	jmp fin
 desinst:
 	cmp ah,01h
-	jne fin
+	jne cif
 	call desinstalar
+	jmp fin
+cif:
+	cmp ah,11h
+	jne descif
+	call cifrar
+	jmp fin
+descif:
+	cmp ah,12h
+	jne fin
+	call descifrar
 	jmp fin
 fin:
 	iret
 interfaz endp 
 
+; Cesar recibe el string en DS:DX y la clave en AL
+cesar proc
+	
+	mov bx, dx
+	mov ah, 02h
+cifbuc:
+	mov dl, [bx]
+	inc bx
+	cmp dl, '$'
+	je ter ;Fin de cadena
+
+	cmp dl, 20
+	je printchar ;Imprimimos el espacio
+
+spa:
+	cmp dl, 60h ;minuscula
+	ja minus
+
+	;-- mayus
+	add dl, al
+	cmp dl, 5bh
+	jb printchar
+	sub dl, 26
+	jmp printchar
+
+minus:
+	add dl, al
+	cmp dl, 7bh
+	jb printchar
+	sub dl, 26
+	jmp printchar
+
+printchar:
+	int 21h
+	jmp cifbuc
+
+
+ter: ;Imprimir salto de linea y salir
+	mov dl, 13
+	int 21h
+	mov dl, 10
+	int 21h
+
+	ret
+cesar endp
+
+; Nuestro numero de pareja es 14, por lo que usaremos el 17
+cifrar proc
+	push ax bx cx dx
+	mov al, 17
+	call cesar
+	pop dx cx bx ax
+	ret
+cifrar endp
+
+; Para descifrar se usa el 9 (26-17)
+descifrar proc
+	push ax bx cx dx
+	mov al, 9
+	call cesar
+	pop dx cx bx ax
+	ret
+descifrar endp
 
 desinstalar proc
 	push ax
@@ -72,7 +145,6 @@ instalar proc
 	mov dx, offset instalado
     mov ah, 9
     int 21h
-    ret
 
 	mov dx,offset instalar
 	int 27h
@@ -151,8 +223,7 @@ detectar_int2:
 	mov ah, 00h
 	int 60h
 	cmp ax, 0F0F0h ; Comprobamos el fingerprint del driver
-	jnz call_instalar
-	jmp ya_instalado ; Si el fingerprint coincide, ya esta instalado
+	jz ya_instalado ; Si el fingerprint coincide, ya esta instalado
 
 call_instalar:
 	call instalar
