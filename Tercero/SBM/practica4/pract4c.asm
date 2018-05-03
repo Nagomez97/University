@@ -5,11 +5,14 @@ driver_start:
 	jmp check_args
 	;Variables del driver
 	old_60h dw 0,0
+	old_70h dw 0,0
 	info_pareja DB "Grupo 2301, pareja 14: Jose Ignacio Gomez y Oscar Gomez.",13,10,'$'
 	instalado DB "Driver instalado.",13,10,'$'
 	no_instalado DB "Driver no instalado.",13,10,'$'
 	desinstalado DB "Driver desinstalado.",13,10,'$'
 	error_param DB "Error al introducir argumentos.",13,10,'$'
+	fincadena DB 0 ;Flag para fin de cadena
+	clave DB 0 ; Clave para cesar
 
 ;Interfaz con el prog. residente
 interfaz proc
@@ -29,21 +32,53 @@ cif:
 	jmp fin
 descif:
 	cmp ah,12h
-	jne fin
+	jne stop
 	call descifrar
 	jmp fin
+stop:
+	cmp ah,13h
+	jne fin
+	call stopinterrupciones
 fin:
 	iret
 interfaz endp 
 
-; Cesar recibe el string en DS:DX y la clave en AL
+; Rutina RTC
+rutina_rtc proc far
+	push bx cx dx ax
+	sti
+
+	;Leer el registro C del RTC
+	mov al,0Ch
+	out 60,al
+	in al,71h
+
+	cmp fincadena, 1 ;Flag para fin de cadena
+	je rutina_rtc_fin
+
+	pop ax dx
+	call cesar
+	inc dx
+	push dx ax
+
+rutina_rtc_fin:
+	;Enviar el EOI al PIC esclavo
+	mov al,20h
+	out 0A0h,al
+	;Enviar el EOI al PIC maestro
+	out 20h,al
+	pop ax dx cx bx
+	iret
+rutina_rtc endp
+
+; Cesar recibe el string en DS:DX y la clave en clave
 cesar proc
 	
+	mov al, clave
 	mov bx, dx
 	mov ah, 02h
-cifbuc:
+
 	mov dl, [bx]
-	inc bx
 	cmp dl, '$'
 	je ter ;Fin de cadena
 
@@ -75,30 +110,42 @@ minus:
 
 printchar:
 	int 21h
-	jmp cifbuc
-
+	ret
 
 ter: ;Salir
+	mov fincadena, 1
 	ret
 cesar endp
 
 ; Nuestro numero de pareja es 14, por lo que usaremos el 17
 cifrar proc
-	push ax bx cx dx
-	mov al, 17
-	call cesar
-	pop dx cx bx ax
+	mov clave, 17
+	mov fincadena, 0
 	ret
 cifrar endp
 
 ; Para descifrar se usa el 9 (26-17)
 descifrar proc
-	push ax bx cx dx
-	mov al, 9
-	call cesar
-	pop dx cx bx ax
+	mov clave, 9
+	mov fincadena, 0
 	ret
 descifrar endp
+
+stopinterrupciones proc
+	;Programar PIC esclavo deshabilitando interrupciones del RTC
+	in al,0a1h
+	or al,00000001b
+	out 0a1h,al
+
+	;Desactivar el PIE del RTC
+	mov al,0bh
+	out 70h,al
+	in al,71h
+	and al, 10111111b
+	out 71h,al
+
+	ret
+stopinterrupciones endp
 
 desinstalar proc
 	push ax
@@ -111,6 +158,11 @@ desinstalar proc
 	mov es:[60h*4],ax
 	mov ax,old_60h+2
 	mov es:[60h*4+2],ax
+
+	mov ax,old_70h
+	mov es:[70h*4],ax
+	mov ax,old_70h+2
+	mov es:[70h*4+2],ax
 	sti
 	mov es,cs:[2ch]
 	mov ah,49h
@@ -132,14 +184,40 @@ detectar endp
 instalar proc
 	xor ax,ax
 	mov es,ax
-	 cli
+
+	cli
 	mov ax,es:[60h*4]
 	mov old_60h,ax
 	mov ax,es:[60h*4+2]
 	mov old_60h+2,ax
 	mov es:[60h*4],offset interfaz
-	mov es:[60h*4+2],cs
+	mov es:[60h*4+2], cs
+
+	mov ax,es:[70h*4]
+	mov old_70h,ax
+	mov ax,es:[70h*4+2]
+	mov old_70h+2,ax
+	mov es:[70h*4],offset rutina_rtc
+	mov es:[70h*4+2],cs
 	sti
+
+	;Programar PIC esclavo habilitando interrupciones del RTC
+	in al,0a1h
+	and al,11111110b
+	out 0a1h,al
+
+	;Programar frecuencia del RTC
+	mov al,0ah
+	out 70h,al
+	mov al, 00101111b ;(sabemos que son 2 Hz, pero no sabemos hacerlo de un solo hercio)
+	out 71h,al
+
+	;Activar el PIE del RTC
+	mov al,0bh
+	out 70h,al
+	in al,71h
+	or al,01000000b
+	out 71h,al
 
 	; Tras instalarlo, imprimimos un aviso
 	mov dx, offset instalado
