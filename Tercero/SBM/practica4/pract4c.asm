@@ -1,9 +1,12 @@
-code segment
-	assume cs:code
-	org 100h
-driver_start:
-	jmp check_args
-	;Variables del driver
+;******************************************************************************* 
+; Autores: José Ignacio Gómez García
+;          Óscar Gómez Borzdynski
+; Pareja 14
+;*******************************************************************************
+
+; DEFINICION DEL SEGMENTO DE DATOS 
+
+DATOS SEGMENT 
 	old_60h dw 0,0
 	old_70h dw 0,0
 	info_pareja DB "Grupo 2301, pareja 14: Jose Ignacio Gomez y Oscar Gomez.",13,10,'$'
@@ -11,37 +14,115 @@ driver_start:
 	no_instalado DB "Driver no instalado.",13,10,'$'
 	desinstalado DB "Driver desinstalado.",13,10,'$'
 	error_param DB "Error al introducir argumentos.",13,10,'$'
+	instruccion DB "Introduzca una instruccion: ",'$'
+	instruccion_leida DB 9,0, 9 dup('$')
+	string DB 100,0, 100 dup('$')
+	introduzca DB "Introduzca String: $"
+	resultado DB "Resultado: $"
 	fincadena DB 0 ;Flag para fin de cadena
 	clave DB 0 ; Clave para cesar
+	flag_act DB 0
+	fin db "fin"
+	cod db "code"
+	salto db 13,10,'$'
+	decode db "decode"
+DATOS ENDS 
 
-;Interfaz con el prog. residente
-interfaz proc
-	cmp ah,00h
-	jne desinst
-	call detectar
-	jmp fin
-desinst:
-	cmp ah,01h
-	jne cif
-	call desinstalar
-	jmp fin
-cif:
-	cmp ah,11h
-	jne descif
-	call cifrar
-	jmp fin
-descif:
-	cmp ah,12h
-	jne stop
+; DEFINICION DEL SEGMENTO DE PILA 
+
+PILA SEGMENT STACK "STACK" 
+    DB   40H DUP (0) 
+PILA ENDS 
+
+
+EXTRA 	SEGMENT  	
+EXTRA ENDS 
+
+CODE SEGMENT
+    ASSUME CS:CODE, DS:DATOS, ES:EXTRA, SS:PILA 
+
+
+main proc
+	;INICIALIZA LOS REGISTROS DE SEGMENTO CON SUS VALORES 
+    MOV AX, DATOS 
+    MOV DS, AX 
+
+    MOV AX, PILA 
+    MOV SS, AX 
+
+    MOV AX, EXTRA 
+    MOV ES, AX 
+
+    ; CARGA EL PUNTERO DE PILA CON EL VALOR MAS ALTO 
+    MOV SP, 64 
+
+    ; FIN DE LAS INICIALIZACIONES
+
+	call instalar
+
+buc_main:
+	mov ah, 09h
+	mov dx, offset instruccion
+	int 21H
+
+	mov ah, 0ah
+	mov dx, offset instruccion_leida
+	int 21h
+
+	add dx, 2
+	call check_ins
+
+	mov ah, 09h
+    mov dx, offset salto
+    int 21h
+
+	cmp al, 3
+	je fin_main
+	cmp al, 4
+	je buc_main
+
+	call string_ini
+
+	mov ah, 09h
+	mov dx, offset introduzca
+	int 21H
+
+	mov ah, 0ah
+	mov dx, offset string
+	int 21h
+
+	mov ah, 09h
+    mov dx, offset salto
+    int 21h
+
+	mov ah, 09h
+	mov dx, offset resultado
+	int 21H
+
+	mov dx, offset string
+	add dx,2
+	cmp al, 1
+	je code_main
+
 	call descifrar
-	jmp fin
-stop:
-	cmp ah,13h
-	jne fin
-	call stopinterrupciones
-fin:
-	iret
-interfaz endp 
+	mov ah, 09h
+    mov dx, offset salto
+    int 21h
+	jmp buc_main
+
+code_main:
+	call cifrar
+	mov ah, 09h
+    mov dx, offset salto
+    int 21h
+	jmp buc_main
+
+fin_main:
+	call desinstalar
+	; FIN DEL PROGRAMA 
+    MOV AX, 4C00H 
+    INT 21H 
+main endp
 
 ; Rutina RTC
 rutina_rtc proc far
@@ -49,19 +130,12 @@ rutina_rtc proc far
 	sti
 
 	;Leer el registro C del RTC
-	mov al,0Ch
-	out 60,al
-	in al,71h
+	mov al, 0Ch
+	out 70h,al
+	in al, 71h
 
-	cmp fincadena, 1 ;Flag para fin de cadena
-	je rutina_rtc_fin
+	mov flag_act, 1
 
-	pop ax dx
-	call cesar
-	inc dx
-	push dx ax
-
-rutina_rtc_fin:
 	;Enviar el EOI al PIC esclavo
 	mov al,20h
 	out 0A0h,al
@@ -73,12 +147,18 @@ rutina_rtc endp
 
 ; Cesar recibe el string en DS:DX y la clave en clave
 cesar proc
-	
-	mov al, clave
+
 	mov bx, dx
-	mov ah, 02h
+	mov al, clave
+
+bucle_infinito:
+	cmp flag_act, 1
+	jne bucle_infinito
+
+	mov flag_act, 0
 
 	mov dl, [bx]
+
 	cmp dl, '$'
 	je ter ;Fin de cadena
 
@@ -109,29 +189,33 @@ minus:
 	jmp printchar
 
 printchar:
+	mov ah, 02h
 	int 21h
-	ret
+	inc bx
+	jmp bucle_infinito
 
 ter: ;Salir
-	mov fincadena, 1
 	ret
 cesar endp
 
 ; Nuestro numero de pareja es 14, por lo que usaremos el 17
 cifrar proc
 	mov clave, 17
-	mov fincadena, 0
+	call cesar
 	ret
 cifrar endp
 
 ; Para descifrar se usa el 9 (26-17)
 descifrar proc
 	mov clave, 9
-	mov fincadena, 0
+	call cesar
 	ret
 descifrar endp
 
-stopinterrupciones proc
+desinstalar proc
+	push ax
+	push es
+
 	;Programar PIC esclavo deshabilitando interrupciones del RTC
 	in al,0a1h
 	or al,00000001b
@@ -144,25 +228,15 @@ stopinterrupciones proc
 	and al, 10111111b
 	out 71h,al
 
-	ret
-stopinterrupciones endp
-
-desinstalar proc
-	push ax
-	push es
 	xor ax,ax
 	mov es,ax
 	cli
-	 ;Vector 60h
-	mov ax,old_60h
-	mov es:[60h*4],ax
-	mov ax,old_60h+2
-	mov es:[60h*4+2],ax
 
 	mov ax,old_70h
 	mov es:[70h*4],ax
 	mov ax,old_70h+2
 	mov es:[70h*4+2],ax
+
 	sti
 	mov es,cs:[2ch]
 	mov ah,49h
@@ -182,17 +256,11 @@ detectar proc
 detectar endp
 
 instalar proc
+	push es
 	xor ax,ax
 	mov es,ax
 
 	cli
-	mov ax,es:[60h*4]
-	mov old_60h,ax
-	mov ax,es:[60h*4+2]
-	mov old_60h+2,ax
-	mov es:[60h*4],offset interfaz
-	mov es:[60h*4+2], cs
-
 	mov ax,es:[70h*4]
 	mov old_70h,ax
 	mov ax,es:[70h*4+2]
@@ -209,7 +277,7 @@ instalar proc
 	;Programar frecuencia del RTC
 	mov al,0ah
 	out 70h,al
-	mov al, 00101111b ;(sabemos que son 2 Hz, pero no sabemos hacerlo de un solo hercio)
+	mov al, 00101111b ;(sabemos que son 2 Hz, pero nose puede a un solo hercio)
 	out 71h,al
 
 	;Activar el PIE del RTC
@@ -218,134 +286,88 @@ instalar proc
 	in al,71h
 	or al,01000000b
 	out 71h,al
-
-	; Tras instalarlo, imprimimos un aviso
-	mov dx, offset instalado
-    mov ah, 9
-    int 21h
-
-	mov dx,offset instalar
-	int 27h
+	pop es
+    ret
 instalar endp
 
-check_args proc
+; REcibe en DS:DX, Devuelve en al:
+; 1 si es code
+; 2 si es decode
+; 3 si es fin
+; 4 si error
+check_ins proc
+	push cx dx bx si
+	mov bx, dx
+	mov si, 0
 
-	xor dh, dh
-	mov dl, es:[80h]
-	cmp dx, 0
-	jne hay_args
-
-	;Sin argumentos, se muestra info de la pareja y estado del driver
-	mov ax, 0
-	mov es, ax
-	cmp word ptr es:[60h*4], 0h
-	jnz detectar_int
-	cmp word ptr es:[60h*4+2], 0h
-	je no_driver
-
-detectar_int:
-	mov ah, 00h
-	int 60h
-	cmp ax, 0F0F0h ; Comprobamos el fingerprint del driver
-	jnz no_driver
-
-	mov dx, offset instalado
-    mov ah, 9
-    int 21h	
-
-    jmp print_info_pareja
-
-no_driver:
-	mov dx, offset no_instalado
-    mov ah, 9
-    int 21h
-
-print_info_pareja:
-	mov dx, offset info_pareja
-    mov ah, 9
-    int 21h
-
-    ; FIN DEL PROGRAMA 
-    MOV AX, 4C00H 
-    INT 21H
-
-hay_args:
-
-	cmp dx, 3
-	jnz error_args
-
-
-	mov cl, es:[82h] ;Leemos caracter a caracter
-	cmp cl, '/'
-	jnz error_args
-
+strcmpfin:
+	mov cl, fin[si]
+	mov ch, [bx]
+	cmp cl, ch
+	jne strcmpcodeini
+	inc bx
 	inc si
-	mov cl, es:[83h]
-	cmp cl, 'I'
-	jz instalar_args
-	cmp cl, 'D'
-	jz desinstalar_args
+	cmp si, 3
+	jne strcmpfin
+	mov al, 3
+	jmp finn
 
-	jmp error_args
+strcmpcodeini:
+	mov bx, dx
+	mov si, 0
 
-instalar_args:
+strcmpcode:
+	mov cl, cod[si]
+	mov ch, [bx]
+	cmp cl, ch
+	jne strcmpdecodeini
+	inc bx
+	inc si
+	cmp si, 4
+	jne strcmpcode
+	mov al, 1
+	jmp finn
 
-	mov ax, 0
-	mov es, ax
-	cmp word ptr es:[60h*4], 0h
-	jnz detectar_int2
-	cmp word ptr es:[60h*4+2], 0h
-	je call_instalar
+strcmpdecodeini:
+	mov bx, dx
+	mov si, 0
 
-detectar_int2:
-	mov ah, 00h
-	int 60h
-	cmp ax, 0F0F0h ; Comprobamos el fingerprint del driver
-	jz ya_instalado ; Si el fingerprint coincide, ya esta instalado
+strcmpdecode:
+	mov cl, decode[si]
+	mov ch, [bx]
+	cmp cl, ch
+	jne error
+	inc bx
+	inc si
+	cmp si, 6
+	jne strcmpdecode
+	mov al, 2
+	jmp finn
 
-call_instalar:
-	call instalar
+error: 
+	mov al, 4
+	pop si bx dx cx
+	ret
 
-ya_instalado:
-	mov dx, offset instalado
-    mov ah, 9
-    int 21h
-    ; FIN DEL PROGRAMA 
-    MOV AX, 4C00H 
-    INT 21H
+finn:
+	pop si bx dx cx
+	ret
 
-desinstalar_args:
-	mov ah, 00h
-	int 60h
-	cmp ax, 0f0f0h
-	jnz no_ya_instalado ; Si el fingerprint no coincide, no esta instalado
+check_ins endp
 
-	call desinstalar
+string_ini proc
+	push bx
+	mov bx, 2
 
-	mov dx, offset desinstalado
-    mov ah, 9
-    int 21h
-    ; FIN DEL PROGRAMA 
-    MOV AX, 4C00H 
-    INT 21H
+string_ini_buc:
+	mov string[bx], '$'
+	inc bx
+	cmp bx, 102
+	jne string_ini_buc
 
+	pop bx	
+	ret
+string_ini endp
 
-no_ya_instalado:
-	mov dx, offset no_instalado
-    mov ah, 9
-    int 21h
-    ; FIN DEL PROGRAMA 
-    MOV AX, 4C00H 
-    INT 21H
-
-error_args:
-	mov dx, offset error_param
-    mov ah, 9
-    int 21h
-    ; FIN DEL PROGRAMA 
-    MOV AX, 4C00H 
-    INT 21H
-
-check_args endp
-code ends
-end driver_start
+CODE ENDS
+END main

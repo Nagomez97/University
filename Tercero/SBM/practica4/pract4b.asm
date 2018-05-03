@@ -1,5 +1,4 @@
 ;******************************************************************************* 
-; CALCULA LA CODIFICACION HAMMING EDAC
 ; Autores: José Ignacio Gómez García
 ;          Óscar Gómez Borzdynski
 ; Pareja 14

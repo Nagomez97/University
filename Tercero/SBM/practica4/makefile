@@ -1,4 +1,10 @@
-all: pract4a.com pract4b.exe pract4c.com
+#******************************************************************************* 
+# Autores: José Ignacio Gómez García
+#          Óscar Gómez Borzdynski
+# Pareja 14
+#*******************************************************************************
+
+all: pract4a.com pract4b.exe pract4c.exe
 
 pract4a.com: pract4a.obj
 	tlink /v /t pract4a
@@ -12,13 +18,8 @@ pract4b.exe: pract4b.obj
 pract4b.obj: pract4b.asm
  	tasm /zi pract4b.asm
 
-pract4c.com: pract4c.obj
-	tlink /v /t pract4c
+pract4c.exe: pract4c.obj
+	tlink /v pract4c
 
 pract4c.obj: pract4c.asm
 	tasm /zi pract4c.asm
-# prueba.exe: prueba.obj
-# 	tlink /v prueba
-
-# prueba.obj: prueba.asm
-# 	tasm /zi prueba.asm
