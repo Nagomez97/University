@@ -9,6 +9,22 @@ no
 no
 no
 yes
+<<<<<<< HEAD
+yes
+=======
+>>>>>>> 881bdfc725d94ee4719f4768988db38cba4460d7
+no
+no
+no
+no
+<<<<<<< HEAD
+=======
+yes
+>>>>>>> 881bdfc725d94ee4719f4768988db38cba4460d7
+no
+no
+no
+no
 no
 no
 no
@@ -22,6 +38,21 @@ no
 no
 no
 no
+no
+no
+no
+<<<<<<< HEAD
+no
+no
+no
+yes
+no
+no
+no
+no
+no
+no
+no
 yes
 no
 no
@@ -31,9 +62,7 @@ no
 no
 no
 no
-no
-no
-no
+=======
 yes
 no
 no
@@ -51,10 +80,20 @@ no
 yes
 no
 yes
+>>>>>>> 881bdfc725d94ee4719f4768988db38cba4460d7
 no
 no
 no
 no
+<<<<<<< HEAD
+no
+no
+no
+no
+no
+no
+no
+=======
 yes
 no
 no
@@ -64,6 +103,7 @@ yes
 yes
 no
 yes
+>>>>>>> 881bdfc725d94ee4719f4768988db38cba4460d7
 no
 no
 no
@@ -71,6 +111,14 @@ no
 no
 no
 yes
+<<<<<<< HEAD
+no
+no
+no
+no
+yes
+no
+=======
 yes
 no
 yes
@@ -78,6 +126,7 @@ yes
 no
 no
 no
+>>>>>>> 881bdfc725d94ee4719f4768988db38cba4460d7
 no
 no
 no
@@ -91,9 +140,15 @@ yes
 no
 no
 no
+<<<<<<< HEAD
+no
+no
+no
+=======
 yes
 no
 yes
+>>>>>>> 881bdfc725d94ee4719f4768988db38cba4460d7
 no
 no
 no
