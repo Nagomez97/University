@@ -1,3 +1,9 @@
+;******************************************************************************* 
+; Autores: José Ignacio Gómez García
+;          Óscar Gómez Borzdynski
+; Pareja 14
+;*******************************************************************************
+
 code segment
 	assume cs:code
 	org 100h
@@ -50,7 +56,12 @@ cifbuc:
 	cmp dl, 20
 	je printchar ;Imprimimos el espacio
 
-spa:
+	cmp dl, 13
+	je printchar
+
+	cmp dl, 10
+	je printchar
+
 	cmp dl, 60h ;minuscula
 	ja minus
 
@@ -73,12 +84,7 @@ printchar:
 	jmp cifbuc
 
 
-ter: ;Imprimir salto de linea y salir
-	mov dl, 13
-	int 21h
-	mov dl, 10
-	int 21h
-
+ter: ;Salir
 	ret
 cesar endp
 
