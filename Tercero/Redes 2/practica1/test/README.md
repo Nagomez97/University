@@ -1,0 +1,1 @@
+Lugar donde se encuentran los ficheros de código que generan programas de prueba. Deben tener un método main.

@@ -1,0 +1,1 @@
+Lugar donde se encuentran los ficheros del servidor al que se podrá acceder mediante peticiones.

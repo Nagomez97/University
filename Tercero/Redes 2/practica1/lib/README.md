@@ -1,0 +1,1 @@
+Lugar donde se guardan las librerías compiladas, son de tipo .a.

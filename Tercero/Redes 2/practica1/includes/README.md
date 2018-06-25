@@ -1,0 +1,1 @@
+Carpeta donde se sitúan las cabeceras realizadas por nosotros, los ficheros son de tipo .h.
